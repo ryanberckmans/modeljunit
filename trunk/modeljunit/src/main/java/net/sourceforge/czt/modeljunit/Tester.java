@@ -249,4 +249,50 @@ public abstract class Tester
     rand_ = old;
     return graph;
   }
+
+  /** Generate a graph using a breadth-first approach with optimisations.
+   *  <p>
+   *  Note that this method uses a fresh random number generator
+   *  (with FIXEDSEED) to avoid modifying the random number
+   *  generator {@link #getRandom()} that is used for test generation.
+   *  </p>
+   *  <p>
+   *  The approach taken by this method is to maintain two queues:
+   *  <ul>
+   *  <li>a high priority queue, consisting of actions and guards that have 
+   *      not previously been encountered, and</li>
+   *  <li>a low priority queue, consisting of transitions that have not 
+   *      previously been taken, and high-priority transitions beyond 
+   *      depth {@code maxDepth}.</li>
+   *  </ul>
+   *  </p>
+   *
+   *  @param maxDepth An upper bound on the depth to explore, 
+   *            to avoid eternal exploration of large graphs.
+   *  @param clear If this is true, the TODO and DONE flags on each
+   *            transition of the graph are cleared after the graph is built.
+   *            This is recommended, so that algorithms like GreedyTester
+   *            get a fresh view of the graph.
+   *  @see GraphListener.isComplete()
+   */
+  public GraphListener buildGraphBreadthFirst(int maxDepth, boolean clear)
+  {
+    Random old = rand_;
+    rand_ = new Random(FIXEDSEED);
+    GraphListener graph = (GraphListener) model_.addListener("graph");
+    boolean wasTesting = model_.setTesting(false);
+    model_.doReset("Buildgraph");
+   
+    
+ 
+    model_.setTesting(wasTesting);
+    model_.doReset("Buildgraph");
+    if (clear) {
+      graph.clearDoneTodo();
+    }
+
+    // restore the original random number generator.
+    rand_ = old;
+    return graph;
+  }
 }
