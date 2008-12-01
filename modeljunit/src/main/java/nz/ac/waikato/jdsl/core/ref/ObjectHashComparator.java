@@ -22,7 +22,7 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.core.ref;
+package nz.ac.waikato.jdsl.core.ref;
 
 /** 
  * Implements the JDSL HashComparator interface in terms of Java's
@@ -32,7 +32,7 @@ package net.sourceforge.czt.jdsl.core.ref;
  * @version JDSL 2.1.1 
  */
 public class ObjectHashComparator 
-  implements net.sourceforge.czt.jdsl.core.api.HashComparator {
+  implements nz.ac.waikato.jdsl.core.api.HashComparator {
 
   /** 
     * @param o Object you propose to compare with this comparator

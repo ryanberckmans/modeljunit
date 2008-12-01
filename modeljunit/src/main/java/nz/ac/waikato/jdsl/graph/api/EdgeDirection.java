@@ -22,7 +22,7 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.graph.api;
+package nz.ac.waikato.jdsl.graph.api;
 
 /**
  * Interface containing constants for specifying which edges are desired in

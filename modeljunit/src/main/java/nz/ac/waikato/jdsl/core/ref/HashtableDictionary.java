@@ -22,9 +22,9 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.core.ref;
+package nz.ac.waikato.jdsl.core.ref;
 
-import net.sourceforge.czt.jdsl.core.api.*;
+import nz.ac.waikato.jdsl.core.api.*;
 import java.util.Vector;
 
 /** 
@@ -714,7 +714,7 @@ public class HashtableDictionary extends AbstractDictionary
      */
     private HashtableData iPrev;
     /** 
-     *The net.sourceforge.czt.jdsl.core.api.Container in which this Locator resides 
+     *The nz.ac.waikato.jdsl.core.api.Container in which this Locator resides 
      */
     private Container iContainer;
     /**

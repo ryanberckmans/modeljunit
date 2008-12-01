@@ -17,9 +17,9 @@ along with CZT; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package net.sourceforge.czt.modeljunit;
+package nz.ac.waikato.modeljunit;
 
-import net.sourceforge.czt.modeljunit.coverage.TransitionCoverage;
+import nz.ac.waikato.modeljunit.coverage.TransitionCoverage;
 import junit.framework.TestCase;
 
 public class ListenerFactoryTest extends TestCase

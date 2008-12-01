@@ -90,7 +90,7 @@ public class TestExeModel
     
     m_modelClass = classLoader.loadClass(Parameter.getClassName());
     try {
-      m_modelObject = (net.sourceforge.czt.modeljunit.FsmModel) m_modelClass
+      m_modelObject = (nz.ac.waikato.modeljunit.FsmModel) m_modelClass
           .newInstance();
       return true;
     }

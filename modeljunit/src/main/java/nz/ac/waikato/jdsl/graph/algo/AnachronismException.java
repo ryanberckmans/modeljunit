@@ -22,7 +22,7 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.graph.algo;
+package nz.ac.waikato.jdsl.graph.algo;
 
 
 

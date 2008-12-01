@@ -22,20 +22,20 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.core.ref;
+package nz.ac.waikato.jdsl.core.ref;
 
 
 
 /** 
  * Takes a <code>java.util.Comparator</code> and adapts it to the
- * <code>net.sourceforge.czt.jdsl.core.api.Comparator</code>.
+ * <code>nz.ac.waikato.jdsl.core.api.Comparator</code>.
  *
  * @author Mike Boilen (mgb)
  * @author Luca Vismara (lv)
  * @version JDSL 2.1.1 
  */
 public class ComparatorExtender extends AbstractComparator
-  implements net.sourceforge.czt.jdsl.core.api.Comparator {
+  implements nz.ac.waikato.jdsl.core.api.Comparator {
 
   /**
    * The underlying comparator.

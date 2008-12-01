@@ -17,7 +17,7 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package net.sourceforge.czt.modeljunit;
+package nz.ac.waikato.modeljunit;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

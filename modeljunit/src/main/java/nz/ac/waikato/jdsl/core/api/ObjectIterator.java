@@ -22,7 +22,7 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.core.api;
+package nz.ac.waikato.jdsl.core.api;
 
 import java.util.NoSuchElementException;
 

@@ -57,9 +57,9 @@ public class OptionPanelRandomWalk extends OptionPanelAdapter
       // Initialize model test case by using the loaded model
       // Tester tester = new GreedyTester(new SimpleSet());
       Class<?> testerClass = Class
-          .forName("net.sourceforge.czt.modeljunit.RandomTester");
+          .forName("nz.ac.waikato.modeljunit.RandomTester");
       Constructor<?> con = testerClass.getConstructor(new Class[]{Class
-          .forName("net.sourceforge.czt.modeljunit.FsmModel")});
+          .forName("nz.ac.waikato.modeljunit.FsmModel")});
       m_tester[idx] = (RandomTester) con.newInstance(new Object[]{TestExeModel
           .getModelObject()});
     }

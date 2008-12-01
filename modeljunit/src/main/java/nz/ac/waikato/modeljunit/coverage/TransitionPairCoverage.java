@@ -21,12 +21,12 @@ package nz.ac.waikato.modeljunit.coverage;
 
 import java.util.Map;
 
-import net.sourceforge.czt.jdsl.graph.api.Edge;
-import net.sourceforge.czt.jdsl.graph.api.EdgeDirection;
-import net.sourceforge.czt.jdsl.graph.api.EdgeIterator;
-import net.sourceforge.czt.jdsl.graph.api.InspectableGraph;
-import net.sourceforge.czt.jdsl.graph.api.Vertex;
-import net.sourceforge.czt.jdsl.graph.api.VertexIterator;
+import nz.ac.waikato.jdsl.graph.api.Edge;
+import nz.ac.waikato.jdsl.graph.api.EdgeDirection;
+import nz.ac.waikato.jdsl.graph.api.EdgeIterator;
+import nz.ac.waikato.jdsl.graph.api.InspectableGraph;
+import nz.ac.waikato.jdsl.graph.api.Vertex;
+import nz.ac.waikato.jdsl.graph.api.VertexIterator;
 import nz.ac.waikato.modeljunit.Transition;
 import nz.ac.waikato.modeljunit.TransitionPair;
 

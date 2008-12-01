@@ -25,12 +25,12 @@ import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sourceforge.czt.jdsl.graph.api.Edge;
-import net.sourceforge.czt.jdsl.graph.api.EdgeIterator;
-import net.sourceforge.czt.jdsl.graph.api.Graph;
-import net.sourceforge.czt.jdsl.graph.api.InspectableGraph;
-import net.sourceforge.czt.jdsl.graph.api.Vertex;
-import net.sourceforge.czt.jdsl.graph.ref.IncidenceListGraph;
+import nz.ac.waikato.jdsl.graph.api.Edge;
+import nz.ac.waikato.jdsl.graph.api.EdgeIterator;
+import nz.ac.waikato.jdsl.graph.api.Graph;
+import nz.ac.waikato.jdsl.graph.api.InspectableGraph;
+import nz.ac.waikato.jdsl.graph.api.Vertex;
+import nz.ac.waikato.jdsl.graph.ref.IncidenceListGraph;
 import nz.ac.waikato.modeljunit.coverage.CoverageMetric;
 
 

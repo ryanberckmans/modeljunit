@@ -64,9 +64,9 @@ public class OptionPanelGreedy extends OptionPanelAdapter
       // Initialize model test case by using the loaded model
       // Tester tester = new GreedyTester(new SimpleSet());
       Class<?> testerClass = Class
-          .forName("net.sourceforge.czt.modeljunit.GreedyTester");
+          .forName("nz.ac.waikato.modeljunit.GreedyTester");
       Constructor<?> con = testerClass.getConstructor(new Class[]{Class
-          .forName("net.sourceforge.czt.modeljunit.FsmModel")});
+          .forName("nz.ac.waikato.modeljunit.FsmModel")});
       m_tester[idx] = (GreedyTester) con.newInstance(new Object[]{TestExeModel
           .getModelObject()});
     }

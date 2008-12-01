@@ -22,8 +22,8 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.core.algo.traversals;
-import net.sourceforge.czt.jdsl.core.api.*;
+package nz.ac.waikato.jdsl.core.algo.traversals;
+import nz.ac.waikato.jdsl.core.api.*;
 
 
 /**

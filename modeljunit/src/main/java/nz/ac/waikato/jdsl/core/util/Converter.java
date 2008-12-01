@@ -24,11 +24,11 @@
 // Jan 2006: marku@cs.waikato.ac.nz, added the full package name of
 //   PriorityQueue, to fix ambiguity with Java 1.5 PriorityQueue.
 
-package net.sourceforge.czt.jdsl.core.util;
+package nz.ac.waikato.jdsl.core.util;
 
-import net.sourceforge.czt.jdsl.core.ref.*;
-import net.sourceforge.czt.jdsl.core.api.*;
-import net.sourceforge.czt.jdsl.graph.api.*;
+import nz.ac.waikato.jdsl.core.ref.*;
+import nz.ac.waikato.jdsl.core.api.*;
+import nz.ac.waikato.jdsl.graph.api.*;
 import java.util.*;
 
 
@@ -184,7 +184,7 @@ public class Converter {
    * @throws InvalidKeyException if the map has a key that the dictionary 
    * can't deal with properly
    */
-  public static void mapToDictionary(Map from, net.sourceforge.czt.jdsl.core.api.Dictionary to)
+  public static void mapToDictionary(Map from, nz.ac.waikato.jdsl.core.api.Dictionary to)
     throws InvalidKeyException {
     Set fromset = from.entrySet();
     iteratorToDictionary(fromset.iterator(),to);
@@ -273,7 +273,7 @@ public class Converter {
    * locator or entry which the dictionary can't deal with
    */
   public static void iteratorToDictionary(Iterator from,
-					  net.sourceforge.czt.jdsl.core.api.Dictionary to)
+					  nz.ac.waikato.jdsl.core.api.Dictionary to)
     throws InvalidKeyException {
     while (from.hasNext()) {
       Object o = from.next();
@@ -300,7 +300,7 @@ public class Converter {
    * locator or entry which the PQ can't deal with
    */
   public static void iteratorToPriorityQueue(Iterator from, 
-					     net.sourceforge.czt.jdsl.core.api.PriorityQueue to)
+					     nz.ac.waikato.jdsl.core.api.PriorityQueue to)
     throws InvalidKeyException { 
     while (from.hasNext()) {
       Object o = from.next();

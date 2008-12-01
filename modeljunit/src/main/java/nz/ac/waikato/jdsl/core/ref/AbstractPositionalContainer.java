@@ -22,9 +22,9 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.core.ref;
+package nz.ac.waikato.jdsl.core.ref;
 
-import net.sourceforge.czt.jdsl.core.api.*;
+import nz.ac.waikato.jdsl.core.api.*;
 
 
 
@@ -35,7 +35,7 @@ import net.sourceforge.czt.jdsl.core.api.*;
  * some of the methods of container that aren't terribly pertinent to
  * a PositionalContainer.  Feel free to override any of these methods in
  * subclasses, but be certain that they work according
- * to the API in net.sourceforge.czt.jdsl.core.api.
+ * to the API in nz.ac.waikato.jdsl.core.api.
  *
  * Also handles isEmpty() from InspectableContainer.
  *

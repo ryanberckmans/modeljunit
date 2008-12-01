@@ -22,10 +22,10 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.graph.ref;
+package nz.ac.waikato.jdsl.graph.ref;
 
-import net.sourceforge.czt.jdsl.core.api.*;
-import net.sourceforge.czt.jdsl.graph.api.*;
+import nz.ac.waikato.jdsl.core.api.*;
+import nz.ac.waikato.jdsl.graph.api.*;
 
 /**
  * Takes an ObjectIterator known to be iterating over things that  

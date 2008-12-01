@@ -19,9 +19,9 @@
 
 package nz.ac.waikato.modeljunit;
 
-import net.sourceforge.czt.jdsl.graph.api.Edge;
-import net.sourceforge.czt.jdsl.graph.api.EdgeIterator;
-import net.sourceforge.czt.jdsl.graph.api.InspectableGraph;
+import nz.ac.waikato.jdsl.graph.api.Edge;
+import nz.ac.waikato.jdsl.graph.api.EdgeIterator;
+import nz.ac.waikato.jdsl.graph.api.InspectableGraph;
 import nz.ac.waikato.modeljunit.coverage.ActionCoverage;
 import nz.ac.waikato.modeljunit.coverage.CoverageMetric;
 import nz.ac.waikato.modeljunit.coverage.TransitionCoverage;

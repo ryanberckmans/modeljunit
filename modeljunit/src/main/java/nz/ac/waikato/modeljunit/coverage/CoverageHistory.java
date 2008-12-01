@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.czt.jdsl.graph.api.InspectableGraph;
-import net.sourceforge.czt.jdsl.graph.api.Vertex;
+import nz.ac.waikato.jdsl.graph.api.InspectableGraph;
+import nz.ac.waikato.jdsl.graph.api.Vertex;
 import nz.ac.waikato.modeljunit.AbstractListener;
 import nz.ac.waikato.modeljunit.Model;
 import nz.ac.waikato.modeljunit.TestFailureException;

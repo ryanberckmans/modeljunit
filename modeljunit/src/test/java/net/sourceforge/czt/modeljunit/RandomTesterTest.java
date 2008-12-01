@@ -17,19 +17,19 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package net.sourceforge.czt.modeljunit;
+package nz.ac.waikato.modeljunit;
 
 import java.io.StringWriter;
 import java.util.List;
 import java.util.Random;
 
-import net.sourceforge.czt.modeljunit.coverage.ActionCoverage;
-import net.sourceforge.czt.modeljunit.coverage.CoverageHistory;
-import net.sourceforge.czt.modeljunit.coverage.CoverageMetric;
-import net.sourceforge.czt.modeljunit.coverage.StateCoverage;
-import net.sourceforge.czt.modeljunit.coverage.TransitionCoverage;
-import net.sourceforge.czt.modeljunit.coverage.TransitionPairCoverage;
-import net.sourceforge.czt.modeljunit.examples.FSM;
+import nz.ac.waikato.modeljunit.coverage.ActionCoverage;
+import nz.ac.waikato.modeljunit.coverage.CoverageHistory;
+import nz.ac.waikato.modeljunit.coverage.CoverageMetric;
+import nz.ac.waikato.modeljunit.coverage.StateCoverage;
+import nz.ac.waikato.modeljunit.coverage.TransitionCoverage;
+import nz.ac.waikato.modeljunit.coverage.TransitionPairCoverage;
+import nz.ac.waikato.modeljunit.examples.FSM;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 

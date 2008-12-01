@@ -25,10 +25,10 @@
 //   from 'enum' to 'edges', because enum is a keyword of Java 1.5.
 
 
-package net.sourceforge.czt.jdsl.graph.ref;
+package nz.ac.waikato.jdsl.graph.ref;
 
-import net.sourceforge.czt.jdsl.core.api.*;
-import net.sourceforge.czt.jdsl.graph.api.*;
+import nz.ac.waikato.jdsl.core.api.*;
+import nz.ac.waikato.jdsl.graph.api.*;
 
 
 
@@ -58,7 +58,7 @@ import net.sourceforge.czt.jdsl.graph.api.*;
   * @version JDSL 2.1.1 
   */
 abstract public class AbstractGraph
-extends net.sourceforge.czt.jdsl.core.ref.AbstractPositionalContainer
+extends nz.ac.waikato.jdsl.core.ref.AbstractPositionalContainer
 implements InspectableGraph
 {
     
@@ -98,7 +98,7 @@ implements InspectableGraph
      * @see InspectableGraph#isDirected(Edge)
      */
     public EdgeIterator directedEdges() {
-	Sequence accum = new net.sourceforge.czt.jdsl.core.ref.NodeSequence();
+	Sequence accum = new nz.ac.waikato.jdsl.core.ref.NodeSequence();
 	EdgeIterator edges = edges();
 	while(edges.hasNext()) {
 	    Edge e = edges.nextEdge();
@@ -118,7 +118,7 @@ implements InspectableGraph
      * @see InspectableGraph#isDirected(Edge)
      */
     public EdgeIterator undirectedEdges() {
-	Sequence accum = new net.sourceforge.czt.jdsl.core.ref.NodeSequence();
+	Sequence accum = new nz.ac.waikato.jdsl.core.ref.NodeSequence();
 	EdgeIterator edges = edges();
 	while(edges.hasNext()) {
 	    Edge e = edges.nextEdge();
@@ -200,7 +200,7 @@ implements InspectableGraph
     public EdgeIterator connectingEdges(Vertex v1, Vertex v2) {
 	if( degree(v1) < degree(v2) ) {
 	    EdgeIterator edges = incidentEdges(v1);
-	    Sequence accum = new net.sourceforge.czt.jdsl.core.ref.NodeSequence();
+	    Sequence accum = new nz.ac.waikato.jdsl.core.ref.NodeSequence();
 	    while(edges.hasNext()) {
 		Edge e = edges.nextEdge();
 		if(opposite(v1,e) == v2) accum.insertLast(e);
@@ -209,7 +209,7 @@ implements InspectableGraph
 	}
 	else {
 	    EdgeIterator edges = incidentEdges(v2);
-	    Sequence accum = new net.sourceforge.czt.jdsl.core.ref.NodeSequence();
+	    Sequence accum = new nz.ac.waikato.jdsl.core.ref.NodeSequence();
 	    while(edges.hasNext()) {
 		Edge e = edges.nextEdge();
 		if(opposite(v2,e) == v1) accum.insertLast(e);
@@ -282,7 +282,7 @@ implements InspectableGraph
      */
     private VertexIterator _adjacentVertices(Vertex v,
 						 EdgeIterator edgelist) {
-	Sequence accum = new net.sourceforge.czt.jdsl.core.ref.NodeSequence();
+	Sequence accum = new nz.ac.waikato.jdsl.core.ref.NodeSequence();
 	Edge curr;
 	while (edgelist.hasNext()) {
 	    curr = edgelist.nextEdge();

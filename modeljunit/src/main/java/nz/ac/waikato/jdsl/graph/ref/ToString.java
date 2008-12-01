@@ -22,15 +22,15 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.graph.ref;
+package nz.ac.waikato.jdsl.graph.ref;
 
-import net.sourceforge.czt.jdsl.graph.api.*;
+import nz.ac.waikato.jdsl.graph.api.*;
 
 /** 
  * string representing a graph.  Since
  * all the useful methods are static, it should never be necessary to
  * create an instance of ToString.  Until I get around to writing
- * better documentation here, see net.sourceforge.czt.jdsl.core.ref.ToString for the style
+ * better documentation here, see nz.ac.waikato.jdsl.core.ref.ToString for the style
  * I use here.
  * 
  * @author Mark Handy
@@ -60,7 +60,7 @@ public class ToString {
   /** 
    * Code lifted shamelessly from rt's corresponding class in
    * jdsltools.testers.graph, then adapted to the style of my
-   * net.sourceforge.czt.jdsl.core.ref.ToString.
+   * nz.ac.waikato.jdsl.core.ref.ToString.
    */
   public static String stringfor( InspectableGraph g,
 				  VertexToString vts,

@@ -22,9 +22,9 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.core.ref;
+package nz.ac.waikato.jdsl.core.ref;
 
-import net.sourceforge.czt.jdsl.core.api.HashComparator;
+import nz.ac.waikato.jdsl.core.api.HashComparator;
 
 /**
  * An implementation of a HashComparator for java.lang.Integers

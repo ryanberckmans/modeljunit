@@ -22,7 +22,7 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.core.api;
+package nz.ac.waikato.jdsl.core.api;
 
 /**
  * All JDSL core containers provide a way to access their internal structure;

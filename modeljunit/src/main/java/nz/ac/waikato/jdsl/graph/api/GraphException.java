@@ -22,14 +22,14 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.graph.api;
+package nz.ac.waikato.jdsl.graph.api;
 
 import java.lang.RuntimeException;
 
 
 
 /** 
-  * <code>net.sourceforge.czt.jdsl.graph.api</code> package. 
+  * <code>nz.ac.waikato.jdsl.graph.api</code> package. 
   * Not intended ever to be instantiated directly.
   *
   * GraphExceptions (and its subclasses) can now take a "cause" to enhance
