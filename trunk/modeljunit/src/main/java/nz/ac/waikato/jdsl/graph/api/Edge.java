@@ -22,9 +22,9 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.graph.api;
+package nz.ac.waikato.jdsl.graph.api;
 
-import net.sourceforge.czt.jdsl.core.api.*;
+import nz.ac.waikato.jdsl.core.api.*;
 
 
 

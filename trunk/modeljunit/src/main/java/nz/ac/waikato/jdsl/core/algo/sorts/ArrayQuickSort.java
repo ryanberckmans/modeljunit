@@ -22,9 +22,9 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.core.algo.sorts;
+package nz.ac.waikato.jdsl.core.algo.sorts;
 
-import net.sourceforge.czt.jdsl.core.api.*;
+import nz.ac.waikato.jdsl.core.api.*;
 
 /** 
  * Performs an in-place quicksort in expected O(n log n)

@@ -22,9 +22,9 @@ package nz.ac.waikato.modeljunit.coverage;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sourceforge.czt.jdsl.graph.api.Edge;
-import net.sourceforge.czt.jdsl.graph.api.InspectableGraph;
-import net.sourceforge.czt.jdsl.graph.api.Vertex;
+import nz.ac.waikato.jdsl.graph.api.Edge;
+import nz.ac.waikato.jdsl.graph.api.InspectableGraph;
+import nz.ac.waikato.jdsl.graph.api.Vertex;
 import nz.ac.waikato.modeljunit.AbstractListener;
 import nz.ac.waikato.modeljunit.Model;
 import nz.ac.waikato.modeljunit.Transition;

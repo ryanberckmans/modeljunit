@@ -22,9 +22,9 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.graph.algo;
+package nz.ac.waikato.jdsl.graph.algo;
 
-import net.sourceforge.czt.jdsl.graph.api.GraphException;
+import nz.ac.waikato.jdsl.graph.api.GraphException;
 
 
 

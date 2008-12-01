@@ -21,9 +21,9 @@ package nz.ac.waikato.modeljunit.coverage;
 
 import java.util.Map;
 
-import net.sourceforge.czt.jdsl.graph.api.InspectableGraph;
-import net.sourceforge.czt.jdsl.graph.api.Vertex;
-import net.sourceforge.czt.jdsl.graph.api.VertexIterator;
+import nz.ac.waikato.jdsl.graph.api.InspectableGraph;
+import nz.ac.waikato.jdsl.graph.api.Vertex;
+import nz.ac.waikato.jdsl.graph.api.VertexIterator;
 import nz.ac.waikato.modeljunit.Transition;
 
 /** Counts the number of times each state has been entered.

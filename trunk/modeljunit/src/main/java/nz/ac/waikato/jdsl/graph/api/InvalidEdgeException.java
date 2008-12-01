@@ -22,7 +22,7 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.graph.api;
+package nz.ac.waikato.jdsl.graph.api;
 
 
 
@@ -30,7 +30,7 @@ package net.sourceforge.czt.jdsl.graph.api;
  * An object of this class gets thrown when topological information
  * related to <code>Edge</code>s is somehow incorrect. Note that this
  * exception is not intended to replace the
- * <code>net.sourceforge.czt.jdsl.core.api.InvalidAccessorException</code>, 
+ * <code>nz.ac.waikato.jdsl.core.api.InvalidAccessorException</code>, 
  * which covers cases where the edge passed to a function is null, or
  * of a different implementation class, or from a different container.
  * <p>

@@ -17,15 +17,15 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package net.sourceforge.czt.modeljunit;
+package nz.ac.waikato.modeljunit;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sourceforge.czt.modeljunit.coverage.CoverageMetric;
-import net.sourceforge.czt.modeljunit.coverage.TransitionCoverage;
-import net.sourceforge.czt.modeljunit.examples.SimpleSet;
+import nz.ac.waikato.modeljunit.coverage.CoverageMetric;
+import nz.ac.waikato.modeljunit.coverage.TransitionCoverage;
+import nz.ac.waikato.modeljunit.examples.SimpleSet;
 import junit.framework.TestCase;
 
 /**

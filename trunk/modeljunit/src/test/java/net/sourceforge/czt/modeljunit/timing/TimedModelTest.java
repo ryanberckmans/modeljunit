@@ -1,9 +1,9 @@
-package net.sourceforge.czt.modeljunit.timing;
+package nz.ac.waikato.modeljunit.timing;
 
 import java.util.Random;
 
 import junit.framework.TestCase;
-import net.sourceforge.czt.modeljunit.Action;
+import nz.ac.waikato.modeljunit.Action;
 
 
 public class TimedModelTest extends TestCase{

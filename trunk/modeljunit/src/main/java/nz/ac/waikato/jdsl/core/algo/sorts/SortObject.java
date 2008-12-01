@@ -22,9 +22,9 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.core.algo.sorts;
+package nz.ac.waikato.jdsl.core.algo.sorts;
 
-import net.sourceforge.czt.jdsl.core.api.*;
+import nz.ac.waikato.jdsl.core.api.*;
 
 /**
  * Algorithm interface for sorting a sequence according to a given
@@ -35,7 +35,7 @@ import net.sourceforge.czt.jdsl.core.api.*;
  * <p>
  * If the comparator encounters an element which it is unable to compare, a
  * ClassCastException will be thrown, as is documented in the
- * EqualityComparator and Comparator interfaces in net.sourceforge.czt.jdsl.core.api.
+ * EqualityComparator and Comparator interfaces in nz.ac.waikato.jdsl.core.api.
  * <p>
  * Running times (time complexities) given for individual algorithms
  * depend on the assumption that the comparator can compare two 

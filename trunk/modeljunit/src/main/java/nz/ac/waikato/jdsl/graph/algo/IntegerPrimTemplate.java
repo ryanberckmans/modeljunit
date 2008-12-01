@@ -22,10 +22,10 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.graph.algo;
+package nz.ac.waikato.jdsl.graph.algo;
 
-import net.sourceforge.czt.jdsl.core.api.*;
-import net.sourceforge.czt.jdsl.graph.api.*;
+import nz.ac.waikato.jdsl.core.api.*;
+import nz.ac.waikato.jdsl.graph.api.*;
 
 /**
  * Implementation of the algorithm of Prim and Jarnik for finding a
@@ -243,7 +243,7 @@ public abstract class IntegerPrimTemplate {
     /** 
      * Can be overridden to supply a priority queue of your
      * choosing, but the default implementation, which gives an empty   
-     * net.sourceforge.czt.jdsl.core.ref.ArrayHeap, is probably sufficient for most
+     * nz.ac.waikato.jdsl.core.ref.ArrayHeap, is probably sufficient for most
      * purposes.  The priority queue must be able to accept keys of
      * type Integer.  If you choose to override the method, 
      * for typical applications you should return an empty priority
@@ -252,8 +252,8 @@ public abstract class IntegerPrimTemplate {
      * @return PriorityQueue to be used by the algorithm
      */
     protected PriorityQueue newPQ() {
-	return new net.sourceforge.czt.jdsl.core.ref.ArrayHeap
-	    ( new net.sourceforge.czt.jdsl.core.ref.IntegerComparator() );
+	return new nz.ac.waikato.jdsl.core.ref.ArrayHeap
+	    ( new nz.ac.waikato.jdsl.core.ref.IntegerComparator() );
     }
     
     /** 

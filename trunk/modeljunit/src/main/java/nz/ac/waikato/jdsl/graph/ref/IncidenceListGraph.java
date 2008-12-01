@@ -22,11 +22,11 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.graph.ref ;
+package nz.ac.waikato.jdsl.graph.ref ;
 
-import net.sourceforge.czt.jdsl.core.api.*;
-import net.sourceforge.czt.jdsl.core.ref.NodeSequence;
-import net.sourceforge.czt.jdsl.graph.api.*;
+import nz.ac.waikato.jdsl.core.api.*;
+import nz.ac.waikato.jdsl.core.ref.NodeSequence;
+import nz.ac.waikato.jdsl.graph.api.*;
 
 
 
@@ -539,7 +539,7 @@ implements Graph, EdgeDirection {
 
 
     public String toString() {
-	return net.sourceforge.czt.jdsl.graph.ref.ToString.stringfor(this);
+	return nz.ac.waikato.jdsl.graph.ref.ToString.stringfor(this);
     }
 
 
@@ -698,7 +698,7 @@ implements Graph, EdgeDirection {
      *
      * @see IncidenceListGraph
      */
-    private static class ILVertex extends net.sourceforge.czt.jdsl.core.ref.NodeSequence.FNSNode
+    private static class ILVertex extends nz.ac.waikato.jdsl.core.ref.NodeSequence.FNSNode
     implements Vertex {
 
 	// vert holds circularly linked list of edges, with one dummy node
@@ -778,7 +778,7 @@ implements Graph, EdgeDirection {
          * @return  All incident edges (in, out, and undirected)
          */
         EdgeIterator incidentEdges( int edgetype ) {
-	    Sequence accum = new net.sourceforge.czt.jdsl.core.ref.NodeSequence();
+	    Sequence accum = new nz.ac.waikato.jdsl.core.ref.NodeSequence();
 	    ILEdge e = edummy_.next();
 	    while( e != edummy_ ) {
 		int num = e.numMatches( this, edgetype );
@@ -816,7 +816,7 @@ implements Graph, EdgeDirection {
         }
 
 	public String toString() {
-	    return net.sourceforge.czt.jdsl.graph.ref.ToString.stringfor(this);
+	    return nz.ac.waikato.jdsl.graph.ref.ToString.stringfor(this);
 	}
 
     } // class ILVertex
@@ -833,7 +833,7 @@ implements Graph, EdgeDirection {
      * is also a position in the global edge list.
      */
   private static abstract class ILEdge
-    extends net.sourceforge.czt.jdsl.core.ref.NodeSequence.FNSNode implements Edge {
+    extends nz.ac.waikato.jdsl.core.ref.NodeSequence.FNSNode implements Edge {
 
 	private boolean isDirected_;
 
@@ -850,7 +850,7 @@ implements Graph, EdgeDirection {
 	}
 
 	public String toString() {
-	    return net.sourceforge.czt.jdsl.graph.ref.ToString.stringfor(this);
+	    return nz.ac.waikato.jdsl.graph.ref.ToString.stringfor(this);
 	}
 
 	// an edge, when being removed, removes itself from

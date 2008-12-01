@@ -24,8 +24,8 @@ import java.util.HashMap;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import net.sourceforge.czt.jdsl.graph.api.Edge;
-import net.sourceforge.czt.jdsl.graph.api.EdgeIterator;
+import nz.ac.waikato.jdsl.graph.api.Edge;
+import nz.ac.waikato.jdsl.graph.api.EdgeIterator;
 import nz.ac.waikato.modeljunit.GraphListener;
 import nz.ac.waikato.modeljunit.Transition;
 import edu.uci.ics.jung.algorithms.layout.CircleLayout;

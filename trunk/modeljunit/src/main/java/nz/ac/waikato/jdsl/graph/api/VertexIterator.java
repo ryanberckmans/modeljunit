@@ -22,7 +22,7 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.graph.api;
+package nz.ac.waikato.jdsl.graph.api;
 
 import java.util.NoSuchElementException;
 
@@ -42,7 +42,7 @@ import java.util.NoSuchElementException;
  * @version JDSL 2.1.1 
  * @author Mark Handy
  */
-public interface VertexIterator extends net.sourceforge.czt.jdsl.core.api.PositionIterator {
+public interface VertexIterator extends nz.ac.waikato.jdsl.core.api.PositionIterator {
 
     /**
      * @return Next vertex to consider

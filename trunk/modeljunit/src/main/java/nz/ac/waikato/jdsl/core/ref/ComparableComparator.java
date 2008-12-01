@@ -22,7 +22,7 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.core.ref;
+package nz.ac.waikato.jdsl.core.ref;
 
 import java.lang.Comparable;
 
@@ -38,7 +38,7 @@ import java.lang.Comparable;
  * @version JDSL 2.1.1 
  */
 public class ComparableComparator extends AbstractComparator
-  implements net.sourceforge.czt.jdsl.core.api.Comparator {
+  implements nz.ac.waikato.jdsl.core.api.Comparator {
 
   /** 
    * Invokes the <code>compareTo</code> method of <code>x1</code> on

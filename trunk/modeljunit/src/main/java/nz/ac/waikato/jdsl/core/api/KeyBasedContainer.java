@@ -22,7 +22,7 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.core.api;
+package nz.ac.waikato.jdsl.core.api;
 
 /**
  * Key-based containers are containers that store (key,element) pairs;

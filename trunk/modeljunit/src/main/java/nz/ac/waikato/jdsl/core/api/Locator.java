@@ -22,7 +22,7 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.core.api;
+package nz.ac.waikato.jdsl.core.api;
 
 /** A locator is a coat-check, of sorts, for a (key,element) pair inside
  * a KeyBasedContainer.  If you give the container a pair to hold, the

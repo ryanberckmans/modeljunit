@@ -22,13 +22,13 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.graph.algo;
+package nz.ac.waikato.jdsl.graph.algo;
 
-import net.sourceforge.czt.jdsl.graph.api.*;
-import net.sourceforge.czt.jdsl.graph.ref.*;
-import net.sourceforge.czt.jdsl.core.api.Sequence;
-import net.sourceforge.czt.jdsl.core.api.ObjectIterator;
-import net.sourceforge.czt.jdsl.core.ref.NodeSequence;
+import nz.ac.waikato.jdsl.graph.api.*;
+import nz.ac.waikato.jdsl.graph.ref.*;
+import nz.ac.waikato.jdsl.core.api.Sequence;
+import nz.ac.waikato.jdsl.core.api.ObjectIterator;
+import nz.ac.waikato.jdsl.core.ref.NodeSequence;
 
 
 /**

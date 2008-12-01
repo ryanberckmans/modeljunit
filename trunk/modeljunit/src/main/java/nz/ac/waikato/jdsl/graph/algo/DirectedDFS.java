@@ -22,7 +22,7 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.graph.algo;
+package nz.ac.waikato.jdsl.graph.algo;
 
 /**
   * Extends DFS to create a directed Depth First Search.
@@ -32,7 +32,7 @@ package net.sourceforge.czt.jdsl.graph.algo;
   * @version JDSL 2.1.1 
   **/
 
-import net.sourceforge.czt.jdsl.graph.api.*;
+import nz.ac.waikato.jdsl.graph.api.*;
 
 public class DirectedDFS extends DFS {
 

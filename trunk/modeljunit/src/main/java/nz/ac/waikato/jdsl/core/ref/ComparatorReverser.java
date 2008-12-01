@@ -22,9 +22,9 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.core.ref;
+package nz.ac.waikato.jdsl.core.ref;
 
-import net.sourceforge.czt.jdsl.core.api.Comparator;
+import nz.ac.waikato.jdsl.core.api.Comparator;
 
 
 
@@ -54,7 +54,7 @@ public class ComparatorReverser extends AbstractComparator
   }
 
 
-  // instance methods from net.sourceforge.czt.jdsl.core.api.Comparator
+  // instance methods from nz.ac.waikato.jdsl.core.api.Comparator
 
   /**
    * @return the negation of a <code>compare(Object,Object)</code>

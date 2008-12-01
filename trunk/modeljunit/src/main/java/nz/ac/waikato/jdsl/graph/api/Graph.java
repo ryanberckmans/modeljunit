@@ -22,9 +22,9 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.graph.api;
+package nz.ac.waikato.jdsl.graph.api;
 
-import net.sourceforge.czt.jdsl.core.api.*;
+import nz.ac.waikato.jdsl.core.api.*;
 
 
 
@@ -34,7 +34,7 @@ import net.sourceforge.czt.jdsl.core.api.*;
  * self-loops are allowed.  The graph can be disconnected.
  * 
  * Note that the <code>Vertex</code> and <code>Edge</code> interfaces,
- * which are subinterfaces of <code>net.sourceforge.czt.jdsl.core.api.Position</code>, are
+ * which are subinterfaces of <code>nz.ac.waikato.jdsl.core.api.Position</code>, are
  * empty interfaces, for type safety only.
  *
  * @author Luca Vismara (lv)

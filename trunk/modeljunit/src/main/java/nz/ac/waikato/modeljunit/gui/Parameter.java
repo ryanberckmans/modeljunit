@@ -27,7 +27,7 @@ public class Parameter
   /** The path to the top-level package directory of the model. */
   private static String m_strPackageLocation;
 
-  /** The Java package name.  Eg. net.sourceforge.czt.modeljunit */
+  /** The Java package name.  Eg. nz.ac.waikato.modeljunit */
   private static String m_strPackageName;
 
   /** The path to the directory containing the model files. */

@@ -22,10 +22,10 @@
   PERFORMANCE OF THIS SOFTWARE.
 */
 
-package net.sourceforge.czt.jdsl.graph.algo;
+package nz.ac.waikato.jdsl.graph.algo;
 
-import net.sourceforge.czt.jdsl.graph.api.*;
-import net.sourceforge.czt.jdsl.core.api.PositionIterator;
+import nz.ac.waikato.jdsl.graph.api.*;
+import nz.ac.waikato.jdsl.core.api.PositionIterator;
 
 /**
   * This algorithm class performs a topological ordering on a
@@ -164,8 +164,8 @@ public class TopologicalSort extends AbstractTopologicalSort {
 				      + "on a cyclic graph");
     }
     else{
-      PositionIterator pi = new net.sourceforge.czt.jdsl.core.ref.ArrayPositionIterator(array_);
-      return new net.sourceforge.czt.jdsl.graph.ref.VertexIteratorAdapter(pi);
+      PositionIterator pi = new nz.ac.waikato.jdsl.core.ref.ArrayPositionIterator(array_);
+      return new nz.ac.waikato.jdsl.graph.ref.VertexIteratorAdapter(pi);
     }
   }
 

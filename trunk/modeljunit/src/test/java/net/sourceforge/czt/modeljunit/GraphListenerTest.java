@@ -1,14 +1,14 @@
-package net.sourceforge.czt.modeljunit;
+package nz.ac.waikato.modeljunit;
 
 import java.util.BitSet;
 
 import org.junit.Test;
 
-import net.sourceforge.czt.jdsl.graph.api.Edge;
-import net.sourceforge.czt.jdsl.graph.api.EdgeIterator;
-import net.sourceforge.czt.jdsl.graph.api.InspectableGraph;
-import net.sourceforge.czt.jdsl.graph.api.Vertex;
-import net.sourceforge.czt.modeljunit.examples.FSM;
+import nz.ac.waikato.jdsl.graph.api.Edge;
+import nz.ac.waikato.jdsl.graph.api.EdgeIterator;
+import nz.ac.waikato.jdsl.graph.api.InspectableGraph;
+import nz.ac.waikato.jdsl.graph.api.Vertex;
+import nz.ac.waikato.modeljunit.examples.FSM;
 import junit.framework.TestCase;
 
 public class GraphListenerTest extends TestCase

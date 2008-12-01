@@ -17,7 +17,7 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package net.sourceforge.czt.modeljunit;
+package nz.ac.waikato.modeljunit;
 
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
@@ -29,10 +29,10 @@ import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import net.sourceforge.czt.modeljunit.coverage.TransitionCoverage;
-import net.sourceforge.czt.modeljunit.examples.FSM;
-import net.sourceforge.czt.modeljunit.examples.SimpleSetWithAdaptor;
-import net.sourceforge.czt.modeljunit.examples.StringSetBuggy;
+import nz.ac.waikato.modeljunit.coverage.TransitionCoverage;
+import nz.ac.waikato.modeljunit.examples.FSM;
+import nz.ac.waikato.modeljunit.examples.SimpleSetWithAdaptor;
+import nz.ac.waikato.modeljunit.examples.StringSetBuggy;
 
 /**
  * Unit tests for Model
@@ -65,7 +65,7 @@ public class ModelTest extends TestCase
     Model model = new Model(sut);
     assertEquals(sut, model.getModel());
     assertEquals(FSM.class, model.getModelClass());
-    assertEquals("net.sourceforge.czt.modeljunit.examples.FSM",
+    assertEquals("nz.ac.waikato.modeljunit.examples.FSM",
         model.getModelName());
     assertEquals(4, model.getNumActions());
     Assert.assertEquals("0", model.getCurrentState());
