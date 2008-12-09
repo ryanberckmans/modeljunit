@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.sourceforge.czt.modeljunit</groupId>
   <artifactId>modeljunit</artifactId>
-  <version>1.5-SNAPSHOT</version>
+  <version>1.5</version>
   <packaging>jar</packaging>
   <name>ModelJUnit</name>
   <description>

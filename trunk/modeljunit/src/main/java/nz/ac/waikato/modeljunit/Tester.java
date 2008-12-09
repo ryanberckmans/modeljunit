@@ -266,6 +266,8 @@ public abstract class Tester
    *      depth {@code maxDepth}.</li>
    *  </ul>
    *  </p>
+   *  <p>Note that this function is incomplete and will be available in a
+   *     subsequent release.</p>
    *
    *  @param maxDepth An upper bound on the depth to explore, 
    *            to avoid eternal exploration of large graphs.
@@ -282,8 +284,6 @@ public abstract class Tester
     GraphListener graph = (GraphListener) model_.addListener("graph");
     boolean wasTesting = model_.setTesting(false);
     model_.doReset("Buildgraph");
-   
-    
  
     model_.setTesting(wasTesting);
     model_.doReset("Buildgraph");
