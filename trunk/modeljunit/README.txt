@@ -12,7 +12,7 @@
   and Bruno Legeard: <Practical Model-Based Testing: A Tools Approach>,
   Elsevier 2007}}.
 
-  This is a version 1.1 of ModelJUnit.  Note that it uses the annotations
+  This is version 1.5 of ModelJUnit.  Note that it uses the annotations
   feature of Java 5.0, so requires JDK 1.5 or higher to run.
 
 
@@ -42,11 +42,10 @@ Documentation
 
   then point your web browser at <<<target/site/apidocs/index.html>>>.
   Start by reading the "description" section in the
-  net.sourceforge.czt.modeljunit package.
+  nz.ac.waikato.modeljunit package.
 
   These Java docs are also available from
   {{{http://www.cs.waikato.ac.nz/~marku/mbt/modeljunit} here}}.
-
 
 
 Using ModelJUnit
@@ -54,6 +53,6 @@ Using ModelJUnit
   See {{{http://www.cs.waikato.ac.nz/~marku/mbt/modeljunit} instructions
   and examples}} on how to use ModelJUnit to generate tests.  
   There are also lots of examples in the 
-  <<<src/main/java/net/sourceforge/czt/modeljunit/examples>>>
+  <<<src/main/java/nz/ac/modeljunit/examples>>>
   directory of this distribution.
 
