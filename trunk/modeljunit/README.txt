@@ -21,8 +21,7 @@ Compilation
   To compile modeljunit you need Maven 2.0.4 or higher from maven.apache.org.
   Then you can run the following Maven command in this modeljunit directory
   (which should contain this README.txt file, a pom.xml file, and directories
-  called jdsl and src).  The parent directory must contain the CZT top-level
-  pom.xml file.
+  called jdsl and src). 
 
 +-----------------+
     mvn install
