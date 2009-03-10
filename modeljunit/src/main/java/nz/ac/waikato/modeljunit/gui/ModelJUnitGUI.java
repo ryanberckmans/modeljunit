@@ -21,6 +21,7 @@ package nz.ac.waikato.modeljunit.gui;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 
 import nz.ac.waikato.modeljunit.gui.visualisaton.PanelJUNGVisualisation;
 
@@ -33,7 +34,10 @@ public class ModelJUnitGUI implements Runnable
    private JFrame mAppWindow;
    private String mAppWindowTitle = "ModelJUnit - Untitled*";
 
+   private Project mProject;
+
    public ModelJUnitGUI() {
+      mProject = new Project();
       buildGUI();
    }
 
@@ -96,6 +100,13 @@ public class ModelJUnitGUI implements Runnable
 
    public void run() {
       mAppWindow.setVisible(true);
+
+      Project pr = new Project();
+      pr.setName("Test Project");
+      pr.setFileName(new File("test.project"));
+      pr.setProperty("foobar",new Integer(123));
+      pr.setProperty("test","hello, world");
+      Project.save(pr);
    }
 
    public static void main(String[] args) {
