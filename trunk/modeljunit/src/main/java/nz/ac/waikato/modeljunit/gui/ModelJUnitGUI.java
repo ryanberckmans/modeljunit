@@ -59,7 +59,7 @@ public class ModelJUnitGUI implements Runnable
       mAppWindow.setJMenuBar(new ModelJUnitMenuBar());
 
       // Add tool bar:
-      JPanel toolbar = new JPanel();
+      JPanel toolbar = new Toolbar(this);
       toolbar.setPreferredSize(new Dimension(750,40));
 
       mAppWindow.getContentPane().add(toolbar, BorderLayout.PAGE_START);
@@ -68,7 +68,7 @@ public class ModelJUnitGUI implements Runnable
       JPanel infopanel = new JPanel();
       infopanel.setPreferredSize(new Dimension(120,550));
 
-      mAppWindow.getContentPane().add(infopanel, BorderLayout.LINE_START);
+      //mAppWindow.getContentPane().add(infopanel, BorderLayout.LINE_START);
       
       // Add visualiser
 
