@@ -117,7 +117,7 @@
               </descriptorRefs>
               <archive>
                 <manifest>
-                  <mainClass>nz.ac.waikato.modeljunit.gui.Main</mainClass>
+                  <mainClass>nz.ac.waikato.modeljunit.gui.ModelJUnitGUI</mainClass>
                 </manifest>
               </archive>
             </configuration>
