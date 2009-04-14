@@ -215,7 +215,7 @@ public class TestExeModel
     // This writer updates the test results panel.
     Writer newWriter = new Writer()
     {
-      PanelResultViewer panel = PanelResultViewer.getResultViewerInstance();
+      //PanelResultViewer panel = PanelResultViewer.getResultViewerInstance();
 
       @Override
       public void close() throws IOException
@@ -234,7 +234,7 @@ public class TestExeModel
         for (int i = off; i < off + len; i++) {
           str.append(cbuf[i]);
         }
-        panel.updateRunTimeInformation(str.toString());
+        //panel.updateRunTimeInformation(str.toString());
       }
     };
     md.setOutput(newWriter);

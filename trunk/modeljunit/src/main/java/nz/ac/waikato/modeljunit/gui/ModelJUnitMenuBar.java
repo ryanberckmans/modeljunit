@@ -31,26 +31,51 @@ import java.awt.event.*;
  **/
 public class ModelJUnitMenuBar extends JMenuBar
 {
+   private ModelJUnitGUI mParent;
+
    private JMenu mFile = new JMenu("File");
    private JMenu mEdit = new JMenu("Edit");
    private JMenu mView = new JMenu("View");
    private JMenu mRun = new JMenu("Run");
    private JMenu mHelp = new JMenu("Help");
 
-
-   public ModelJUnitMenuBar() {
+   /** Construct a new Menu bar with appropriate action listener hooks.
+    *
+    * @param parent The ModelJUnitGUI frame to which this menu will be attached.
+    */
+   public ModelJUnitMenuBar(ModelJUnitGUI parent) {
       super();
+
+      mParent = parent;
       
       // Populate the "File" menu:
       JMenuItem item = new JMenuItem("New Project");
       item.setAccelerator(KeyStroke.getKeyStroke(
         KeyEvent.VK_N, ActionEvent.CTRL_MASK));
       mFile.add(item);
+ 
+      item.addActionListener(
+         new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+               System.out.println("New is pressed");
+            }
+         }
+      );
       
       item = new JMenuItem("Open Project...");
       item.setAccelerator(KeyStroke.getKeyStroke(
         KeyEvent.VK_O, ActionEvent.CTRL_MASK));
       mFile.add(item);     
+
+      item.addActionListener(
+         new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+               mParent.displayFileChooser();
+            }
+         }
+      );
  
       mFile.addSeparator();
 

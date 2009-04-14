@@ -20,10 +20,22 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 package nz.ac.waikato.modeljunit.gui;
 
 import javax.swing.*;
+
 import java.awt.*;
+
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+import java.util.regex.Matcher;
+
+import java.lang.reflect.Method;
 
 import nz.ac.waikato.modeljunit.gui.visualisaton.PanelJUNGVisualisation;
+
+import nz.ac.waikato.modeljunit.Action;
+
+import org.objectweb.asm.ClassReader;
 
 /** The main ModelJUnit GUI class.
  *
@@ -56,7 +68,7 @@ public class ModelJUnitGUI implements Runnable
       // * Status panel (Bottom)
 
       // Add menu bar:
-      mAppWindow.setJMenuBar(new ModelJUnitMenuBar());
+      mAppWindow.setJMenuBar(new ModelJUnitMenuBar(this));
 
       // Add tool bar:
       JPanel toolbar = new Toolbar(this);
@@ -108,6 +120,112 @@ public class ModelJUnitGUI implements Runnable
       pr.setProperty("test","hello, world");
       Project.save(pr);
    }
+
+   /** Display a file chooser and load the model.
+    *
+    * This needs to be broken up into two routines so that any
+    * model-related logic can be called without displaying the file
+    * chooser.  This is so that we can reload a model when opening
+    * a project.
+    **/
+   public void displayFileChooser()
+   {
+    // ------------ Open model from class file --------------
+    FileChooserFilter javaFileFilter = new FileChooserFilter("class",
+        "Java class Files");
+    JFileChooser chooser = new JFileChooser();
+    chooser.setCurrentDirectory(new File(Parameter.getModelChooserDirectory()));
+    chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    chooser.setDialogTitle("Select Model File");
+    chooser.addChoosableFileFilter(javaFileFilter);
+    int option = chooser.showOpenDialog(mAppWindow);
+
+    if (option == JFileChooser.APPROVE_OPTION) {
+      String errmsg = null;  // null means no errors yet
+      File f = chooser.getSelectedFile();
+      String wholePath = f.getAbsolutePath();
+      Parameter.setModelChooserDirectory(f.getParent());
+
+      // Use ASM to read the package and class name from the .class file
+      try {
+        ClassReader reader = new ClassReader(new FileInputStream(f));
+        String internalName = reader.getClassName();
+        int slash = internalName.lastIndexOf('/');
+        String className = internalName.substring(slash+1);
+        String packageName = "";
+        String classPath = "";
+        if (slash >= 0) {
+          packageName = internalName.substring(0, slash).replaceAll("/", ".");
+        }
+        //System.out.println("f.absolutePath="+f.getAbsolutePath());
+        //System.out.println("internalName="+internalName);
+        //System.out.println("className="+className);
+        //System.out.println("packageName="+packageName);
+
+        // now calculate the classpath for this .class file.
+        String sep = Matcher.quoteReplacement(File.separator);
+        String ignore = ("/"+internalName+".class").replaceAll("/", sep);
+        //System.out.println("ignore="+ignore);
+        if (wholePath.endsWith(ignore)) {
+          classPath = wholePath.substring(0, wholePath.lastIndexOf(ignore));
+          //System.out.println("MU: classPath="+classPath);
+        }
+        else {
+          errmsg = "Error calculating top of package from: "+wholePath;
+        }
+
+        // Load model from file and initialize the model object
+        int actionNumber = 0;
+        if (errmsg == null) {
+          Parameter.setModelPath(wholePath);
+          Parameter.setClassName(className);
+          Parameter.setPackageName(packageName);
+          Parameter.setPackageLocation(classPath);
+          if (TestExeModel.loadModelClassFromFile()) {
+            Class<?> testcase = TestExeModel.getModelClass();
+            for (Method method : testcase.getMethods()) {
+              if (method.isAnnotationPresent(Action.class)) {
+                actionNumber++;
+                TestExeModel.addMethod(method);
+              }
+            }
+          }
+          else {
+            errmsg = "Invalid model class: no @Action methods.";
+          }
+        }
+        if (errmsg == null) {
+          // We have successfully loaded a new model
+          //initializeTester(0);
+          //initializeTester(1);
+          //m_butExternalExecute.setEnabled(true);
+          String cName = Parameter.getPackageName()+"."+Parameter.getClassName();
+          setTitle("ModelJUnit: " + cName);
+          //m_modelInfo1.setText("Model:   "+cName);
+          //m_modelInfo2.setText("Path:     "+Parameter.getPackageLocation());
+          //m_modelInfo3.setText("Actions: "+actionNumber + " actions were loaded.");
+          //m_gui.newModel(); // tell the other panels about the new model
+        }
+      }
+      catch (IOException ex) {
+        errmsg = "Error reading .class file: "+ex.getLocalizedMessage();
+      }
+      if (errmsg != null) {
+        ErrorMessage.DisplayErrorMessage("Error loading model", errmsg);
+        TestExeModel.resetModelToNull();
+        Parameter.setModelPath("");
+        Parameter.setClassName("");
+        Parameter.setPackageName("");
+        Parameter.setPackageLocation("");
+        //m_modelInfo1.setText(" ");
+        //m_modelInfo2.setText(MSG_NO_MODEL);
+        //m_modelInfo3.setText(" ");
+        // TODO: could call m_gui.newModel() here too? (To reset all panels)
+      }
+    }
+  }
+
+
 
    public static void main(String[] args) {
       ModelJUnitGUI gui = new ModelJUnitGUI();

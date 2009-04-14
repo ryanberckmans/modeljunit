@@ -33,8 +33,11 @@ public class ClassFileLoader extends ClassLoader
     String strPL = Parameter.getPackageLocation();
     strPL = "file://" + strPL;
     String strPN = Parameter.getPackageName();
-    if (strPN.charAt(strPN.length() - 1) != '.')
+    if (strPN != null && strPN.length() > 0 && strPN.charAt(strPN.length() - 1) != '.')
       strPN = strPN + ".";
+
+    System.out.println("**** Loading: PL: " + strPL);
+    System.out.println("**** Loading: PN: " + strPN);
 
     ClassLoader prevCL = Thread.currentThread().getContextClassLoader();
     // Create the class loader by using the given URL
