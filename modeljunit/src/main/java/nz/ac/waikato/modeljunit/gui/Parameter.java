@@ -14,7 +14,7 @@ import nz.ac.waikato.modeljunit.RandomTester;
  * @author rong ID : 1005450 13th Aug 2007
  */
 
-public class Parameter
+public @XmlRootElement class Parameter
 {
   public static final String DEFAULT_DIRECTORY = System.getProperty("user.dir");
 
