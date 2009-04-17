@@ -58,7 +58,7 @@ public class ModelJUnitMenuBar extends JMenuBar
          new ActionListener(){
             public void actionPerformed(ActionEvent e)
             {
-               System.out.println("New is pressed");
+               mParent.showProjectDialog(null);
             }
          }
       );

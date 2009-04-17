@@ -8,6 +8,7 @@ package nz.ac.waikato.modeljunit.gui;
 import java.awt.Color;
 
 import nz.ac.waikato.modeljunit.RandomTester;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /*
  * Parameter.java

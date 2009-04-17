@@ -110,6 +110,10 @@ public class ModelJUnitGUI implements Runnable
       return mAppWindowTitle;
    }
 
+   public JFrame getFrame() {
+      return mAppWindow;
+   }
+
    public void run() {
       mAppWindow.setVisible(true);
 
@@ -225,6 +229,13 @@ public class ModelJUnitGUI implements Runnable
     }
   }
 
+   public void showProjectDialog(Project project) {
+      ProjectDialog pd;
+      if(project == null) pd = new ProjectDialog(this);
+      else pd = new ProjectDialog(this, project);
+
+      pd.setVisible(true);
+   }
 
 
    public static void main(String[] args) {
