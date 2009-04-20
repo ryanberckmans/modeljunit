@@ -166,6 +166,15 @@ public class ModelJUnitMenuBar extends JMenuBar
         KeyEvent.VK_R, ActionEvent.CTRL_MASK));
       mRun.add(item);
 
+      item.addActionListener(
+         new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+               mParent.runModel();
+            }
+         }
+      );
+
       this.add(mRun);
 
       // Populate the "Help" menu:

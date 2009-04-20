@@ -36,6 +36,9 @@ import nz.ac.waikato.modeljunit.gui.visualisaton.PanelJUNGVisualisation;
 import nz.ac.waikato.modeljunit.Action;
 import nz.ac.waikato.modeljunit.Model;
 import nz.ac.waikato.modeljunit.Tester;
+import nz.ac.waikato.modeljunit.GreedyTester;
+import nz.ac.waikato.modeljunit.coverage.CoverageHistory;
+import nz.ac.waikato.modeljunit.coverage.TransitionCoverage;
 
 import org.objectweb.asm.ClassReader;
 
@@ -52,8 +55,11 @@ public class ModelJUnitGUI implements Runnable
 
    private static Model mModel;
 
+   private boolean mGraphCurrent;
+
    public ModelJUnitGUI() {
       mProject = new Project();
+      mGraphCurrent = false;
       buildGUI();
    }
 
@@ -216,6 +222,9 @@ public class ModelJUnitGUI implements Runnable
 
           ModelJUnitGUI.setModel(mod);
 
+          mGraphCurrent = false;
+         // buildGraphGUI();
+
           //m_modelInfo1.setText("Model:   "+cName);
           //m_modelInfo2.setText("Path:     "+Parameter.getPackageLocation());
           //m_modelInfo3.setText("Actions: "+actionNumber + " actions were loaded.");
@@ -306,6 +315,38 @@ public class ModelJUnitGUI implements Runnable
    public static Model getModel() {
       return mModel;
    }
+
+   public void buildGraphGUI() {
+      if(mGraphCurrent) return;
+
+      JDialog dialog = new JDialog(mAppWindow,"Graph building in progress",true);
+      dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+      dialog.getContentPane().add(new JLabel("ModelJUnit is currently building a graph from your model.\nThis may take a few seconds."));
+      dialog.pack();
+      dialog.setVisible(true);
+
+      Tester tester = new GreedyTester(mModel);
+      tester.buildGraph(100000); 
+      mGraphCurrent = true; 
+
+      dialog.setVisible(false);
+   }
+
+
+   public void runModel() {
+      if(mModel == null) return;
+
+      buildGraphGUI();
+ 
+      /*CoverageHistory hist = new CoverageHistory(new TransitionCoverage(), 1);
+      tester.addCoverageMetric(hist);
+      tester.addListener("verbose");
+      while (hist.getPercentage() < 99.0)
+        tester.generate();
+      System.out.println("Transition Coverage ="+hist.toString());
+      System.out.println("History = "+hist.toCSV());*/
+   }
+
 
    public static void main(String[] args) {
       ModelJUnitGUI gui = new ModelJUnitGUI();
