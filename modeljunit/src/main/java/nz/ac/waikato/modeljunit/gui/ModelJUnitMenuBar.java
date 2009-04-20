@@ -117,16 +117,43 @@ public class ModelJUnitMenuBar extends JMenuBar
       item.setAccelerator(KeyStroke.getKeyStroke(
         KeyEvent.VK_A, ActionEvent.SHIFT_MASK+ActionEvent.CTRL_MASK));
       mView.add(item);  
+
+      item.addActionListener(
+         new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+               mParent.displayAnimateWindow();
+            }
+         }
+      );
  
       item = new JMenuItem("Results Window");
       item.setAccelerator(KeyStroke.getKeyStroke(
         KeyEvent.VK_R, ActionEvent.SHIFT_MASK+ActionEvent.CTRL_MASK));
       mView.add(item);
 
+      item.addActionListener(
+         new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+               mParent.displayResultsWindow();
+            }
+         }
+      );
+
       item = new JMenuItem("Coverage Window");
       item.setAccelerator(KeyStroke.getKeyStroke(
         KeyEvent.VK_C, ActionEvent.SHIFT_MASK+ActionEvent.CTRL_MASK));
       mView.add(item);
+
+      item.addActionListener(
+         new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+               mParent.displayCoverageWindow();
+            }
+         }
+      );
 
       this.add(mView);
 
