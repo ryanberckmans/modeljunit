@@ -237,6 +237,30 @@ public class ModelJUnitGUI implements Runnable
       pd.setVisible(true);
    }
 
+   /** Display the window that permits animation of models. **/
+   public void displayAnimateWindow() {
+      JFrame animate = new JFrame("Animator - ModelJUnit");
+      animate.setMinimumSize(new Dimension(760,500));
+      animate.setVisible(true);
+   }
+   
+   /** Display the window that shows coverage metrics for models. **/
+   public void displayCoverageWindow() {
+      JFrame coverage = new JFrame("Coverage - ModelJUnit");
+      PanelCoverage pc = PanelCoverage.getInstance();
+      coverage.setMinimumSize(new Dimension(760,500));
+      coverage.add(pc);
+      coverage.setVisible(true);
+   }
+
+   /** Display the window that shows test results. **/
+   public void displayResultsWindow() {
+      JFrame results = new JFrame("Results - ModelJUnit");
+      results.setMinimumSize(new Dimension(760,500));
+      PanelResultViewer prv = PanelResultViewer.getResultViewerInstance();
+      results.add(prv);
+      results.setVisible(true);
+   }
 
    public static void main(String[] args) {
       ModelJUnitGUI gui = new ModelJUnitGUI();
