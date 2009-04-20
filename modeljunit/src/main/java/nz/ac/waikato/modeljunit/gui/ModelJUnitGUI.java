@@ -34,6 +34,8 @@ import java.lang.reflect.Method;
 import nz.ac.waikato.modeljunit.gui.visualisaton.PanelJUNGVisualisation;
 
 import nz.ac.waikato.modeljunit.Action;
+import nz.ac.waikato.modeljunit.Model;
+import nz.ac.waikato.modeljunit.Tester;
 
 import org.objectweb.asm.ClassReader;
 
@@ -47,6 +49,8 @@ public class ModelJUnitGUI implements Runnable
    private String mAppWindowTitle = "ModelJUnit - Untitled*";
 
    private Project mProject;
+
+   private static Model mModel;
 
    public ModelJUnitGUI() {
       mProject = new Project();
@@ -191,6 +195,7 @@ public class ModelJUnitGUI implements Runnable
               if (method.isAnnotationPresent(Action.class)) {
                 actionNumber++;
                 TestExeModel.addMethod(method);
+                System.out.println("Added method #"+actionNumber);
               }
             }
           }
@@ -205,10 +210,16 @@ public class ModelJUnitGUI implements Runnable
           //m_butExternalExecute.setEnabled(true);
           String cName = Parameter.getPackageName()+"."+Parameter.getClassName();
           setTitle("ModelJUnit: " + cName);
+
+          //Tester tester = new Tester(TestExeModel.getModelObject());
+          Model mod = new Model(TestExeModel.getModelObject());
+
+          ModelJUnitGUI.setModel(mod);
+
           //m_modelInfo1.setText("Model:   "+cName);
           //m_modelInfo2.setText("Path:     "+Parameter.getPackageLocation());
           //m_modelInfo3.setText("Actions: "+actionNumber + " actions were loaded.");
-          //m_gui.newModel(); // tell the other panels about the new model
+          //newModel(); // tell the other panels about the new model
         }
       }
       catch (IOException ex) {
@@ -239,8 +250,34 @@ public class ModelJUnitGUI implements Runnable
 
    /** Display the window that permits animation of models. **/
    public void displayAnimateWindow() {
+      // if there is no model loaded, throw an error:
+      if(getModel() == null) {
+         System.err.println("Error: no model loaded");
+         //XXX: throw up a dialog box.
+         return;
+      }
+
       JFrame animate = new JFrame("Animator - ModelJUnit");
-      animate.setMinimumSize(new Dimension(760,500));
+      animate.setPreferredSize(new Dimension(760,500));
+      PanelAnimator pa = PanelAnimator.getInstance();
+      pa.newModel();
+      
+      // Add the action history, which the animator supplies.
+      JScrollPane scroll = new JScrollPane(pa.getActionHistoryList());
+
+      JPanel labelPanel = new JPanel();
+
+      labelPanel.add(new JLabel("<html><h1>"+getModel().getModelName()+"</h1></html>"),BorderLayout.PAGE_START);
+      labelPanel.add(pa.getStateLabel(),BorderLayout.PAGE_END);
+
+      animate.add(labelPanel, BorderLayout.PAGE_START);
+      animate.add(pa, BorderLayout.CENTER);
+
+      animate.add(scroll, BorderLayout.LINE_END);
+
+      animate.add(pa.getResetButton(), BorderLayout.PAGE_END);
+
+      animate.pack();
       animate.setVisible(true);
    }
    
@@ -260,6 +297,14 @@ public class ModelJUnitGUI implements Runnable
       PanelResultViewer prv = PanelResultViewer.getResultViewerInstance();
       results.add(prv);
       results.setVisible(true);
+   }
+
+   public static void setModel(Model model) {
+      mModel = model;
+   }
+
+   public static Model getModel() {
+      return mModel;
    }
 
    public static void main(String[] args) {
