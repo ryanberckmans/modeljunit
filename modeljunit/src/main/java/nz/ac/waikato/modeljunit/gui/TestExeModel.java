@@ -168,7 +168,7 @@ public class TestExeModel
     // Redirect the system.out to result viewer text area component
     PrintStream ps = System.out; //Backup the System.out for later restore
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    System.setOut(new PrintStream(baos, true));
+    //System.setOut(new PrintStream(baos, true));
     // Run algorithm
     m_algo.runAlgorithm(0);
     if (m_tester[0] instanceof RandomTester) {
@@ -215,7 +215,7 @@ public class TestExeModel
     // This writer updates the test results panel.
     Writer newWriter = new Writer()
     {
-      //PanelResultViewer panel = PanelResultViewer.getResultViewerInstance();
+      PanelResultViewer panel = PanelResultViewer.getResultViewerInstance();
 
       @Override
       public void close() throws IOException
@@ -234,7 +234,7 @@ public class TestExeModel
         for (int i = off; i < off + len; i++) {
           str.append(cbuf[i]);
         }
-        //panel.updateRunTimeInformation(str.toString());
+        panel.updateRunTimeInformation(str.toString());
       }
     };
     md.setOutput(newWriter);

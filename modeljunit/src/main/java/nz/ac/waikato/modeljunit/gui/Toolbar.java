@@ -21,6 +21,7 @@ package nz.ac.waikato.modeljunit.gui;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 
 /** The toolbar class for ModelJUnit.
  *
@@ -42,6 +43,15 @@ public class Toolbar extends JPanel
    public void buildGUI() {
       JButton b = new JButton("New",createImageIcon("/images/New16.gif", "New Project"));
       this.add(b);
+
+      b.addActionListener(
+         new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+               mParent.showProjectDialog(null);
+            }
+         }
+      );
       
       b = new JButton("Open", createImageIcon("/images/Open16.gif", "Open Project"));
       this.add(b);
@@ -49,17 +59,52 @@ public class Toolbar extends JPanel
       b = new JButton("Save", createImageIcon("/images/Save16.gif", "Save Project"));
       this.add(b);
 
-      b = new JButton("Results",createImageIcon("/images/Results16.gif", "View Results") );
+
+      b = new JButton("Animate Model", createImageIcon("/images/Animate16.gif", "Animate Model"));
       this.add(b);
 
-      b = new JButton("Animate", createImageIcon("/images/Animate16.gif", "Animate Model"));
-      this.add(b);
+      b.addActionListener(
+         new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+               mParent.displayAnimateWindow();
+            }
+         }
+      );
       
       String[] configurations = {"Configuration 1", "Configuration 2", "Configuration 3"};
       JComboBox combo = new JComboBox(configurations);
 
       this.add(combo);
-      this.add(new JButton("Run", createImageIcon("/images/Play16.gif", "Run Configuration")));
+
+      b = new JButton("Generate Tests", createImageIcon("/images/Play16.gif", "Run Configuration"));
+
+      this.add(b);
+
+      b.addActionListener(
+         new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+               mParent.runModel();
+	       //TestExeModel.runTestAuto();
+
+            }
+         }
+      );
+
+
+      b = new JButton("View Tests",createImageIcon("/images/Results16.gif", "View Results") );
+      this.add(b);
+
+      b.addActionListener(
+         new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+               mParent.displayResultsWindow();
+            }
+         }
+      );
+
    }
 
    /** Returns an ImageIcon, or null if the path was invalid. */
