@@ -127,7 +127,7 @@ public class ModelJUnitMenuBar extends JMenuBar
          }
       );
  
-      item = new JMenuItem("Results Window");
+      item = new JMenuItem("View Tests Window");
       item.setAccelerator(KeyStroke.getKeyStroke(
         KeyEvent.VK_R, ActionEvent.SHIFT_MASK+ActionEvent.CTRL_MASK));
       mView.add(item);
@@ -160,8 +160,19 @@ public class ModelJUnitMenuBar extends JMenuBar
       // Populate the "Run" menu:
       item = new JMenuItem("Configurations...");
       mRun.add(item);
-      
-      item = new JMenuItem("Run Configuration...");
+     
+      item.addActionListener(
+         new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+               mParent.displayAlgorithmPane();
+            }
+         }
+      );
+
+	  
+ 
+      item = new JMenuItem("Generate Tests");
       item.setAccelerator(KeyStroke.getKeyStroke(
         KeyEvent.VK_R, ActionEvent.CTRL_MASK));
       mRun.add(item);
@@ -171,6 +182,8 @@ public class ModelJUnitMenuBar extends JMenuBar
             public void actionPerformed(ActionEvent e)
             {
                mParent.runModel();
+	       //TestExeModel.runTestAuto();
+
             }
          }
       );

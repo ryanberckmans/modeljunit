@@ -37,8 +37,13 @@ import nz.ac.waikato.modeljunit.Action;
 import nz.ac.waikato.modeljunit.Model;
 import nz.ac.waikato.modeljunit.Tester;
 import nz.ac.waikato.modeljunit.GreedyTester;
+
+import nz.ac.waikato.modeljunit.GraphListener;
+import nz.ac.waikato.modeljunit.coverage.ActionCoverage;
 import nz.ac.waikato.modeljunit.coverage.CoverageHistory;
+import nz.ac.waikato.modeljunit.coverage.StateCoverage;
 import nz.ac.waikato.modeljunit.coverage.TransitionCoverage;
+import nz.ac.waikato.modeljunit.coverage.TransitionPairCoverage;
 
 import org.objectweb.asm.ClassReader;
 
@@ -54,12 +59,22 @@ public class ModelJUnitGUI implements Runnable
    private Project mProject;
 
    private static Model mModel;
+   private PanelJUNGVisualisation mVisualisation;
+   private PanelCoverage mCoverage;
+   private PanelResultViewer mResultViewer;
+   private PanelTestDesign mTestDesign;
 
    private boolean mGraphCurrent;
 
    public ModelJUnitGUI() {
       mProject = new Project();
       mGraphCurrent = false;
+
+      mVisualisation = PanelJUNGVisualisation.getGraphVisualisationInstance();
+      mCoverage = PanelCoverage.getInstance();
+      mResultViewer = PanelResultViewer.getResultViewerInstance();
+      mTestDesign = PanelTestDesign.getTestDesignPanelInstance(this); 
+
       buildGUI();
    }
 
@@ -94,10 +109,9 @@ public class ModelJUnitGUI implements Runnable
       
       // Add visualiser
 
-      PanelAbstract visualisation = new PanelJUNGVisualisation();
-      visualisation.setPreferredSize(new Dimension(630,430));
+            mVisualisation.setPreferredSize(new Dimension(630,430));
 
-      mAppWindow.getContentPane().add(visualisation, BorderLayout.CENTER);
+      mAppWindow.getContentPane().add(mVisualisation, BorderLayout.CENTER);
 
       // Add status panel
       JPanel statuspanel = new JPanel();
@@ -228,7 +242,7 @@ public class ModelJUnitGUI implements Runnable
           //m_modelInfo1.setText("Model:   "+cName);
           //m_modelInfo2.setText("Path:     "+Parameter.getPackageLocation());
           //m_modelInfo3.setText("Actions: "+actionNumber + " actions were loaded.");
-          //newModel(); // tell the other panels about the new model
+          newModel(); // tell the other panels about the new model
         }
       }
       catch (IOException ex) {
@@ -293,9 +307,8 @@ public class ModelJUnitGUI implements Runnable
    /** Display the window that shows coverage metrics for models. **/
    public void displayCoverageWindow() {
       JFrame coverage = new JFrame("Coverage - ModelJUnit");
-      PanelCoverage pc = PanelCoverage.getInstance();
       coverage.setMinimumSize(new Dimension(760,500));
-      coverage.add(pc);
+      coverage.add(mCoverage);
       coverage.setVisible(true);
    }
 
@@ -303,8 +316,7 @@ public class ModelJUnitGUI implements Runnable
    public void displayResultsWindow() {
       JFrame results = new JFrame("Results - ModelJUnit");
       results.setMinimumSize(new Dimension(760,500));
-      PanelResultViewer prv = PanelResultViewer.getResultViewerInstance();
-      results.add(prv);
+      results.add(mResultViewer);
       results.setVisible(true);
    }
 
@@ -316,27 +328,98 @@ public class ModelJUnitGUI implements Runnable
       return mModel;
    }
 
+   public void newModel() {
+      mVisualisation.newModel();
+      mCoverage.newModel();
+      mResultViewer.newModel();
+      mTestDesign.newModel();
+   }
+
+   public void displayAlgorithmPane() {
+      JDialog dialog = new JDialog(mAppWindow,"Edit Configuration",true);
+      dialog.getContentPane().add(mTestDesign);
+      dialog.pack();
+      dialog.setVisible(true);
+   }
+
    public void buildGraphGUI() {
       if(mGraphCurrent) return;
 
       JDialog dialog = new JDialog(mAppWindow,"Graph building in progress",true);
-      dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+      //dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
       dialog.getContentPane().add(new JLabel("ModelJUnit is currently building a graph from your model.\nThis may take a few seconds."));
       dialog.pack();
       dialog.setVisible(true);
 
-      Tester tester = new GreedyTester(mModel);
-      tester.buildGraph(100000); 
+      Tester tester = TestExeModel.getTester(0);
+      tester.buildGraph(); 
+
       mGraphCurrent = true; 
 
       dialog.setVisible(false);
    }
 
 
+  private void runClass()
+  {
+    // Draw line chart in coverage panel
+    if (mTestDesign.isLineChartDrawable()) {
+      mCoverage.clearCoverages();
+      int[] stages = mCoverage.computeStages(TestExeModel.getWalkLength());
+
+      mTestDesign.initializeTester(0);
+      Tester tester = TestExeModel.getTester(0);
+     /* tester.buildGraph();*/
+      buildGraphGUI();
+
+      CoverageHistory[] coverage = new CoverageHistory[TestExeModel.COVERAGE_NUM];
+      coverage[0] = new CoverageHistory(new StateCoverage(), 1);
+      coverage[1] = new CoverageHistory(new TransitionCoverage(), 1);
+      coverage[2] = new CoverageHistory(new TransitionPairCoverage(), 1);
+      coverage[3] = new CoverageHistory(new ActionCoverage(), 1);
+      tester.addCoverageMetric(coverage[0]);
+      tester.addCoverageMetric(coverage[1]);
+      tester.addCoverageMetric(coverage[2]);
+      tester.addCoverageMetric(coverage[3]);
+      // Run test several times to draw line chart
+      for (int i = 0; i < stages.length; i++) {
+        tester.generate(stages[0]);
+        // Update the line chart and repaint
+        mCoverage.addStateCoverage((int) coverage[0].getPercentage());
+        mCoverage.addTransitionCoverage((int) coverage[1].getPercentage());
+        mCoverage.addTransitionPairCoverage((int) coverage[2].getPercentage());
+        mCoverage.addActionCoverage((int) coverage[3].getPercentage());
+        mCoverage.redrawGraph();
+        try {
+          Thread.sleep(100);
+        }
+        catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+    // To reset tester, it solve the problem that coverage matrix incorrect.
+    mTestDesign.initializeTester(0);
+    //reset the visualisation panel
+    mVisualisation.resetRunTimeInformation();
+    //Try to fully explore the complete graph before running the test explorations
+    Tester tester = TestExeModel.getTester(0);
+    GraphListener graph = tester.buildGraph();
+    mVisualisation.showEmptyExploredGraph(graph);
+
+    // Clear the information in Result viewer text area
+    mResultViewer.resetRunTimeInformation();
+
+    // Run test and display test output
+    TestExeModel.runTestAuto();
+    // Finish the visualisation panel. This effectively starts the animation.    
+    mVisualisation.updateGUI(true);
+   }
+
    public void runModel() {
       if(mModel == null) return;
 
-      buildGraphGUI();
+      runClass();
  
       /*CoverageHistory hist = new CoverageHistory(new TransitionCoverage(), 1);
       tester.addCoverageMetric(hist);
