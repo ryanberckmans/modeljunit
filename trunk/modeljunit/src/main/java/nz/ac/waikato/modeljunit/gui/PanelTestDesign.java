@@ -23,6 +23,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -72,6 +73,7 @@ public class PanelTestDesign extends PanelAbstract
 
   /** The code window view **/
   private JTextArea mCodeView;
+  private JScrollPane mScrollPane;
 
   /** Labels for displaying information about the loaded model. */
   private JLabel m_modelInfo1, m_modelInfo2, m_modelInfo3;
@@ -152,8 +154,10 @@ public class PanelTestDesign extends PanelAbstract
     Parameter.setTestCaseVariableName("testCase");
     this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-    mCodeView = new JTextArea();
-    mCodeView.setPreferredSize(new Dimension(450,500));
+    mCodeView = new JTextArea("");
+    mCodeView.setPreferredSize(new Dimension(250,500));
+
+    mScrollPane = new JScrollPane(mCodeView);
 
     ///////////////////////////////////////////////////////////
     //        Setup model panel
@@ -285,7 +289,7 @@ public class PanelTestDesign extends PanelAbstract
     }
 
     m_panelAlgorithmBase.setLayout(
-        new BoxLayout(m_panelAlgorithmBase, BoxLayout.X_AXIS));
+        new BoxLayout(m_panelAlgorithmBase, BoxLayout.Y_AXIS));
     m_panelAlgorithmBase.add(m_algorithmLeft);
     m_panelAlgorithmBase.add(m_algorithmRight);
 
@@ -430,6 +434,7 @@ public class PanelTestDesign extends PanelAbstract
        mCodeView.setText("There was a problem generating code at this time:\n" + x.getMessage());
     }
 
+    mCodeView.setPreferredSize(mScrollPane.getViewport().getExtentSize());
   }
 
   private void openModelFromFile()
@@ -671,8 +676,8 @@ public class PanelTestDesign extends PanelAbstract
     return buf.toString();
   }
 
-  public JTextArea getCodeView() {
-     return mCodeView;
+  public JComponent getCodeView() {
+     return mScrollPane;
   }
 
   private class FileChooserFilter extends javax.swing.filechooser.FileFilter
@@ -732,6 +737,8 @@ public class PanelTestDesign extends PanelAbstract
     } catch (Exception x) {
        mCodeView.setText("There was a problem generating code at this time:\n" + x.getMessage());
     }
+
+    mCodeView.setPreferredSize(mScrollPane.getViewport().getExtentSize()); 
   }
 
   @Override
