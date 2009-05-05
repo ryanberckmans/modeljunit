@@ -76,6 +76,8 @@ public class ModelJUnitGUI implements Runnable
       mTestDesign = PanelTestDesign.getTestDesignPanelInstance(this); 
 
       buildGUI();
+      
+      displaySplashWindow();
    }
 
    /** Construct an application window. **/
@@ -123,6 +125,65 @@ public class ModelJUnitGUI implements Runnable
       mAppWindow.getContentPane().add(statuspanel, BorderLayout.PAGE_END);
 
       mAppWindow.pack();
+   }
+
+   public void displaySplashWindow() {
+      JDialog splash = new JDialog(mAppWindow, "Welcome to ModelJUnit", true);
+      JPanel pane = new JPanel();
+      pane.setLayout(new GridBagLayout());
+
+      splash.add(pane,BorderLayout.CENTER);
+      splash.add(new JLabel("<html><h1>Welcome to ModelJUnit</h1></html>"), BorderLayout.PAGE_START);
+
+      GridBagConstraints c = new GridBagConstraints();
+
+      c.gridx = 0;
+      c.gridy = 0;
+      c.ipady = 50;
+      c.fill = GridBagConstraints.HORIZONTAL;
+
+      pane.add(new JLabel("(New Icon)"), c);
+
+      c.gridx = 1;
+      c.gridy = 0;
+      c.ipady = 0;
+
+      pane.add(new JLabel("<html><em>Create a new empty ModelJUnit project</em><html>"), c);
+
+      c.gridx = 0;
+      c.gridy = 1;
+      c.ipady = 50;
+
+      pane.add(new JLabel("(Open Icon)"), c);
+
+      c.gridx = 1;
+      c.gridy = 1;
+      c.ipady = 0;
+
+      pane.add(new JLabel("<html><em>Open an existing ModelJUnit project</em><html>"), c);
+
+      c.gridx = 0;
+      c.gridy = 2;
+      c.ipady = 50;
+
+      pane.add(new JLabel("(Example icon)"), c);
+
+      c.gridx = 1;
+      c.gridy = 2;
+      c.ipady = 0;
+
+      pane.add(new JLabel("<html><em>Choose from one of the ModelJUnit examples below:</em><html>"), c);
+
+ 
+      c.gridx = 0;
+      c.gridy = 3;
+      c.ipady = 60;
+      c.gridwidth = 2;
+
+      pane.add(new JTextArea(),c);
+
+      splash.pack();
+      splash.setVisible(true);
    }
 
    public void setTitle(String title) {
