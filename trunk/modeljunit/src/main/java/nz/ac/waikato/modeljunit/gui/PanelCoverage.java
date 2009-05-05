@@ -75,6 +75,7 @@ public class PanelCoverage extends PanelAbstract
     this.setBackground(Color.WHITE);
     this.setDoubleBuffered(true);
     mProgress = new JProgressBar(0,100);
+    mProgress.setStringPainted(true);
   }
 
   /**
@@ -271,6 +272,7 @@ public class PanelCoverage extends PanelAbstract
   {
      double progress = (((double)complete) / ((double)target)) * 100.0;
      mProgress.setValue((int)progress);
+     mProgress.setString("(" + complete + "/" + target +")");
   }
 
   public void redrawGraph()

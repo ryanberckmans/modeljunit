@@ -352,8 +352,12 @@ public class ModelJUnitGUI implements Runnable
       dialog.pack();
       dialog.setVisible(true);*/
 
+      mCoverage.getProgress().setIndeterminate(true);
+
       Tester tester = TestExeModel.getTester(0);
       tester.buildGraph(); 
+
+      mCoverage.getProgress().setIndeterminate(false);
 
       mGraphCurrent = true; 
 
@@ -422,7 +426,16 @@ public class ModelJUnitGUI implements Runnable
    public void runModel() {
       if(mModel == null) return;
 
-      runClass();
+      SwingWorker<String,String> worker = new SwingWorker<String,String>() {
+         public String doInBackground() {
+            runClass();
+            return "";
+         }
+      };
+     
+      worker.execute();
+
+      //runClass();
  
       /*CoverageHistory hist = new CoverageHistory(new TransitionCoverage(), 1);
       tester.addCoverageMetric(hist);
