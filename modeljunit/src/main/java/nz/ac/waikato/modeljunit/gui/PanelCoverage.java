@@ -10,6 +10,7 @@ import java.awt.geom.Line2D;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 
 public class PanelCoverage extends PanelAbstract
 {
@@ -60,6 +61,8 @@ public class PanelCoverage extends PanelAbstract
   // Panel object
   private static PanelCoverage m_panel;
 
+  private JProgressBar mProgress;
+
   public static PanelCoverage getInstance()
   {
     if (m_panel == null)
@@ -71,6 +74,7 @@ public class PanelCoverage extends PanelAbstract
   {
     this.setBackground(Color.WHITE);
     this.setDoubleBuffered(true);
+    mProgress = new JProgressBar(0,100);
   }
 
   /**
@@ -256,6 +260,17 @@ public class PanelCoverage extends PanelAbstract
   public void addActionCoverage(Integer nPercentage)
   {
     m_covA.add(nPercentage);
+  }
+
+  public JProgressBar getProgress()
+  {
+     return mProgress;
+  }
+
+  public void setProgress(int complete, int target)
+  {
+     double progress = (((double)complete) / ((double)target)) * 100.0;
+     mProgress.setValue((int)progress);
   }
 
   public void redrawGraph()

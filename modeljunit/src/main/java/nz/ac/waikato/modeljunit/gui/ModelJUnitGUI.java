@@ -308,7 +308,8 @@ public class ModelJUnitGUI implements Runnable
    public void displayCoverageWindow() {
       JFrame coverage = new JFrame("Coverage - ModelJUnit");
       coverage.setMinimumSize(new Dimension(760,500));
-      coverage.add(mCoverage);
+      coverage.add(mCoverage, BorderLayout.CENTER);
+      coverage.add(mCoverage.getProgress(), BorderLayout.PAGE_END);
       coverage.setVisible(true);
    }
 
@@ -345,20 +346,19 @@ public class ModelJUnitGUI implements Runnable
    public void buildGraphGUI() {
       if(mGraphCurrent) return;
 
-      JDialog dialog = new JDialog(mAppWindow,"Graph building in progress",true);
-      //dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+     /* JDialog dialog = new JDialog(mAppWindow,"Graph building in progress",true);
+      dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
       dialog.getContentPane().add(new JLabel("ModelJUnit is currently building a graph from your model.\nThis may take a few seconds."));
       dialog.pack();
-      dialog.setVisible(true);
+      dialog.setVisible(true);*/
 
       Tester tester = TestExeModel.getTester(0);
       tester.buildGraph(); 
 
       mGraphCurrent = true; 
 
-      dialog.setVisible(false);
-   }
-
+      /*dialog.setVisible(false);*/
+  }
 
   private void runClass()
   {
@@ -370,6 +370,7 @@ public class ModelJUnitGUI implements Runnable
       mTestDesign.initializeTester(0);
       Tester tester = TestExeModel.getTester(0);
      /* tester.buildGraph();*/
+      displayCoverageWindow();
       buildGraphGUI();
 
       CoverageHistory[] coverage = new CoverageHistory[TestExeModel.COVERAGE_NUM];
@@ -384,6 +385,8 @@ public class ModelJUnitGUI implements Runnable
       // Run test several times to draw line chart
       for (int i = 0; i < stages.length; i++) {
         tester.generate(stages[0]);
+	System.out.println("Progress: " + stages[i] + "/" + TestExeModel.getWalkLength());
+        mCoverage.setProgress(stages[i],TestExeModel.getWalkLength());
         // Update the line chart and repaint
         mCoverage.addStateCoverage((int) coverage[0].getPercentage());
         mCoverage.addTransitionCoverage((int) coverage[1].getPercentage());
