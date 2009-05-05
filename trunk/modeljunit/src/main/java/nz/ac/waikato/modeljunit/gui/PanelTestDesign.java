@@ -22,6 +22,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
+import javax.swing.JTextArea;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -68,6 +69,9 @@ public class PanelTestDesign extends PanelAbstract
    *  This is for finding and loading the model class.
    */
   private JPanel m_panelModel;
+
+  /** The code window view **/
+  private JTextArea mCodeView;
 
   /** Labels for displaying information about the loaded model. */
   private JLabel m_modelInfo1, m_modelInfo2, m_modelInfo3;
@@ -147,6 +151,9 @@ public class PanelTestDesign extends PanelAbstract
     // Set test case variable name the name will affect code generation
     Parameter.setTestCaseVariableName("testCase");
     this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
+    mCodeView = new JTextArea();
+    mCodeView.setPreferredSize(new Dimension(450,500));
 
     ///////////////////////////////////////////////////////////
     //        Setup model panel
@@ -415,6 +422,14 @@ public class PanelTestDesign extends PanelAbstract
     if (e.getSource() == m_checkFailureVerbosity) {
       Parameter.setFailureVerbosity(m_checkFailureVerbosity.isSelected());
     }
+
+    // -------- Regenerate Code in View ---------
+    try {
+       mCodeView.setText(generateCode());
+    } catch (Exception x) {
+       mCodeView.setText("There was a problem generating code at this time:\n" + x.getMessage());
+    }
+
   }
 
   private void openModelFromFile()
@@ -656,6 +671,9 @@ public class PanelTestDesign extends PanelAbstract
     return buf.toString();
   }
 
+  public JTextArea getCodeView() {
+     return mCodeView;
+  }
 
   private class FileChooserFilter extends javax.swing.filechooser.FileFilter
   {
@@ -707,6 +725,12 @@ public class PanelTestDesign extends PanelAbstract
             + (1 / Parameter.getResetProbability()));
         // System.out.println("(PaneltestDesign.java)Average length :"+prob);
       }
+    }
+
+    try {
+       mCodeView.setText(generateCode());
+    } catch (Exception x) {
+       mCodeView.setText("There was a problem generating code at this time:\n" + x.getMessage());
     }
   }
 
