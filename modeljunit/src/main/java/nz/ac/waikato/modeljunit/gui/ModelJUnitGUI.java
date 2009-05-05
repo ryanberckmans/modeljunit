@@ -398,9 +398,14 @@ public class ModelJUnitGUI implements Runnable
    }
 
    public void displayAlgorithmPane() {
-      JDialog dialog = new JDialog(mAppWindow,"Edit Configuration",true);
-      dialog.getContentPane().add(mTestDesign, BorderLayout.LINE_START);
-      dialog.getContentPane().add(new JScrollPane(mTestDesign.getCodeView()), BorderLayout.LINE_END);
+      JFrame dialog = new JFrame("Edit Configuration");
+
+      JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+                           mTestDesign, mTestDesign.getCodeView());
+      splitPane.setOneTouchExpandable(true);
+      splitPane.setDividerLocation(400);
+
+      dialog.add(splitPane);
       dialog.pack();
       dialog.setVisible(true);
    }
