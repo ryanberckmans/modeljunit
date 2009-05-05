@@ -142,7 +142,7 @@ public class ModelJUnitGUI implements Runnable
       c.ipady = 50;
       c.fill = GridBagConstraints.HORIZONTAL;
 
-      pane.add(new JLabel("(New Icon)"), c);
+      pane.add(new JButton("(New Icon)"), c);
 
       c.gridx = 1;
       c.gridy = 0;
@@ -154,7 +154,7 @@ public class ModelJUnitGUI implements Runnable
       c.gridy = 1;
       c.ipady = 50;
 
-      pane.add(new JLabel("(Open Icon)"), c);
+      pane.add(new JButton("(Open Icon)"), c);
 
       c.gridx = 1;
       c.gridy = 1;
@@ -166,7 +166,7 @@ public class ModelJUnitGUI implements Runnable
       c.gridy = 2;
       c.ipady = 50;
 
-      pane.add(new JLabel("(Example icon)"), c);
+      pane.add(new JButton("(Example icon)"), c);
 
       c.gridx = 1;
       c.gridy = 2;
@@ -399,7 +399,8 @@ public class ModelJUnitGUI implements Runnable
 
    public void displayAlgorithmPane() {
       JDialog dialog = new JDialog(mAppWindow,"Edit Configuration",true);
-      dialog.getContentPane().add(mTestDesign);
+      dialog.getContentPane().add(mTestDesign, BorderLayout.LINE_START);
+      dialog.getContentPane().add(new JScrollPane(mTestDesign.getCodeView()), BorderLayout.LINE_END);
       dialog.pack();
       dialog.setVisible(true);
    }
