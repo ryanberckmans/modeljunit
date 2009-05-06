@@ -180,7 +180,7 @@ public class PanelTestDesign extends PanelAbstract
     // An information area is to the right of the button.
     JPanel infoPane = new JPanel();
     infoPane.setLayout(new BoxLayout(infoPane, BoxLayout.Y_AXIS));
-    infoPane.setBackground(bg[0]);
+   // infoPane.setBackground(bg[0]);
     m_modelInfo1 = new JLabel(" ");
     m_modelInfo2 = new JLabel(MSG_NO_MODEL);
     m_modelInfo3 = new JLabel(" ");
@@ -195,7 +195,7 @@ public class PanelTestDesign extends PanelAbstract
     // Set panel border
     m_panelModel.setBorder(new TitledBorder(new EtchedBorder(
         EtchedBorder.LOWERED), "Test Model"));
-    m_panelModel.setBackground(bg[0]);
+   // m_panelModel.setBackground(bg[0]);
     this.add(m_panelModel);
     this.add(Box.createVerticalStrut(H_SPACE));
 
@@ -309,7 +309,7 @@ public class PanelTestDesign extends PanelAbstract
             + "<br>be printed as this class builds the FSM graph and generates tests. </html>");
     // Can only use html tags separate lines in tool tip text "\n" doesnt work
     m_checkVerbosity.addActionListener(this);
-    m_checkVerbosity.setBackground(bg[2]);
+   // m_checkVerbosity.setBackground(bg[2]);
     m_checkVerbosity.setSelected(true);
     m_panelReport.add(m_checkVerbosity);
 
@@ -317,7 +317,7 @@ public class PanelTestDesign extends PanelAbstract
         .setToolTipText("Sets the amount of information printed when tests fail."
             +" (not used yet)");
     m_checkFailureVerbosity.addActionListener(this);
-    m_checkFailureVerbosity.setBackground(bg[2]);
+   // m_checkFailureVerbosity.setBackground(bg[2]);
     m_panelReport.add(m_checkFailureVerbosity);
     // Coverage matrix
     m_checkCoverage = new JCheckBox[NUM_GRAPH_CHECKBOX];
@@ -330,17 +330,19 @@ public class PanelTestDesign extends PanelAbstract
 
     m_bChecked = new boolean[NUM_GRAPH_CHECKBOX];
     for (int i = 0; i < NUM_GRAPH_CHECKBOX; i++) {
-      m_checkCoverage[i].setBackground(bg[2]);
+   //   m_checkCoverage[i].setBackground(bg[2]);
       m_checkCoverage[i].addActionListener(this);
       m_bChecked[i] = false;
       m_panelReport.add(m_checkCoverage[i]);
     }
     
     // set border
-    m_panelReport.setBackground(bg[2]);
+   // m_panelReport.setBackground(bg[2]);
     m_panelReport.setBorder(new TitledBorder(new EtchedBorder(
         EtchedBorder.LOWERED), "Reporting"));
     this.add(m_panelReport);
+
+    this.add(new JButton("OK"));
   }
 
   public void setModelRelatedButton(JButton button)
@@ -534,9 +536,13 @@ public class PanelTestDesign extends PanelAbstract
     }
   }
 
-  /** This panel already knows about the new model. */
   public void newModel()
   {
+      String cName = Parameter.getPackageName()+"."+Parameter.getClassName();
+      int actionNumber = TestExeModel.getMethodList().size();
+      m_modelInfo1.setText("Model:   "+cName);
+      m_modelInfo2.setText("Path:     "+Parameter.getPackageLocation());
+      m_modelInfo3.setText("Actions: "+actionNumber + " actions were loaded.");
   }
 
   public String generateCode()
