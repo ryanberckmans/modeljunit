@@ -22,6 +22,7 @@ package nz.ac.waikato.modeljunit.gui;
 import javax.swing.*;
 
 import java.awt.*;
+import java.awt.event.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -63,6 +64,7 @@ public class ModelJUnitGUI implements Runnable
    private PanelCoverage mCoverage;
    private PanelResultViewer mResultViewer;
    private PanelTestDesign mTestDesign;
+   private JDialog mSplash;
 
    private boolean mGraphCurrent;
 
@@ -128,12 +130,12 @@ public class ModelJUnitGUI implements Runnable
    }
 
    public void displaySplashWindow() {
-      JDialog splash = new JDialog(mAppWindow, "Welcome to ModelJUnit", true);
+      mSplash = new JDialog(mAppWindow, "Welcome to ModelJUnit", true);
       JPanel pane = new JPanel();
       pane.setLayout(new GridBagLayout());
 
-      splash.add(pane,BorderLayout.CENTER);
-      splash.add(new JLabel("<html><h1>Welcome to ModelJUnit</h1></html>"), BorderLayout.PAGE_START);
+      mSplash.add(pane,BorderLayout.CENTER);
+      mSplash.add(new JLabel("<html><h1>Welcome to ModelJUnit</h1></html>"), BorderLayout.PAGE_START);
 
       GridBagConstraints c = new GridBagConstraints();
 
@@ -142,7 +144,15 @@ public class ModelJUnitGUI implements Runnable
       c.ipady = 50;
       c.fill = GridBagConstraints.HORIZONTAL;
 
-      pane.add(new JButton("(New Icon)"), c);
+      JButton but = new JButton("New Project");
+      but.addActionListener(new ActionListener() {
+                               public void actionPerformed(ActionEvent e) {
+                                  mSplash.setVisible(false);
+                                  showProjectDialog(null); 
+                               }
+                            });
+
+      pane.add(but, c);
 
       c.gridx = 1;
       c.gridy = 0;
@@ -154,7 +164,15 @@ public class ModelJUnitGUI implements Runnable
       c.gridy = 1;
       c.ipady = 50;
 
-      pane.add(new JButton("(Open Icon)"), c);
+      but = new JButton("Open Project");
+      but.addActionListener(new ActionListener() {
+                               public void actionPerformed(ActionEvent e) {
+                                  mSplash.setVisible(false);
+                                  displayProjectFileChooser(true);
+                               } 
+                            });
+
+      pane.add(but, c);
 
       c.gridx = 1;
       c.gridy = 1;
@@ -182,8 +200,11 @@ public class ModelJUnitGUI implements Runnable
 
       pane.add(new JTextArea(),c);
 
-      splash.pack();
-      splash.setVisible(true);
+      mSplash.pack();
+
+      mSplash.setLocationRelativeTo(null);
+
+      mSplash.setVisible(true);
    }
 
    public void setTitle(String title) {
@@ -201,10 +222,11 @@ public class ModelJUnitGUI implements Runnable
 
    public void run() {
       mAppWindow.setVisible(true);
+      mAppWindow.setExtendedState(JFrame.MAXIMIZED_BOTH); 
 
       Project pr = new Project();
       pr.setName("Test Project");
-      pr.setFileName(new File("test.project"));
+      pr.setFileName(new File("test.mju"));
       pr.setProperty("foobar",new Integer(123));
       pr.setProperty("test","hello, world");
       Project.save(pr);
@@ -230,8 +252,15 @@ public class ModelJUnitGUI implements Runnable
     int option = chooser.showOpenDialog(mAppWindow);
 
     if (option == JFileChooser.APPROVE_OPTION) {
-      String errmsg = null;  // null means no errors yet
       File f = chooser.getSelectedFile();
+      loadModelFile(f);
+      mProject.setModelFile(f);
+    }
+   }
+
+
+   public void loadModelFile(File f) {
+      String errmsg = null;  // null means no errors yet
       String wholePath = f.getAbsolutePath();
       Parameter.setModelChooserDirectory(f.getParent());
 
@@ -322,14 +351,59 @@ public class ModelJUnitGUI implements Runnable
         // TODO: could call m_gui.newModel() here too? (To reset all panels)
       }
     }
-  }
+
+   public void displayProjectFileChooser(boolean opening) {
+      FileChooserFilter javaFileFilter = new FileChooserFilter("mju",
+        "ModelJUnit Project Files");
+      JFileChooser chooser = new JFileChooser();
+      chooser.setCurrentDirectory(new File(Parameter.getModelChooserDirectory()));
+      chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+      if(opening)
+         chooser.setDialogTitle("Select ModelJUnit Project File for Opening");
+      else 
+         chooser.setDialogTitle("Select Location to Save ModelJUnit Project");
+      chooser.addChoosableFileFilter(javaFileFilter);
+      int option = 0;
+
+      if(opening)
+         option = chooser.showOpenDialog(mAppWindow);
+      else
+         option = chooser.showSaveDialog(mAppWindow);
+
+      if (option == JFileChooser.APPROVE_OPTION) {
+         String errmsg = null;  // null means no errors yet
+         File f = chooser.getSelectedFile();
+         String wholePath = f.getAbsolutePath();
+         Parameter.setModelChooserDirectory(f.getParent());
+         
+         if(opening) {
+            mProject = Project.load(f);
+            loadModelFile(mProject.getModelFile());
+         } else {
+            mProject.setFileName(f);
+         }
+      }
+   }
 
    public void showProjectDialog(Project project) {
       ProjectDialog pd;
       if(project == null) pd = new ProjectDialog(this);
       else pd = new ProjectDialog(this, project);
 
+      pd.pack();
+
+      pd.setLocationRelativeTo(null);
+
       pd.setVisible(true);
+   }
+
+   public void saveProject() {
+      if(mProject.getFileName() == null) {
+         displayProjectFileChooser(false);
+      }
+
+      Project.save(mProject);
    }
 
    /** Display the window that permits animation of models. **/

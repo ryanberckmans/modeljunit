@@ -287,8 +287,13 @@ implements ActionListener, MouseListener{
 		vizAndInfo.setOneTouchExpandable(true);
 
 		vizAndControls = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, vizAndInfo, getControlPanel());
+                getControlPanel().setMinimumSize(new Dimension(0,0));
+                getControlPanel().setPreferredSize(new Dimension(0,0));
+                getControlPanel().setMaximumSize(new Dimension(0,0));
+
 		vizAndControls.setResizeWeight(1.0);
 		vizAndControls.setOneTouchExpandable(true);
+                vizAndControls.setDividerLocation(1.0);
 
 		treeAndViz = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, getTreeControls(), vizAndControls);
 		treeAndViz.setResizeWeight(0.0);
