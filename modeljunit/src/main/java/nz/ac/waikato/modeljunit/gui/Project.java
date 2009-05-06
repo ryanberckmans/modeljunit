@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Date;
+import java.util.List;
+import java.util.LinkedList;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -40,21 +42,25 @@ import javax.xml.bind.annotation.XmlRootElement;
 public @XmlRootElement class Project
 {
    private String mProjectName;
-   private Map<String,Object> mConfiguration;
+   private Map<String,String> mConfiguration;
    private File mFile;
    private boolean mSaved;
    private Date mLastModified;
    private Parameter mParameter;
    private File mModelFile;
+   private List<String> mStrings;
 
    /** Create a new (empty) project, untitled and unsaved **/
    public Project() {
       mFile = null;
       mSaved = false;
       mProjectName = "untitled";
-      mConfiguration = new HashMap<String,Object>();
+      mConfiguration = new HashMap<String,String>();
       mParameter = new Parameter();
       mModelFile = null;
+      mConfiguration.put("Foo", "Bar");
+      mConfiguration.put("Blah", "Baz");
+      mConfiguration.put("Foobar", "Bang");
    }
 
    /** Update the project name **/
@@ -83,6 +89,14 @@ public @XmlRootElement class Project
       mLastModified = new Date();
    }
 
+   public Map<String,String> getConfiguration() {
+      return mConfiguration;
+   }
+
+   public void setConfiguration(Map<String,String> strings) {
+      mConfiguration = strings;
+   }
+
    /** Read the modified flag. **/
    public boolean isModified() {
       return !mSaved;
@@ -97,12 +111,12 @@ public @XmlRootElement class Project
    }
 
    /** Set a configuration value. **/
-   public void setProperty(String key,Object value) {
+   public void setProperty(String key,String value) {
       mConfiguration.put(key,value);
    }
 
    /** Get a configuration value **/
-   public Object getProperty(String key) {
+   public String getProperty(String key) {
       return mConfiguration.get(key);
    }
 
