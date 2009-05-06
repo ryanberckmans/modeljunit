@@ -321,6 +321,8 @@ public class ModelJUnitGUI implements Runnable
           String cName = Parameter.getPackageName()+"."+Parameter.getClassName();
           setTitle("ModelJUnit: " + cName);
 
+          mProject.setName(cName);
+
           //Tester tester = new Tester(TestExeModel.getModelObject());
           Model mod = new Model(TestExeModel.getModelObject());
 

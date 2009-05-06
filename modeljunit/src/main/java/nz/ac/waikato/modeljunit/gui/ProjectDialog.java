@@ -34,17 +34,29 @@ import java.io.IOException;
  **/
 public class ProjectDialog extends JDialog
 {
-   ModelJUnitGUI mParent;
+   private ModelJUnitGUI mParent;
+   private JLabel mModelInfo1;
+   private JLabel mModelInfo2;
+   private JLabel mModelInfo3;
+   private JLabel mModelClassName;
 
    public ProjectDialog(ModelJUnitGUI parent) {
          super(parent.getFrame(), "New ModelJUnit Project", true);
          mParent = parent;
+         mModelInfo1 = new JLabel("Model: ");
+         mModelInfo2 = new JLabel("Path: ");
+         mModelInfo3 = new JLabel("Actions: ");
+         mModelClassName = new JLabel("(none selected)");
          constructGUI();
    }
 
    public ProjectDialog(ModelJUnitGUI parent, Project project) {
          super(parent.getFrame(), "Edit ModelJUnit Project", true);
          mParent = parent;
+         mModelInfo1 = new JLabel("Model: ");
+         mModelInfo2 = new JLabel("Path: ");
+         mModelInfo3 = new JLabel("Actions: ");
+         mModelClassName = new JLabel("(none selected)");
          constructGUI();
    }
 
@@ -60,18 +72,25 @@ public class ProjectDialog extends JDialog
 
       JPanel fileSelectPanel = new JPanel();
 
-      fileSelectPanel.add(new JLabel("Model Class File:"));
-      fileSelectPanel.add(new JLabel("<html><em>(none selected)</em></html>"));
+      fileSelectPanel.add(new JLabel("Model Class File:"), BorderLayout.PAGE_START);
+      fileSelectPanel.add(mModelClassName, BorderLayout.CENTER);
 
       JButton browseButton = new JButton("Browse...");
 
-      fileSelectPanel.add(browseButton);
+      fileSelectPanel.add(browseButton, BorderLayout.PAGE_END);
 
       browseButton.addActionListener(
          new ActionListener(){
             public void actionPerformed(ActionEvent e)
             {
                mParent.displayFileChooser();
+
+               String cName = Parameter.getPackageName()+"."+Parameter.getClassName();
+               int actionNumber = TestExeModel.getMethodList().size();
+               mModelInfo1.setText("Model:   "+cName);
+               mModelInfo3.setText("Actions: "+actionNumber + " actions were loaded.");
+               mModelClassName.setText("<html><em>"+Parameter.getPackageLocation()+"</em></html>");
+               pack();
                //XXX: Read from the parent the details of the class and update
             }
          }
@@ -82,7 +101,8 @@ public class ProjectDialog extends JDialog
       JPanel infoPanel = new JPanel();
       infoPanel.setBorder(BorderFactory.createLineBorder(Color.black));
  
-      infoPanel.add(new JLabel("This will be an area with information."), BorderLayout.PAGE_END);
+      infoPanel.add(mModelInfo1, BorderLayout.PAGE_START);
+      infoPanel.add(mModelInfo3, BorderLayout.PAGE_END);
 
       add(infoPanel);
 
