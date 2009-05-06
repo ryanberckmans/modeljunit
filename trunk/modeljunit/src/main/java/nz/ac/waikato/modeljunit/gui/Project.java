@@ -138,6 +138,16 @@ public @XmlRootElement class Project
       mParameter = p;
    }
 
+   public String getVersion() {
+      return ModelJUnitGUI.MODELJUNIT_VERSION;
+   }
+
+   public void setVersion(String version) {
+      if(!version.equals(ModelJUnitGUI.MODELJUNIT_VERSION)) {
+         System.err.println("WARNING:  This project file was made using a different version of ModelJUnit, and may not load correctly.");
+      }
+   }
+
    /** Save the project state to the currently set filename. 
     *  
     *  A null filename will result in an exception.  Checking that the file is

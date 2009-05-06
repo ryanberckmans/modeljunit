@@ -54,6 +54,8 @@ import org.objectweb.asm.ClassReader;
  **/
 public class ModelJUnitGUI implements Runnable
 {
+   public static final String MODELJUNIT_VERSION = "2.0";
+
    private JFrame mAppWindow;
    private String mAppWindowTitle = "ModelJUnit - Untitled*";
 
@@ -227,8 +229,8 @@ public class ModelJUnitGUI implements Runnable
       Project pr = new Project();
       pr.setName("Test Project");
       pr.setFileName(new File("test.mju"));
-      pr.setProperty("foobar",new Integer(123));
-      pr.setProperty("test","hello, world");
+      //pr.setProperty("foobar",new Integer(123));
+      //pr.setProperty("test","hello, world");
       Project.save(pr);
    }
 
