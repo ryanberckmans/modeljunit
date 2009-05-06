@@ -72,7 +72,7 @@ public class ModelJUnitMenuBar extends JMenuBar
          new ActionListener(){
             public void actionPerformed(ActionEvent e)
             {
-               mParent.displayFileChooser();
+               mParent.displayProjectFileChooser(true);
             }
          }
       );
@@ -84,10 +84,29 @@ public class ModelJUnitMenuBar extends JMenuBar
         KeyEvent.VK_S, ActionEvent.CTRL_MASK));
       mFile.add(item);         
 
+      item.addActionListener(
+         new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+               mParent.saveProject();
+            }
+         }
+      );
+
       item = new JMenuItem("Save Project As...");
       item.setAccelerator(KeyStroke.getKeyStroke(
         KeyEvent.VK_S, ActionEvent.SHIFT_MASK + ActionEvent.CTRL_MASK));
       mFile.add(item);
+
+      item.addActionListener(
+         new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+               mParent.displayProjectFileChooser(false);
+               mParent.saveProject();
+            }
+         }
+      );
 
       mFile.addSeparator();
 

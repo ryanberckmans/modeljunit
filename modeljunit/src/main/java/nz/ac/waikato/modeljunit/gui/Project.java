@@ -22,10 +22,12 @@ package nz.ac.waikato.modeljunit.gui;
 import java.util.Map;
 import java.util.HashMap;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Date;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /** A container class for projects.
@@ -42,6 +44,8 @@ public @XmlRootElement class Project
    private File mFile;
    private boolean mSaved;
    private Date mLastModified;
+   private Parameter mParameter;
+   private File mModelFile;
 
    /** Create a new (empty) project, untitled and unsaved **/
    public Project() {
@@ -49,6 +53,8 @@ public @XmlRootElement class Project
       mSaved = false;
       mProjectName = "untitled";
       mConfiguration = new HashMap<String,Object>();
+      mParameter = new Parameter();
+      mModelFile = null;
    }
 
    /** Update the project name **/
@@ -60,6 +66,15 @@ public @XmlRootElement class Project
    /** Get the project name **/
    public String getName() {
       return mProjectName;
+   }
+
+   public File getModelFile() {
+      return mModelFile;
+   }
+
+   public void setModelFile(File m) {
+      mModelFile = m;
+      modify();
    }
 
    /** Set the "modified" flag to indicate that the project is unsaved. **/
@@ -101,6 +116,14 @@ public @XmlRootElement class Project
       return mFile;
    }
 
+   public Parameter getParameter() {
+      return mParameter;
+   }
+
+   public void setParameter(Parameter p) {
+      mParameter = p;
+   }
+
    /** Save the project state to the currently set filename. 
     *  
     *  A null filename will result in an exception.  Checking that the file is
@@ -113,18 +136,42 @@ public @XmlRootElement class Project
       if(project.getFileName() == null) throw new RuntimeException("Filename for current project is null");
      
       try {
+         FileOutputStream fo = new FileOutputStream(project.getFileName());
          JAXBContext context = JAXBContext.newInstance(Project.class);
 
          Marshaller m = context.createMarshaller();
          m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true); 
 
-         m.marshal(project, System.out);
+         m.marshal(project, fo);
+
+         fo.close();
       } catch(Exception e) {
          System.err.println("Project Save Failed: " + e.getMessage());
          return false;
       }
 
       return true;
+   }
+
+   public static Project load(File file) {
+      if(file == null) throw new RuntimeException("Invalid or missing project filename");
+
+      Project result = null;
+
+      try {
+         JAXBContext context = JAXBContext.newInstance(Project.class);
+
+         Unmarshaller m = context.createUnmarshaller();
+      
+         result = (Project)m.unmarshal(file);
+
+         if(result == null) throw new RuntimeException("Error:  Could not load project from file");
+      } catch (Exception e) {
+         System.err.println("Project Load Failed: " + e.getMessage());
+         return null;
+      }
+
+      return result;
    }
  
 }

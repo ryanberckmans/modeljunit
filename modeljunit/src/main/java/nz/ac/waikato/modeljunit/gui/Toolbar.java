@@ -56,8 +56,26 @@ public class Toolbar extends JPanel
       b = new JButton("Open", createImageIcon("/images/Open16.gif", "Open Project"));
       this.add(b);
 
+      b.addActionListener(
+         new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+               mParent.displayProjectFileChooser(true);
+            }
+         }
+      );
+
       b = new JButton("Save", createImageIcon("/images/Save16.gif", "Save Project"));
       this.add(b);
+
+      b.addActionListener(
+         new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+               mParent.saveProject();
+            }
+         }
+      );
 
 
       b = new JButton("Animate Model", createImageIcon("/images/Animate16.gif", "Animate Model"));
