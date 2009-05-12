@@ -20,7 +20,7 @@ public @XmlRootElement class Parameter
   public static final String DEFAULT_DIRECTORY = System.getProperty("user.dir");
 
   // Number of coverage options
-  public static final int NUM_COVERAGE = 4;
+  public static final int NUM_COVERAGE = 5;
 
   /** The absolute path to the directory containing the .class model files. */
   private static String m_modelFolder;
@@ -215,7 +215,7 @@ public @XmlRootElement class Parameter
    * 2. Transition pair coverage
    * 3. Action coverage
    */
-  private static boolean[] m_bCoverageOption = new boolean[4];
+  private static boolean[] m_bCoverageOption = new boolean[NUM_COVERAGE];
 
   public static boolean[] getCoverageOption()
   {

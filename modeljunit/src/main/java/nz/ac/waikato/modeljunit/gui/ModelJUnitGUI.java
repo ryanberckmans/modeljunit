@@ -28,6 +28,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import java.net.URL;
+import java.net.URI;
+
 import java.util.regex.Matcher;
 
 import java.lang.reflect.Method;
@@ -132,6 +135,19 @@ public class ModelJUnitGUI implements Runnable
       mAppWindow.pack();
    }
 
+   public void displayAboutWindow() {
+      final JDialog about = new JDialog(mAppWindow, "About ModelJUnit", true);
+      about.add(new JLabel("<html><h1>ModelJUnit v2.0-beta1</h1></html>"), BorderLayout.PAGE_START);
+      about.add(new JLabel("Copyright (c) 2009 The University of Waikato"), BorderLayout.CENTER);
+      JButton btn = new JButton("OK");
+      btn.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) { about.setVisible(false); } } );
+      about.add(btn, BorderLayout.PAGE_END);
+      about.pack();
+      about.setLocationRelativeTo(null);
+      about.setVisible(true);
+   }
+
+
    public void displaySplashWindow() {
       mSplash = new JDialog(mAppWindow, "Welcome to ModelJUnit", true);
       JPanel pane = new JPanel();
@@ -187,13 +203,16 @@ public class ModelJUnitGUI implements Runnable
       c.gridy = 2;
       c.ipady = 50;
 
-      pane.add(new JButton("(Example icon)"), c);
+      but = new JButton("(Example icon)");
 
+      pane.add(but, c);
+    
+  
       c.gridx = 1;
       c.gridy = 2;
       c.ipady = 0;
 
-      pane.add(new JLabel("<html><em>Choose from one of the ModelJUnit examples below:</em><html>"), c);
+      pane.add(new JLabel("<html><em>Double-click on any of the ModelJUnit examples below:</em><html>"), c);
 
  
       c.gridx = 0;
@@ -201,7 +220,44 @@ public class ModelJUnitGUI implements Runnable
       c.ipady = 60;
       c.gridwidth = 2;
 
-      pane.add(new JTextArea(),c);
+      final DefaultListModel exampleModel = new DefaultListModel();
+      final JList examples = new JList(exampleModel);
+      
+      exampleModel.addElement("FSM");
+      exampleModel.addElement("SpecialFSMNoLoops");
+      exampleModel.addElement("SimpleSet");
+      exampleModel.addElement("StringSetTest");
+      exampleModel.addElement("StringSetBuggy");
+      exampleModel.addElement("AlarmClock");
+      exampleModel.addElement("TrafficLight");
+      exampleModel.addElement("SimpleSetWithAdaptor");
+      exampleModel.addElement("StringSet");
+      exampleModel.addElement("SpecialFSM");
+      exampleModel.addElement("LargeSet");
+      exampleModel.addElement("QuiDonc");
+      exampleModel.addElement("gsm.GSM11Impl");
+      exampleModel.addElement("gsm.SimCard");
+      exampleModel.addElement("ecinema.ECinema");
+      exampleModel.addElement("ecinema.User");
+      exampleModel.addElement("ecinema.Showtime");
+
+      pane.add(new JScrollPane(examples),c);
+      
+      MouseListener mouseListener = new MouseAdapter() {
+         public void mouseClicked(MouseEvent e) {
+            if (e.getClickCount() == 2) {
+              int index = examples.locationToIndex(e.getPoint());
+              String example = ""+exampleModel.get(index);
+              mSplash.setVisible(false);
+              loadModelClass(example, "nz.ac.waikato.modeljunit.examples");
+              boolean[] coverage = {true,true,false,false,false};
+              Parameter.setCoverageOption(coverage);
+              mTestDesign.updatePanelSettings();
+            }
+         }
+      };
+
+      examples.addMouseListener(mouseListener);
 
       mSplash.pack();
 
@@ -261,6 +317,45 @@ public class ModelJUnitGUI implements Runnable
     }
    }
 
+   public void loadModelClass(String className, String packageName) {
+      TestExeModel.reset();
+      Parameter.setClassName(className);
+      Parameter.setPackageName(packageName);
+      
+      int actionNumber = 0;
+      if (TestExeModel.loadModelClassFromFile()) {
+            Class<?> testcase = TestExeModel.getModelClass();
+            for (Method method : testcase.getMethods()) {
+              if (method.isAnnotationPresent(Action.class)) {
+                actionNumber++;
+                TestExeModel.addMethod(method);
+                System.out.println("Added method #"+actionNumber);
+              }
+            }
+      } else {
+         throw new RuntimeException("Error Loading Model - No @Action annotations!");
+      }
+
+          String cName = Parameter.getPackageName()+"."+Parameter.getClassName();
+          setTitle("ModelJUnit: " + cName);
+
+          mProject.setName(cName);
+
+
+          Model mod = new Model(TestExeModel.getModelObject());
+
+          ModelJUnitGUI.setModel(mod);
+
+          mGraphCurrent = false;
+         // buildGraphGUI();
+
+          //m_modelInfo1.setText("Model:   "+cName);
+          //m_modelInfo2.setText("Path:     "+Parameter.getPackageLocation());
+          //m_modelInfo3.setText("Actions: "+actionNumber + " actions were loaded.");
+          newModel(); // tell the other panels about the new model
+
+
+   }
 
    public void loadModelFile(File f) {
       String errmsg = null;  // null means no errors yet

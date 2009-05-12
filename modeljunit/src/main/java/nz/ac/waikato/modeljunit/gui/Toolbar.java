@@ -93,7 +93,21 @@ public class Toolbar extends JPanel
       String[] configurations = {"Configuration 1", "Configuration 2", "Configuration 3"};
       JComboBox combo = new JComboBox(configurations);
 
-      this.add(combo);
+      //this.add(combo);
+
+      b = new JButton("Test Configuration");
+      this.add(b);
+      
+      b.addActionListener(
+         new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+               mParent.displayAlgorithmPane();
+            }
+         }
+      );
+
+      
 
       b = new JButton("Generate Tests", createImageIcon("/images/Play16.gif", "Run Configuration"));
 
