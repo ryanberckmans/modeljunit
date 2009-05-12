@@ -128,8 +128,6 @@ public class PanelTestDesign extends PanelAbstract
 
   private JCheckBox[] m_checkCoverage;
 
-  private boolean[] m_bChecked;
-
   /** Main panel for the test design tab. */
   private static PanelTestDesign m_panel = null;
 
@@ -320,7 +318,7 @@ public class PanelTestDesign extends PanelAbstract
    // m_checkFailureVerbosity.setBackground(bg[2]);
     m_panelReport.add(m_checkFailureVerbosity);
     // Coverage matrix
-    m_checkCoverage = new JCheckBox[NUM_GRAPH_CHECKBOX];
+    m_checkCoverage = new JCheckBox[NUM_GRAPH_CHECKBOX+1];
     m_checkCoverage[0] = new JCheckBox("State coverage");
     m_checkCoverage[1] = new JCheckBox("Transition coverage");
     m_checkCoverage[2] = new JCheckBox("Transition pair coverage");
@@ -328,11 +326,9 @@ public class PanelTestDesign extends PanelAbstract
     m_checkCoverage[CHECKBOX_PAINTGRAPH] = new JCheckBox(
         "Print graph to a file");
 
-    m_bChecked = new boolean[NUM_GRAPH_CHECKBOX];
     for (int i = 0; i < NUM_GRAPH_CHECKBOX; i++) {
    //   m_checkCoverage[i].setBackground(bg[2]);
       m_checkCoverage[i].addActionListener(this);
-      m_bChecked[i] = false;
       m_panelReport.add(m_checkCoverage[i]);
     }
     
@@ -356,10 +352,10 @@ public class PanelTestDesign extends PanelAbstract
   /** Load panel settings from the current Parameter class. **/
   public void updatePanelSettings()
   {
-     m_checkCoverage[0].setSelected(Parameter.getCoverageOption()[0]);
-     m_checkCoverage[1].setSelected(Parameter.getCoverageOption()[1]);
-     m_checkCoverage[2].setSelected(Parameter.getCoverageOption()[2]);
-     m_checkCoverage[3].setSelected(Parameter.getCoverageOption()[3]);
+     for (int i = 0; i < NUM_GRAPH_CHECKBOX; i++) {
+        m_checkCoverage[i].setSelected(Parameter.getCoverageOption()[i]);
+     }
+     
      m_checkCoverage[CHECKBOX_PAINTGRAPH].setSelected(Parameter.getGenerateGraph());
 
      m_checkFailureVerbosity.setSelected(Parameter.getFailureVerbosity());
@@ -437,10 +433,14 @@ public class PanelTestDesign extends PanelAbstract
       Project.getInstance().setAlgorithm(m_nCurAlgo);
     }
     // -------------- Check the coverage matrix options --------------
+
+    boolean bchecked[] = Parameter.getCoverageOption();
+
     for (int i = 0; i < NUM_GRAPH_CHECKBOX; i++) {
       if (e.getSource() == m_checkCoverage[i]) {
-        m_bChecked[i] = !m_bChecked[i];
-        Parameter.setCoverageOption(m_bChecked);
+        bchecked[i] = !bchecked[i];
+        Parameter.setCoverageOption(bchecked);
+        System.out.println("Checkbox: " + i + " " + bchecked[i]);
         if (i == CHECKBOX_PAINTGRAPH)
           Parameter.setGenerateGraph(m_checkCoverage[CHECKBOX_PAINTGRAPH]
               .isSelected());
