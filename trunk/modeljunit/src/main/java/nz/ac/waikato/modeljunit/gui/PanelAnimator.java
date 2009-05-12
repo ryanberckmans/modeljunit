@@ -64,8 +64,9 @@ public class PanelAnimator extends PanelAbstract implements ActionListener {
       buildGUI();
       mButtons.put(mResetButton, new Integer(-1));
 
+      mActionHistory.clear();
       mModel.doReset();
-      mActionHistory.addElement("*** RESET ***");
+      mActionHistory.addElement("*** RESET *** (" + mModel.getCurrentState() + ")");
    }
 
    /** Construct an animator GUI based on the current state of the Model structure. 
@@ -134,13 +135,14 @@ public class PanelAnimator extends PanelAbstract implements ActionListener {
       // -1 is the special "reset" button flag
       if(i == -1) {
          mModel.doReset();
-         mActionHistory.addElement("*** RESET ***");
+         mActionHistory.clear();
+         mActionHistory.addElement("*** RESET *** (" + mModel.getCurrentState() + ")");
          updateGUI();
          return;
       }
 
       mModel.doAction(i);
-      mActionHistory.addElement(mModel.getActionName(i));
+      mActionHistory.addElement(mModel.getActionName(i) + "(" + mModel.getCurrentState() + ")");
     
       updateGUI();
    }

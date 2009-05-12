@@ -159,6 +159,11 @@ public class TestExeModel
     return m_arrayMethod;
   }
 
+  public static void reset() {
+     m_arrayMethod.clear();
+     //resetModelToNull();
+  }
+
   /** Generate and execute tests automatically.
    *  This is called when the user presses the run button.
    */

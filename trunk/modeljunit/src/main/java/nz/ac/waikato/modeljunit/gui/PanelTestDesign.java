@@ -342,7 +342,35 @@ public class PanelTestDesign extends PanelAbstract
         EtchedBorder.LOWERED), "Reporting"));
     this.add(m_panelReport);
 
-    this.add(new JButton("OK"));
+    JButton closeButton = new JButton("OK");
+
+    closeButton.addActionListener(new ActionListener() {
+                                     public void actionPerformed(ActionEvent e) {
+                                        getTopLevelAncestor().setVisible(false);
+                                     }
+                                   }); 
+
+    this.add(closeButton);
+  }
+
+  /** Load panel settings from the current Parameter class. **/
+  public void updatePanelSettings()
+  {
+     m_checkCoverage[0].setSelected(Parameter.getCoverageOption()[0]);
+     m_checkCoverage[1].setSelected(Parameter.getCoverageOption()[1]);
+     m_checkCoverage[2].setSelected(Parameter.getCoverageOption()[2]);
+     m_checkCoverage[3].setSelected(Parameter.getCoverageOption()[3]);
+     m_checkCoverage[CHECKBOX_PAINTGRAPH].setSelected(Parameter.getGenerateGraph());
+
+     m_checkFailureVerbosity.setSelected(Parameter.getFailureVerbosity());
+     
+     m_combAlgorithmSelection.setSelectedIndex(Project.getInstance().getAlgorithm());
+     Parameter.setAlgorithmName(m_panelAlgorithm[Project.getInstance().getAlgorithm()].getAlgorithmName());
+
+     // We need to take the inverse to get back to a slider value.
+     m_sliderAverageTestLength.setValue((int) (1.0 / Parameter.getResetProbability()));
+
+     m_txtLength.setText(""+TestExeModel.getWalkLength());
   }
 
   public void setModelRelatedButton(JButton button)
@@ -406,6 +434,7 @@ public class PanelTestDesign extends PanelAbstract
       // Update the setting
       Parameter.setAlgorithmName(m_panelAlgorithm[m_nCurAlgo]
           .getAlgorithmName());
+      Project.getInstance().setAlgorithm(m_nCurAlgo);
     }
     // -------------- Check the coverage matrix options --------------
     for (int i = 0; i < NUM_GRAPH_CHECKBOX; i++) {
@@ -419,7 +448,7 @@ public class PanelTestDesign extends PanelAbstract
     }
     // ------- Model loading --------
     if (e.getSource() == m_butOpenModel) {
-      openModelFromFile();
+      //openModelFromFile();
     }
     // ------- Verbosity comboboxes --------
     if (e.getSource() == m_checkVerbosity) {
@@ -439,7 +468,7 @@ public class PanelTestDesign extends PanelAbstract
     mCodeView.setPreferredSize(mScrollPane.getViewport().getExtentSize());
   }
 
-  private void openModelFromFile()
+ /* private void openModelFromFile()
   {
     // ------------ Open model from class file --------------
     String[] extensions = {"class"};
@@ -534,7 +563,7 @@ public class PanelTestDesign extends PanelAbstract
         // TODO: could call m_gui.newModel() here too? (To reset all panels)
       }
     }
-  }
+  }*/
 
   public void newModel()
   {
@@ -543,6 +572,8 @@ public class PanelTestDesign extends PanelAbstract
       m_modelInfo1.setText("Model:   "+cName);
       m_modelInfo2.setText("Path:     "+Parameter.getPackageLocation());
       m_modelInfo3.setText("Actions: "+actionNumber + " actions were loaded.");
+ 
+      updatePanelSettings();
   }
 
   public String generateCode()
