@@ -72,6 +72,7 @@ public class ModelJUnitGUI implements Runnable
 
    public ModelJUnitGUI() {
       mProject = new Project();
+      Project.setInstance(mProject);
       mGraphCurrent = false;
 
       mVisualisation = PanelJUNGVisualisation.getGraphVisualisationInstance();
@@ -266,6 +267,9 @@ public class ModelJUnitGUI implements Runnable
       String wholePath = f.getAbsolutePath();
       Parameter.setModelChooserDirectory(f.getParent());
 
+      // Reset the existing model
+      TestExeModel.reset();
+
       // Use ASM to read the package and class name from the .class file
       try {
         ClassReader reader = new ClassReader(new FileInputStream(f));
@@ -383,7 +387,9 @@ public class ModelJUnitGUI implements Runnable
          
          if(opening) {
             mProject = Project.load(f);
+            Project.setInstance(mProject);
             loadModelFile(mProject.getModelFile());
+            mTestDesign.updatePanelSettings();
          } else {
             mProject.setFileName(f);
          }
@@ -466,6 +472,10 @@ public class ModelJUnitGUI implements Runnable
 
    public static Model getModel() {
       return mModel;
+   }
+
+   public Project getProject() {
+      return mProject;
    }
 
    public void newModel() {

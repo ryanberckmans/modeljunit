@@ -49,6 +49,8 @@ public @XmlRootElement class Project
    private Parameter mParameter;
    private File mModelFile;
    private List<String> mStrings;
+   private int mAlgorithm;
+   private static Project mProject;
 
    /** Create a new (empty) project, untitled and unsaved **/
    public Project() {
@@ -148,6 +150,54 @@ public @XmlRootElement class Project
       }
    }
 
+   public boolean[] getCoverageOptions() {
+      return Parameter.getCoverageOption();
+   }
+
+   public void setCoverageOptions(boolean[] options) {
+      Parameter.setCoverageOption(options);
+   }
+
+   public boolean getFailureVerbosity() {
+      return Parameter.getFailureVerbosity();
+   }
+
+   public void setFailureVerbosity(boolean verbosity) {
+      Parameter.setFailureVerbosity(verbosity);
+   }
+
+   public int getAlgorithm() {
+      return mAlgorithm;
+   }
+
+   public void setAlgorithm(int algorithm) {
+      mAlgorithm = algorithm;
+   }
+
+   public double getResetProbability() {
+      return Parameter.getResetProbability();
+   }
+
+   public void setResetProbability(double prob) {
+      Parameter.setResetProbability(prob);
+   }
+
+   public int getWalkLength() {
+      return TestExeModel.getWalkLength();
+   }
+
+   public void setWalkLength(int len) {
+      TestExeModel.setWalkLength(len);
+   }
+
+   public boolean getGenerateGraph() {
+      return Parameter.getGenerateGraph();
+   }
+
+   public void setGenerateGraph(boolean generate) {
+      Parameter.setGenerateGraph(generate);
+   }
+
    /** Save the project state to the currently set filename. 
     *  
     *  A null filename will result in an exception.  Checking that the file is
@@ -196,6 +246,14 @@ public @XmlRootElement class Project
       }
 
       return result;
+   }
+
+   public static void setInstance(Project pr) {
+      mProject = pr;
+   }
+
+   public static Project getInstance() {
+      return mProject;
    }
  
 }
