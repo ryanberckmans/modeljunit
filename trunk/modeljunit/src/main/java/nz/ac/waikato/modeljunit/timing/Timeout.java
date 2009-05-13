@@ -11,15 +11,16 @@ import java.lang.annotation.Target;
  * @author Scott
  * 
  * eg. a timeout is declared as:
- * @Timeout("myAction") public int myTimer;
+ * <code>@Timeout("myAction") public int myTimer;</code>
  * 
- * The action myAction will be triggered when the timeout is expired
+ * The action <code>myAction</code> will be triggered when the timeout is expired
  * 
  * Timeouts follow the following conventions:
+ * <pre>
  * value == 0 or -1						--> Not Set
  * value > 0 && value < current time	--> Set
  * value > current time					--> Expired
- *
+ * </pre>
  */
 
 

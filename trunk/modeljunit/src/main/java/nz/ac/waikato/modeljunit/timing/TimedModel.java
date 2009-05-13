@@ -221,7 +221,7 @@ public class TimedModel extends Model{
 	/**
 	 * Gets the current Time of the model. Uses reflection
 	 * to retrieve the Time value in the FSM object.
-	 * @return 
+	 * @return time or -1 if there is no Time field in the model.
 	 */
 	public int getTime() {
 		if(time_ != null) {
@@ -298,7 +298,7 @@ public class TimedModel extends Model{
 	/**
 	 * Gets the timeout that will expire next in the model.
 	 * If no timeouts are set then null is returned
-	 * @return
+	 * @return first timeout field, or null
 	 */
 	public Field getLowestTimeout(){ 
 		int lowestTimeout = Integer.MAX_VALUE;
@@ -325,7 +325,7 @@ public class TimedModel extends Model{
 	/**
 	 * Gets the value of the lowest enabled timeout. Returns
 	 * Integer.MIN_VALUE if no timeouts are set.
-	 * @return
+	 * @return next timeout value.
 	 */
 	public int getLowestTimeoutValue() {
 		Field lowest = getLowestTimeout();
