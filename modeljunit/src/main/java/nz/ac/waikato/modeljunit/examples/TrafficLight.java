@@ -122,7 +122,7 @@ public class TrafficLight implements TimedFsmModel {
 	 * Guard for the safetyPeriodEnd action. We only want this
 	 * action to occur when the safetyTimer expires so the guard 
 	 * is set up to do this.
-	 * @return
+	 * @return true when the allowPedestrians action is enabled.
 	 */
 	public boolean allowPedestriansGuard() {
 		return now == allowPedestriansTimer;

@@ -30,12 +30,12 @@
     <ol>
       <li><strong>Design a model of your SUT.</strong> In ModelJUnit,
          this model is written as a Java class that implements the
-         {@link net.sourceforge.czt.modeljunit.FsmModel} interface.
+         {@link nz.ac.waikato.modeljunit.FsmModel} interface.
 	 The current state of the SUT is modelled by the private data variables
          of this class and the operations of the SUT are modelled by
          the <em>action methods</em> of this class.
          For example, see the 
-         {@link net.sourceforge.czt.modeljunit.examples.SimpleSet} model.
+         {@link nz.ac.waikato.modeljunit.examples.SimpleSet} model.
          </li>
       <li><strong>Connect your Model to your SUT.</strong>
          Add a pointer to an SUT object into your model class.
@@ -45,14 +45,14 @@
          your model, it will be calling SUT operations and checking
          their results.
          For example, see the 
-         {@link net.sourceforge.czt.modeljunit.examples.SimpleSetWithAdaptor}
-         and {@link net.sourceforge.czt.modeljunit.examples.SmartSetAdaptor}
+         {@link nz.ac.waikato.modeljunit.examples.SimpleSetWithAdaptor}
+         and {@link nz.ac.waikato.modeljunit.examples.SmartSetAdaptor}
          classes, which add adaptor code to the SimpleSet model.
          </li>
       <li><strong>Generate some Tests.</strong>
          Create a test suite by passing an instance of your model
          to one of the Tester classes, for example,
-         {@link net.sourceforge.czt.modeljunit.GreedyTester}.
+         {@link nz.ac.waikato.modeljunit.GreedyTester}.
          Then you can generate online (on-the-fly) test sequences of 
          varying length using its generate(N) method.  You can also
          connect various model coverage metrics to the tester so that
@@ -73,13 +73,13 @@
     <p>
       Here is a brief overview of most of the test generation
       algorithms that ModelJUnit provides.  These are all subclasses
-      of the {@link net.sourceforge.czt.modeljunit.Tester} class.
+      of the {@link nz.ac.waikato.modeljunit.Tester} class.
       Many of the test generation algorithms use randomness to explore
       the graph of the model, but by default the random number
       generator is usually created with a fixed seed so that the test
       generation will be predictable and the same test results will be
       obtained each session.  You can use the {@link
-      net.sourceforge.czt.modeljunit.Tester#setRandom(Random)} method
+      nz.ac.waikato.modeljunit.Tester#setRandom(Random)} method
       in the Tester class if you want to use different seeds.  For
       example, <code>tester.setRandom(new Random())</code> will make
       <code>tester</code> generate different tests (which may expose
@@ -90,10 +90,10 @@
     </p>
       
     <p>
-      {@link net.sourceforge.czt.modeljunit.RandomTester} does a
+      {@link nz.ac.waikato.modeljunit.RandomTester} does a
       random walk around the graph.  At each state it randomly chooses
       one of the enabled transitions.  {@link
-      net.sourceforge.czt.modeljunit.GreedyTester} is a subclass of
+      nz.ac.waikato.modeljunit.GreedyTester} is a subclass of
       RandomTester that also does a random walk, but gives preference
       to the unexplored transitions.  This means that it covers the
       transitions of the model more quickly than RandomTester, then
@@ -102,7 +102,7 @@
     </p>
 
     <p>
-      {@link net.sourceforge.czt.modeljunit.LookaheadTester} is like
+      {@link nz.ac.waikato.modeljunit.LookaheadTester} is like
       GreedyTester, but more sophisticated, because it looks ahead
       several transitions to see where there are unexplored areas
       and then tries to go towards those areas.  It allows the lookahead
@@ -111,7 +111,7 @@
     </p>
 
     <p>
-      {@link net.sourceforge.czt.modeljunit.AllRoundTester} can be
+      {@link nz.ac.waikato.modeljunit.AllRoundTester} can be
       used as a wrapper around any other test generation algorithm.
       It terminates each generated test sequence once a given number
       of loops are detected (one by default).  So it is helpful for

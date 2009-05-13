@@ -216,7 +216,7 @@ public abstract class Tester
    *            transition of the graph are cleared after the graph is built.
    *            This is recommended, so that algorithms like GreedyTester
    *            get a fresh view of the graph.
-   *  @see GraphListener.isComplete()
+   *  @see GraphListener#isComplete()
    */
   public GraphListener buildGraph(int maxSteps, boolean clear)
   {
@@ -275,7 +275,7 @@ public abstract class Tester
    *            transition of the graph are cleared after the graph is built.
    *            This is recommended, so that algorithms like GreedyTester
    *            get a fresh view of the graph.
-   *  @see GraphListener.isComplete()
+   *  @see GraphListener#isComplete()
    */
   public GraphListener buildGraphBreadthFirst(int maxDepth, boolean clear)
   {
