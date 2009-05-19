@@ -24,16 +24,23 @@ import nz.ac.waikato.modeljunit.gui.visualisaton.VisualisationListener;
 
 
 /*
- * To execute the test
+ * TODO: This class plays several roles, which need to be separated.
+ * 1. Loading the FsmModel class and keeping track of some statistics.
+ *    (eg. m_arrayMethod).
+ * 2. Recording (statically!) the current test generation algorithm.
+ * 3. Running the automatic test generation.
  */
 public class TestExeModel
 {
-  // There are four coverages, state, transition, transition pair and action.
+  /** There are four coverages, state, transition, transition pair and action.
+   *  TODO: remove this constant and make the COVERAGE_MATRIX extensible.
+   */
   public static final int COVERAGE_NUM = 4;
 
   public static final String[] COVERAGE_MATRIX = {"State coverage",
       "Transition coverage", "Transition pair coverage", "Action coverage"};
 
+  /** TODO: move into a configuration/Parameter class. */
   private static int m_nWalkLength;
 
   public static void setWalkLength(int length)
@@ -81,13 +88,15 @@ public class TestExeModel
 
   /** Tries to load an instance of the current model class from a .class file.
    *
+   * TODO: move this to a more appropriate class.
+   *
    * @return true iff successful load with no errors
    */
   public static boolean loadModelClassFromFile()
   {
     ClassFileLoader classLoader = ClassFileLoader.getInstance();
     assert classLoader != null;
-    
+
     m_modelClass = classLoader.loadClass(Parameter.getClassName());
     try {
       m_modelObject = (nz.ac.waikato.modeljunit.FsmModel) m_modelClass
@@ -118,10 +127,13 @@ public class TestExeModel
   }
 
   /**
+   * TODO: eliminate this.  Instead, instantiate the appropriate 
+   * Tester subclass on-the-fly each time we want to generate tests.
+   * 
    * The array of tester object
    * Using array because we need to separate several tester for different panel.
    * m_tester[0]. For automatically run testing.
-   * m_tester[1]. For manually run testing.
+   * m_tester[1]. For manually run testing.  (NO LONGER USED)
    **/
   private static Tester[] m_tester = new Tester[2];
 
@@ -166,6 +178,10 @@ public class TestExeModel
 
   /** Generate and execute tests automatically.
    *  This is called when the user presses the run button.
+   *  
+   *  TODO: this should almost all disappear and be done
+   *  by the current algorithm (Tester subclass) and a configuration
+   *  object.
    */
   public static void runTestAuto()
   {
@@ -218,6 +234,7 @@ public class TestExeModel
     Writer defWriter = md.getOutput();
     md.setOutput(sw);
     // This writer updates the test results panel.
+    // TODO: move this class into PanelResultViewer.
     Writer newWriter = new Writer()
     {
       PanelResultViewer panel = PanelResultViewer.getResultViewerInstance();
