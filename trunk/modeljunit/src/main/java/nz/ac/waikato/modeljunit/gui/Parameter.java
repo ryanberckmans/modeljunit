@@ -13,6 +13,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 /*
  * Parameter.java
  * @author rong ID : 1005450 13th Aug 2007
+ * 
+ * TODO: Move the model-related parameters into the Project class,
+ * so that they are saved, and turn the remaining parameters
+ * (to do with test generation) into a serializable, non-singleton
+ * configuration class, so that it becomes possible to have multiple
+ * configurations within a project.
  */
 
 public @XmlRootElement class Parameter
