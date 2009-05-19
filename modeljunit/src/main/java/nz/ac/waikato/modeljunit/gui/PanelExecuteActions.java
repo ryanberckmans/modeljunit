@@ -463,6 +463,13 @@ public class PanelExecuteActions extends PanelAbstract
     }
   }
 
+  /** TODO: remove this and replace it by allowing manually
+   * generated test sequences to be treated like the automatically
+   * generated sequences (visualized, saved, etc.) and perhaps
+   * saved as JUnit code.
+   * 
+   * @param code
+   */
   public void saveTestFile(String code)
   {
     String extension = "java";

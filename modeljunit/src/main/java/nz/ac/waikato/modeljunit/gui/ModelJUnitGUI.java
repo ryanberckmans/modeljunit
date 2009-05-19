@@ -73,6 +73,13 @@ public class ModelJUnitGUI implements Runnable
 
    private boolean mGraphCurrent;
 
+   /**
+    *  This creates the persistent panels for ModelJUnit
+    *  (except the animation panel, which is transient).
+    *  All panels are subclasses of PanelAbstract, which
+    *  handles model-change notifications etc.
+    *  When each panel is displayed, it is put into a transient frame.
+    */
    public ModelJUnitGUI() {
       mProject = new Project();
       Project.setInstance(mProject);
