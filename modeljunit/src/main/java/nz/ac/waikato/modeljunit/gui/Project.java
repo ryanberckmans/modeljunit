@@ -37,19 +37,29 @@ import javax.xml.bind.annotation.XmlRootElement;
  * Designed to contain preferences and configuration information,
  * as well as logic for saving/opening projects from files.
  *
+ * The static setInstance/getInstance methods give access
+ * to the singleton instance, which is the current project.
+ * 
  * @author Gian Perrone <gian@waikato.ac.nz>
  **/
 public @XmlRootElement class Project
 {
    private String mProjectName;
+   /** Not used yet.
+    * TODO: make this a map from configuration name to a 
+    * Configuration object (or Parameter object), to allow
+    * multiple configurations with different test generation options. 
+    */
    private Map<String,String> mConfiguration;
    private File mFile;
    private boolean mSaved;
+   /** Time when this project was last modified. */
    private Date mLastModified;
    private Parameter mParameter;
    private File mModelFile;
-   private List<String> mStrings;
+   /** This should be part of the configuration. */
    private int mAlgorithm;
+   /** The singleton object for the current project. */
    private static Project mProject;
 
    /** Create a new (empty) project, untitled and unsaved **/
@@ -60,9 +70,6 @@ public @XmlRootElement class Project
       mConfiguration = new HashMap<String,String>();
       mParameter = new Parameter();
       mModelFile = null;
-      mConfiguration.put("Foo", "Bar");
-      mConfiguration.put("Blah", "Baz");
-      mConfiguration.put("Foobar", "Bang");
    }
 
    /** Update the project name **/
