@@ -349,7 +349,10 @@ public class PanelTestDesign extends PanelAbstract
     this.add(closeButton);
   }
 
-  /** Load panel settings from the current Parameter class. **/
+  /** Load panel settings from the current Parameter class.
+   *  This is typically called when a new model is loaded,
+   *  or (in the future) when a new configuration is created.
+   **/
   public void updatePanelSettings()
   {
      for (int i = 0; i < NUM_GRAPH_CHECKBOX; i++) {
