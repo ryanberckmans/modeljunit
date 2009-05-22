@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.Random;
 import java.util.BitSet;
 
+import nz.ac.waikato.modeljunit.GraphListener;
 import nz.ac.waikato.modeljunit.coverage.CoverageMetric;
 import nz.ac.waikato.modeljunit.timing.TimedFsmModel;
 import nz.ac.waikato.modeljunit.timing.TimedModel;
@@ -338,19 +339,17 @@ public abstract class Tester
              if(nenabled.get(i)) {
                 if(!seenActions.contains(model_.getActionName(i))) {
                    // High priority - not seen before
-                   List<Integer> newPath = path; //TODO: clone this
+                   List<Integer> newPath = (List<Integer>) ((LinkedList<Integer>) path).clone();
                    newPath.add(i);
                    highPriority.offer(newPath);
                 } else {
                    // Low priority
-                   List<Integer> newPath = path; //TODO: clone this
+                   List<Integer> newPath = (List<Integer>) ((LinkedList<Integer>) path).clone();
                    newPath.add(i);
                    //TODO: Need to make this a proper equality test - will fail at the moment
                    // because it is checking references.  Should be equivalent to checking
                    // if we have taken the current path + the action under consideration before.
                    if(!visitedPaths.contains(newPath)) {
-                      highPriority.offer(newPath);
-                   } else {
                       lowPriority.offer(newPath);
                    }
                 }
