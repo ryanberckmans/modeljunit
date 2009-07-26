@@ -15,7 +15,7 @@ public class SuggestionsTableModel
 {
    public static final long serialVersionUID = 1;
    
-   private static final int MAX = 4;
+   private static final int MAX = 1000;
    /** The suggestion strategies */
    private final List<SuggestionStrategy> mStrategies;
    /** The suggestions */

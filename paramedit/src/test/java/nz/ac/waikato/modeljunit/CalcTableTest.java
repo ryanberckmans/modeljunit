@@ -1,4 +1,4 @@
-package storytest;
+package nz.ac.waikato.modeljunit.storytest;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -19,7 +19,7 @@ public class CalcTableTest extends TestCase {
      * Prepare for the test by creating some simulation objects.
      */
     protected void setUp() { 
-       mTable = new CalcTable(Arrays.asList(mColumns));
+       mTable = new CalcTable("Test", Arrays.asList(mColumns));
        try {
           for (int i = 0; i < mRows.length; i++) {
              for (int j = 0; j < mRows.length; j++) {
