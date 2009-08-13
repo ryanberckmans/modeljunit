@@ -42,11 +42,13 @@ public class CalcTablePanel
 {
    public static final long serialVersionUID = 1;
    
-   private static Color NORMALCOLOR = Color.WHITE;
-   private static Color RESULTCOLOR = Color.YELLOW.brighter();
-   private static Color ERRORCOLOR = Color.RED.brighter();
-   private static Color HIGHLIGHTEDCOLOR = Color.GREEN.brighter();
-   
+   // Eclipse JUnit colours are: green=0x5fbf5f, red=0xc91625/0xde1f2f/0x9f3f3f
+   // JUnit Swingui colours were blatant: green=0x04fc04 red=0xff0000
+   private static final Color NORMALCOLOR = Color.WHITE;
+   /** This colour is used for the background colour of output columns. */
+   private static final Color RESULTCOLOR = new Color(0xcdffcb); // very pale green
+   private static final Color ERRORCOLOR = new Color(0xde1f2f); // Eclipse JUnit red
+   private static final Color HIGHLIGHTEDCOLOR = new Color(0x04fc04); // Eclipse JUnit green   
    private final Action mUA;
    private final Action mRA;
    private final Action mAR;
@@ -102,7 +104,14 @@ public class CalcTablePanel
       mRow = mCalc.rows();
       mColumn = mCalc.columns() - 1;
    }
-   
+
+   /** Create a slightly different colour.  eg. darker. */
+   public static Color subtleDifference(Color c) {
+	   float[] hsb = new float[3];
+	   Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), hsb);
+	   return Color.getHSBColor(hsb[0], hsb[1], hsb[2]*0.95F);
+   }
+	
    private class MYFocusListener
       extends FocusAdapter
    {
@@ -177,7 +186,7 @@ public class CalcTablePanel
             background = mCalc.isError(row - 1) ? ERRORCOLOR : background;
             background = mCalc.isHighlighted(row - 1) ? HIGHLIGHTEDCOLOR : background;
          }
-         background = row % 2 == 0 ? background : background.darker();
+         background = row % 2 == 0 ? background : subtleDifference(background);
          comp.setBackground(background);
          return comp;
       }
