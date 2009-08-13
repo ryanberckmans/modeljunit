@@ -11,6 +11,8 @@ import nz.ac.waikato.modeljunit.command.AddSuggestionCommand;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.ListSelectionEvent;
 
 public class CalcTableSuggestionPanel
    extends JPanel
@@ -38,6 +40,20 @@ public class CalcTableSuggestionPanel
       mPopup.add(new AddSuggestionAction());
       mTable.addMouseListener(new MyMouseListener());
       add(mTable);
+      mTable.getSelectionModel().addListSelectionListener(new MySelectionListener());
+   }
+   
+   private class MySelectionListener
+      implements ListSelectionListener
+   {
+      public void valueChanged(ListSelectionEvent e)
+      {
+         int index = e.getFirstIndex();
+         if (mTable.getSelectionModel().isSelectedIndex(index)) {
+            Suggestion sug = mModel.getSuggestion(index);
+            sug.selected();
+         }
+      }
    }
    
    private class AddSuggestionAction

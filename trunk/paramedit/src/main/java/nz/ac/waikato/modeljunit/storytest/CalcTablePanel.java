@@ -34,6 +34,7 @@ import javax.swing.event.ChangeEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import javax.swing.event.ListSelectionListener;
 
 public class CalcTablePanel
    extends JPanel
@@ -42,7 +43,9 @@ public class CalcTablePanel
    public static final long serialVersionUID = 1;
    
    private static Color NORMALCOLOR = Color.WHITE;
-   private static Color RESULTCOLOR = Color.GRAY;
+   private static Color RESULTCOLOR = Color.YELLOW.brighter();
+   private static Color ERRORCOLOR = Color.RED.brighter();
+   private static Color HIGHLIGHTEDCOLOR = Color.GREEN.brighter();
    
    private final Action mUA;
    private final Action mRA;
@@ -98,7 +101,6 @@ public class CalcTablePanel
       mTable.addFocusListener(focus);
       mRow = mCalc.rows();
       mColumn = mCalc.columns() - 1;
-      //addKeyListener(new MyOtherKeyListener());
    }
    
    private class MYFocusListener
@@ -171,6 +173,10 @@ public class CalcTablePanel
                                                                   hasFocus, row,
                                                                   column);
          Color background = mCalc.isResult(column) ? RESULTCOLOR : NORMALCOLOR;
+         if (row > 0) {
+            background = mCalc.isError(row - 1) ? ERRORCOLOR : background;
+            background = mCalc.isHighlighted(row - 1) ? HIGHLIGHTEDCOLOR : background;
+         }
          background = row % 2 == 0 ? background : background.darker();
          comp.setBackground(background);
          return comp;
