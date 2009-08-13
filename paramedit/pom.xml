@@ -22,6 +22,28 @@
              <target>1.6</target>
            </configuration>
          </plugin>
+         <plugin>
+           <groupId>org.apache.maven.plugins</groupId>
+           <artifactId>maven-assembly-plugin</artifactId>
+           <executions>
+             <execution>
+               <phase>package</phase>
+               <configuration>
+                 <descriptorRefs>
+                   <descriptorRef>jar-with-dependencies</descriptorRef>
+                 </descriptorRefs>
+                 <archive>
+                   <manifest>
+                     <mainClass>nz.ac.waikato.modeljunit.storytest.StoryTestPanel</mainClass>
+                   </manifest>
+                 </archive>
+               </configuration>
+               <goals>
+                 <goal>attached</goal>
+               </goals>
+             </execution>
+           </executions>
+         </plugin>
       </plugins>
    </build>
   <dependencies>

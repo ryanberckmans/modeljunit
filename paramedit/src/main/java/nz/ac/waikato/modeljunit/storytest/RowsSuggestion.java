@@ -2,14 +2,18 @@ package nz.ac.waikato.modeljunit.storytest;
 
 import java.util.List;
 
-public class DefaultSuggestion
+public class RowsSuggestion
    implements Suggestion
 {
    private final List<String> mSuggestion;
+   private final int[] mRows;
+   private final CalcTable mCalc;
    
-   public DefaultSuggestion(List<String> suggestion)
+   public RowsSuggestion(List<String> suggestion, int[] rows, CalcTable calc)
    {
       mSuggestion = suggestion;
+      mRows = rows;
+      mCalc = calc;
    }
    
    public List<String> getFields()
@@ -20,6 +24,7 @@ public class DefaultSuggestion
    
    public void selected()
    {
+      mCalc.setHighlighted(mRows);
    }
    
    public boolean equals(Object o)
