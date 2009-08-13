@@ -92,6 +92,7 @@ public class StoryTestPanel
       frame.add((Component)visitor.visit(story, null));
       frame.pack();
       frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+      frame.setSize(400, 400);
       frame.setVisible(true);
    }
 }
