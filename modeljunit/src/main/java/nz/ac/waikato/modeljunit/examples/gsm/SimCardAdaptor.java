@@ -1,12 +1,6 @@
 package nz.ac.waikato.modeljunit.examples.gsm;
 
-import java.io.FileNotFoundException;
-
 import junit.framework.Assert;
-import nz.ac.waikato.modeljunit.Action;
-import nz.ac.waikato.modeljunit.GraphListener;
-import nz.ac.waikato.modeljunit.GreedyTester;
-import nz.ac.waikato.modeljunit.RandomTester;
 
 /** This class connects the SimCard model to the GSM11Impl.
  *
@@ -117,52 +111,52 @@ public class SimCardAdaptor
     sut = new GSM11Impl(); // or we could add a reset operation to GSM11Impl.
   }
 
-  public void Verify_PIN(int Pin, SimCard.Status_Word result)
+  public void Verify_PIN(int pin, SimCard.Status_Word result)
   {
     initCmd(0x20, 0x00, 0x01, 0x08);
-    setChv(5, Pin);
+    setChv(5, pin);
     response = sut.cmd(apdu);
     checkStatus(result, 0);
   }
 
-  public void Unblock_PIN(int Puk, int new_Pin, SimCard.Status_Word result)
+  public void Unblock_PIN(int puk, int newPin, SimCard.Status_Word result)
   {
     initCmd(0x2C, 0x00, 0x00, 0x10);
-    setChv(5, Puk);
-    setChv(13, new_Pin);
+    setChv(5, puk);
+    setChv(13, newPin);
     response = sut.cmd(apdu);
     checkStatus(result, 0);
   }
 
-  public void Enabled_PIN(int Pin, SimCard.Status_Word result)
+  public void Enabled_PIN(int pin, SimCard.Status_Word result)
   {
     initCmd(0x28, 0x00, 0x01, 0x08);
-    setChv(5, Pin);
+    setChv(5, pin);
     response = sut.cmd(apdu);
     checkStatus(result, 0);
   }
 
-  public void Disabled_PIN(int Pin, SimCard.Status_Word result)
+  public void Disabled_PIN(int pin, SimCard.Status_Word result)
   {
     initCmd(0x26, 0x00, 0x01, 0x08);
-    setChv(5, Pin);
+    setChv(5, pin);
     response = sut.cmd(apdu);
     checkStatus(result, 0);
   }
 
-  public void Change_PIN(int old_Pin, int new_Pin, SimCard.Status_Word result)
+  public void Change_PIN(int oldPin, int newPin, SimCard.Status_Word result)
   {
     initCmd(0x24, 0x00, 0x01, 0x10);
-    setChv(5, old_Pin);
-    setChv(13, new_Pin);
+    setChv(5, oldPin);
+    setChv(13, newPin);
     response = sut.cmd(apdu);
     checkStatus(result, 0);
   }
 
-  public void Select_file(SimCard.F_Name file_name, SimCard.Status_Word result)
+  public void Select_file(SimCard.F_Name filename, SimCard.Status_Word result)
   {
     initCmd(0xA4, 0x00, 0x00, 0x02);
-    setFileID(file_name);
+    setFileID(filename);
     response = sut.cmd(apdu);
     if (result == SimCard.Status_Word.sw_9000) {
       Assert.assertEquals("expect 0x9F", 0x9F, getByte(response,0));
@@ -181,7 +175,7 @@ public class SimCardAdaptor
   /**
    *  This always reads from offset 0, and reads just 2 bytes.
    */
-  public void Read_Binary(SimCard.Status_Word result, String read_data)
+  public void Read_Binary(SimCard.Status_Word result, String readData)
   {
     initCmd(0xB0, 0x00, 0x00, 0x02);
     response = sut.cmd(apdu);
@@ -193,10 +187,10 @@ public class SimCardAdaptor
       initCmd(0xC0, 0x00, 0x00, length);
       response = sut.cmd(apdu);
       // then check the first two bytes of the data
-      System.out.println("checking read_binary result against "+read_data 
-          + " response="+response[0]+","+response[1]+","+response[2]+","+response[3]);
-      Assert.assertEquals(read_data.codePointAt(0), getByte(response,0));
-      Assert.assertEquals(read_data.codePointAt(1), getByte(response,1));
+      //System.out.println("checking read_binary result against "+read_data 
+      //    + " response="+response[0]+","+response[1]+","+response[2]+","+response[3]);
+      Assert.assertEquals(readData.codePointAt(0), getByte(response,0));
+      Assert.assertEquals(readData.codePointAt(1), getByte(response,1));
       Assert.assertEquals(0x9000, getWord(response, length));
     }
     else {

@@ -1,19 +1,19 @@
 package nz.ac.waikato.modeljunit.examples.gsm;
 
-public class File
+public class SimFile
 {
   public SimCard.File_Type type;
   public SimCard.F_Name name;
   public String data;
   public SimCard.Permission perm_read;
-  public File parent;   // null means this is the root file (MF).
+  public SimFile parent;   // null means this is the root file (MF).
   
-  public File(
+  public SimFile(
       SimCard.File_Type type0,
       SimCard.F_Name name0,
       String data0,
       SimCard.Permission perm0,
-      File parent0)
+      SimFile parent0)
   {
     type = type0;
     name = name0;
