@@ -1,3 +1,4 @@
+
 package nz.ac.waikato.modeljunit.timing;
 
 import java.lang.annotation.Retention;
@@ -9,11 +10,9 @@ import java.lang.annotation.ElementType;
  * Time annotation for use in TimedModels. Each TimedModel should have
  * one integer field for the current time.
  * @author Scott
- *
  */
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface Time {
-
 }
