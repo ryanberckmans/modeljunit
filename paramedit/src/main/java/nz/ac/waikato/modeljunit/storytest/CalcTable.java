@@ -24,7 +24,7 @@ public class CalcTable
    /** The Assumed Types of each Column **/
    private final List<Class<?>> mTypes;
    /** Whether or not there is an Contradiction in a row */
-   private final List<Boolean> mError;
+   private final Set<Integer> mContradiction;
    /** Whether or not there is an Contradiction in a row */
    private final Set<Integer> mHighlighted;
   
@@ -38,7 +38,7 @@ public class CalcTable
      mName = name;
      mColumns = new ArrayList<String>(columns);
      mTypes = new ArrayList<Class<?>>();
-     mError = new ArrayList<Boolean>();
+     mContradiction = new HashSet<Integer>();
      for (int i = 0; i < mColumns.size(); i++) {
         mColumns.set(i, mColumns.get(i).trim());
         mTypes.add(null);
@@ -75,8 +75,24 @@ public class CalcTable
    public void setHighlighted(int[] rows)
    {
       mHighlighted.clear();
+      mContradiction.clear();
       for (int i = 0; i < rows.length; i++) {
          mHighlighted.add(rows[i]);
+      }
+      inform();
+   }
+   
+   public boolean isContradiction(int row)
+   {
+      return mContradiction.contains(row);
+   }
+   
+   public void setContradiction(int[] rows)
+   {
+      mHighlighted.clear();
+      mContradiction.clear();
+      for (int i = 0; i < rows.length; i++) {
+         mContradiction.add(rows[i]);
       }
       inform();
    }
@@ -139,8 +155,6 @@ public class CalcTable
    public void addRow(int index, List<String> row)
    {
       mMatrix.add(index, new ArrayList<String>(row));
-      mError.add(false);
-      updateContradictions();
       for (int c = 0; c < columns(); c++) {updateType(c);}
       inform();
    }
@@ -195,7 +209,6 @@ public class CalcTable
    {
       mColumns.add(index, columnName);
       mTypes.add(index, null);
-      updateContradictions();
       for (List<String> list: mMatrix) {
          list.add(index, fillValue);
       }
@@ -241,7 +254,6 @@ public class CalcTable
       throws IndexOutOfBoundsException
    {
       mColumns.remove(index);
-      updateContradictions();
       for (List<String> list: mMatrix) {
          list.remove(index);
       }
@@ -259,8 +271,6 @@ public class CalcTable
       throws IndexOutOfBoundsException
    {
       mMatrix.remove(index);
-      mError.remove(index);
-      updateContradictions();
       inform();
    }
    
@@ -292,7 +302,6 @@ public class CalcTable
       throws IndexOutOfBoundsException
    {
       mMatrix.get(row).set(column, value);
-      updateContradictions();
       updateType(column);
       inform();
    }
@@ -331,7 +340,6 @@ public class CalcTable
       throws IndexOutOfBoundsException
    {
       mColumns.set(column, name.trim());
-      updateContradictions();
       inform();
    }
    
@@ -389,45 +397,6 @@ public class CalcTable
       {
          return Boolean.class;
       }
-   }
-   
-   private void updateContradictions()
-   {
-      for (int i = 0; i < rows(); i++) {
-         if (mError.size() <= i) {
-            mError.add(false);
-         } else {
-            mError.set(i, false);
-         }
-      }
-      System.out.println(mError.size() + " rows:" + rows());
-      for (int i = 0; i < rows(); i++) {
-         rows:
-         for (int j = i + 1; j < rows(); j++) {
-            boolean sameresult = true;
-            for (int c = 0; c < columns(); c++) {
-               if (!getValue(i, c).equals(getValue(j, c))) {
-                  if (isResult(c)) {
-                     System.out.println("different result");
-                     sameresult = false;
-                  } else {
-                     System.out.println("different non-result");
-                     continue rows;
-                  }
-               }
-            }
-            if (!sameresult) {
-               mError.set(j, true);
-               mError.set(i, true);
-            }
-         }
-      }
-   }
-   
-   public boolean isError(int row)
-   {
-      System.out.println(row + " Errors:" + mError.size());
-      return mError.get(row);
    }
    
    private static class ConstructorTester

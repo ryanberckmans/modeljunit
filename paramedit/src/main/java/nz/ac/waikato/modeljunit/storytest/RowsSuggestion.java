@@ -5,9 +5,9 @@ import java.util.List;
 public class RowsSuggestion
    implements Suggestion
 {
-   private final List<String> mSuggestion;
-   private final int[] mRows;
-   private final CalcTable mCalc;
+   final List<String> mSuggestion;
+   final int[] mRows;
+   final CalcTable mCalc;
    
    public RowsSuggestion(List<String> suggestion, int[] rows, CalcTable calc)
    {
