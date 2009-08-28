@@ -11,9 +11,21 @@ import java.awt.Component;
 import javax.swing.JPanel;
 import java.awt.Container;
 import javax.swing.JSplitPane;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JFileChooser;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import javax.swing.Action;
+import java.awt.event.ActionEvent;
+import javax.swing.AbstractAction;
+import java.io.File;
 
 public class StoryTestPanel
-	extends JSplitPane
+	extends JFrame
    implements Observer, StoryTestGUIInterface
 {
    public static final long serialVersionUID = 1;
@@ -24,12 +36,19 @@ public class StoryTestPanel
    private final StoryTestSuggestionVisitor mSuggestionVisitor;
    private final Container mView;
    private final JScrollPane mBottompane;
+   private final JFileChooser mChooser;
    private StoryTestGUIInterface mParent = null;
    
    public StoryTestPanel(StoryTest story, StoryTestGUIVisitor visitor,
                          StoryTestSuggestionVisitor suggestionVisitor)
    {
-      super(JSplitPane.VERTICAL_SPLIT);
+      super();
+      mChooser = new JFileChooser();
+      JMenuBar mbar = new JMenuBar();
+      JMenu menu = new JMenu("File");
+      menu.add(new JMenuItem(new SaveAction()));
+      menu.add(new JMenuItem(new LoadAction()));
+      mbar.add(menu);
       mView = new JPanel();
       mUndo = new UndoThing();
       mStory = story;
@@ -42,8 +61,12 @@ public class StoryTestPanel
       }
       JScrollPane spane = new JScrollPane(mView);
       mBottompane = new JScrollPane();
-      setTopComponent(spane);
-      setBottomComponent(mBottompane);
+      JSplitPane splitpane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+      splitpane.setTopComponent(spane);
+      splitpane.setBottomComponent(mBottompane);
+      setJMenuBar(mbar);
+      add(splitpane);
+      pack();
    }
    
    public StoryTestInterface getStoryTestInterface()
@@ -88,11 +111,74 @@ public class StoryTestPanel
       StoryTestGUIVisitor visitor =
          new StoryTestGUIVisitor(DefaultStoryTestGUIFactory.INSTANCE,
                                  sugvisitor);
-      JFrame frame = new JFrame("frame");
-      frame.add((Component)visitor.visit(story, null));
-      frame.pack();
+      JFrame frame = (JFrame) visitor.visit(story, null);
       frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
       frame.setSize(400, 400);
       frame.setVisible(true);
+   }
+   
+   private class SaveAction
+      extends AbstractAction
+      implements Action
+   {
+      /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+
+      public SaveAction()
+      {
+         super("Save");
+      }
+      
+      public void actionPerformed(ActionEvent e)
+      {         
+         int returnVal = mChooser.showSaveDialog(StoryTestPanel.this);
+         if(returnVal == JFileChooser.APPROVE_OPTION) {
+           try{
+            File saveto = mChooser.getSelectedFile();
+            FileOutputStream fos = new FileOutputStream(saveto);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(mStory);
+            oos.close();
+            } catch (Exception ex) {
+             ex.printStackTrace();
+           }
+         }
+      }
+   }
+   
+   private class LoadAction
+      extends AbstractAction
+      implements Action
+   {
+      /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+
+      public LoadAction()
+      {
+         super("Load");
+      }
+      
+      public void actionPerformed(ActionEvent e)
+      {         
+         int returnVal = mChooser.showOpenDialog(StoryTestPanel.this);
+         if(returnVal == JFileChooser.APPROVE_OPTION) {
+           try {
+              File loadfrom = mChooser.getSelectedFile();
+              FileInputStream fis = new FileInputStream(loadfrom);
+              ObjectInputStream ois = new ObjectInputStream(fis);
+              StoryTest st = (StoryTest)ois.readObject();
+              JFrame frame = (JFrame) mVisitor.visit(st, null);
+              frame.setSize(400, 400);
+              frame.setVisible(true);
+              ois.close();
+           } catch (Exception ex) {
+              ex.printStackTrace();
+           }
+         }
+      }
    }
 }

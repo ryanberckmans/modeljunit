@@ -13,6 +13,7 @@ public class GuessSuggestionStrategy
    implements Observer, Subject, SuggestionStrategy
 {   
    private final List<Suggestion> mSuggestions;
+   private static final String CONTRADICTION = "contradiction";
    
    public GuessSuggestionStrategy(CalcTable calc)
    {
@@ -76,7 +77,11 @@ public class GuessSuggestionStrategy
             for (int i = 0; i < tup.mRows.size(); i++) {
                irows[i] = tup.mRows.get(i);
             }
-            mSuggestions.add(new RowsSuggestion(guess, irows, getCalcTable()));
+            if (!guess.get(result).equals(CONTRADICTION)) {
+               mSuggestions.add(new RowsSuggestion(guess, irows, getCalcTable()));
+            } else {
+               mSuggestions.add(new RowsContradiction(guess, irows, getCalcTable()));
+            }
          }
       }
    }
@@ -324,7 +329,7 @@ public class GuessSuggestionStrategy
    {
       if (depth >= columnorder.length) {
          List<String> guess = new ArrayList<String>(currentguess);
-         guess.set(resultcolumn, "contradicts");
+         guess.set(resultcolumn, CONTRADICTION);
          guesses.add(new Tuple(guess, rows));
          return;
       }
