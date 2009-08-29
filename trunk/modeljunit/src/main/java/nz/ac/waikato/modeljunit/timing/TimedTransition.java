@@ -21,7 +21,7 @@ public class TimedTransition extends Transition
   }
 
   /**
-   * Returns the hashscode for a timed transition.
+   * Returns the hashcode for a timed transition.
    * The time that a transition is taken is ignored when 
    * comparing transitions.
    */

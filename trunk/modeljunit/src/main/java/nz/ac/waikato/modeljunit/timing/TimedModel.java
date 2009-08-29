@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import nz.ac.waikato.modeljunit.Action;
+import nz.ac.waikato.modeljunit.FsmException;
+import nz.ac.waikato.modeljunit.FsmModel;
 import nz.ac.waikato.modeljunit.Model;
 import nz.ac.waikato.modeljunit.TestFailureException;
 import nz.ac.waikato.modeljunit.Transition;
@@ -16,24 +18,29 @@ import junit.framework.Assert;
 
 /**
  * An extension of the model class which supports timed models.
- * @author ScottT
  *
+ * @author Scott Thompson
  */
 public class TimedModel extends Model
 {
 
-  /**The Timeouts of the FSM.*/
+  /** The seed that is used for the default Random object for timeouts. */
+  public static final long TIMEOUT_SEED = 12345L;
+
+  /** The Timeouts of the FSM. */
   private ArrayList<Field> timeouts_;
 
-  /**The single Time annotation.*/
+  /** The single Time annotation. */
   private Field time_;
 
+  // TODO: remove this?  Use timeoutAction instead.
   private boolean timedOut;
 
   private String timeoutAction = "";
 
-  /**Random generator for internal use. Used to decide whether to
-   * do a time increment or a timeout next.
+  /**
+   * Random generator for internal use. Used to decide whether to do a time
+   * increment or a timeout next.
    */
   private Random rand;
 
@@ -42,16 +49,40 @@ public class TimedModel extends Model
   public TimedModel(TimedFsmModel model)
   {
     super(model);
-    rand = new Random(12345); //fixed seed for now
+    rand = new Random(TIMEOUT_SEED);
+  }
+
+  /**
+   * Sets the Random generator that is used to decide whether timeouts
+   * should be taken.  This is typically set to the same Random object
+   * that is used for other test generation decisions.
+   *
+   * @see nz.ac.waikato.modeljunit.Tester
+   *
+   * @param the non-null Random object that will be used from now on.
+   */
+  public void setRandom(Random rand)
+  {
+    if (rand == null) {
+      throw new IllegalArgumentException("Random parameter must be non-null");
+    }
+    this.rand = rand;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void loadModelClass(Class fsm)
+  public void loadModelClass(Class<? extends FsmModel> fsm)
   {
     super.loadModelClass(fsm);
+
+    // check that fsm is actually a realtime model.
+    try {
+      fsm.asSubclass(TimedFsmModel.class);
+    } catch (ClassCastException e) {
+      throw new IllegalArgumentException("not a TimedFsmModel: " + fsm);
+    }
 
     if (timeouts_ == null) {
       timeouts_ = new ArrayList<Field>();
@@ -59,6 +90,9 @@ public class TimedModel extends Model
 
     for (Field field : fsm.getFields()) {
       if (field.isAnnotationPresent(Time.class)) {
+        if (time_ != null) {
+          throw new FsmException("multiple @Time fields in model: " + fsm.getName());
+        }
         if (field.getType() == int.class) {
           time_ = field;
         }
@@ -73,27 +107,28 @@ public class TimedModel extends Model
         }
       }
     }
-    //TODO: check that there is exactly one Time annotation (?)
   }
 
   /**
-   * Verifies that a Timeout is valid in a given FSM. It must be an integer
-   * and the action name provided as an annotation must correspond
-   * to and Action method.
+   * Verifies that a Timeout is valid in a given FSM. It must be an integer and
+   * the action name provided as an annotation must correspond to and Action
+   * method.
+   *
    * @param field the Timeout to verify
    * @param fsm the FSM the the Timeout exists in
    * @return true if the Timeout is valid, false otherwise
    */
-  private boolean verifyTimeout(Field field, Class fsm)
+  private boolean verifyTimeout(Field field, Class<?> fsm)
   {
-    //Timeouts must be integers
+    // Timeouts must be integers
     if (field.getType() != int.class) {
       printWarning("Timeout: " + field.getName()
           + "-Timeouts must be of type int");
       return false;
     }
 
-    //Action name must correspond to an action method
+    // Action name must correspond to an action method
+    // TODO: relax this to allow it to be a non-action void method?
     String actionName = field.getAnnotation(Timeout.class).value();
     for (Method method : fsm.getMethods()) {
       if (method.isAnnotationPresent(Action.class)) {
@@ -103,15 +138,15 @@ public class TimedModel extends Model
       }
     }
 
-    //no corresponding action
+    // no corresponding action
     printWarning("Timeout: " + field.getName()
-        + "-No corresonding action was found");
+        + "-No corresponding action was found");
     return false;
   }
 
   /**
-   * Partitioning actions to make sure that only tick actions can happen
-   * when in a tick state
+   * The strengthens all guards to ensure that only timeout actions are
+   * enabled after a timeout has fired.
    */
   @Override
   public int enabled(int index)
@@ -165,23 +200,23 @@ public class TimedModel extends Model
 
     Object newState = fsmModel_.getState();
 
-    //now either increment the time or do the lowest timeout
+    // now either increment the time or do the lowest timeout
     if (rand.nextDouble() > timeoutProbability) {
-      //try to increment the time
+      // try to increment the time
       if (!incrementTime()) {
-        //we cound't increment the time so we must have a timeout to do
+        // we cound't increment the time so we must have a timeout to do
         doLowestTimeout();
       }
     }
     else {
-      //try to do the lowest timeout
+      // try to do the lowest timeout
       if (!doLowestTimeout()) {
-        //no timeouts to do so increment the time
+        // no timeouts to do so increment the time
         incrementTime();
       }
     }
     if (!newState.equals(fsmModel_.getState())) {
-      //changing the time caused a state change
+      // changing the time caused a state change
       String failmsg = "Failure in action "
           + m.getName()
           + " from state "
@@ -202,8 +237,11 @@ public class TimedModel extends Model
   }
 
   /**
-   * TODO: Change TestFailureException to FsmException in case where 
-   * 	changing time causes a state change
+   * TODO: Change TestFailureException to FsmException in case where changing
+   * time causes a state change
+   * TODO: move this up to parent Model class and/or add a
+   * TestFailureException(Model) constructor.
+   *
    * @param failmsg
    * @param actionName
    */
@@ -219,8 +257,9 @@ public class TimedModel extends Model
   }
 
   /**
-   * Gets the current Time of the model. Uses reflection
-   * to retrieve the Time value in the FSM object.
+   * Gets the current Time of the model. Uses reflection to retrieve the Time
+   * value in the FSM object.
+   *
    * @return time or -1 if there is no Time field in the model.
    */
   public int getTime()
@@ -237,7 +276,8 @@ public class TimedModel extends Model
   }
 
   /**
-   * Sets the current time in the FSM object.
+   * Sets the Time field in the timed FSM model.
+   *
    * @param value
    */
   public void setTime(int value)
@@ -251,14 +291,14 @@ public class TimedModel extends Model
   }
 
   /**
-   * Increment the current time by a random value between the minimum
-   * and maximum delays.
-   * 
-   * If the time can be incremented by at least the minimum delay without
-   * going past any timeouts then the time will be incremented between either
-   * minDelay and max Delay or minDelay and lowestTimeout
-   * 
-   * @return true if the time was changed, otherwise false
+   * Increment the current time by a model-specified amount.
+   * The <code>getNextTimeIncrement</code> method of the real-time model
+   * is used to choose the desired time advance, then this is truncated
+   * to the first timeout if there are any timeouts enabled.
+   *
+   * @see TimedFsmModel
+   *
+   * @return true if the time was advanced, otherwise false
    */
   public boolean incrementTime()
   {
@@ -272,33 +312,34 @@ public class TimedModel extends Model
 
     try {
       if (lowest == null) {
-        //no timeouts set
+        // no timeouts set
         setTime(currTime + increment);
         return true;
       }
       else {
         int maxTime = lowest.getInt(getModel()) - 1;
         if (currTime + increment <= maxTime) {
-          //The increment will not go past the lowest timeout
+          // The increment will not go past the lowest timeout
           setTime(currTime + increment);
           return true;
         }
         else {
-          //incrementing time will take us past a timeout
+          // incrementing time will take us past a timeout
           return false;
         }
       }
     }
     catch (IllegalAccessException ex) {
-      //TODO: is this because of public/private?
+      // TODO: is this because of public/private?
       ex.printStackTrace();
       return false;
     }
   }
 
   /**
-   * Gets the timeout that will expire next in the model.
-   * If no timeouts are set then null is returned
+   * Gets the timeout that will expire next in the model. If no timeouts are set
+   * then null is returned
+   *
    * @return first timeout field, or null
    */
   public Field getLowestTimeout()
@@ -306,11 +347,11 @@ public class TimedModel extends Model
     int lowestTimeout = Integer.MAX_VALUE;
     Field lowest = null;
     try {
-      //find the lowest timeout first
+      // find the lowest timeout first
       for (Field field : timeouts_) {
         int value = field.getInt(getModel());
         if (value > 0) {
-          //timer is set
+          // timer is set
           if (value < lowestTimeout) {
             lowestTimeout = value;
             lowest = field;
@@ -325,8 +366,9 @@ public class TimedModel extends Model
   }
 
   /**
-   * Gets the value of the lowest enabled timeout. Returns
-   * Integer.MIN_VALUE if no timeouts are set.
+   * Gets the value of the lowest enabled timeout. Returns Integer.MIN_VALUE if
+   * no timeouts are set.
+   *
    * @return next timeout value.
    */
   public int getLowestTimeoutValue()
@@ -354,7 +396,7 @@ public class TimedModel extends Model
     if (lowest == null)
       return false;
 
-    //set the time to the timeout value
+    // set the time to the timeout value
     try {
       setTime(lowest.getInt(getModel()));
 
@@ -376,11 +418,22 @@ public class TimedModel extends Model
     return timeouts_.get(index).getName();
   }
 
+  /**
+   * The probability of some timeout being taken.
+   *
+   * @return a probability in the range 0.0L to 1.0L.
+   */
   public double getTimeoutProbability()
   {
     return timeoutProbability;
   }
 
+  /**
+   * Sets the probability of some timeout being taken when one or more
+   * timeouts are enabled.
+   *
+   * @param value the new timeout probability
+   */
   public void setTimeoutProbability(double value)
   {
     timeoutProbability = value;
