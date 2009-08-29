@@ -1,5 +1,5 @@
 
-package nz.ac.waikato.modeljunit.examples;
+package nz.ac.waikato.modeljunit.timing.examples;
 
 import java.util.Random;
 
