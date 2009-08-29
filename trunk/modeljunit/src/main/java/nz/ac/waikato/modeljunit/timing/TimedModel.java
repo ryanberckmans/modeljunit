@@ -33,10 +33,7 @@ public class TimedModel extends Model
   /** The single Time annotation. */
   private Field time_;
 
-  // TODO: remove this?  Use timeoutAction instead.
-  private boolean timedOut;
-
-  private String timeoutAction = "";
+  private String timeoutAction = null;
 
   /**
    * Random generator for internal use. Used to decide whether to do a time
@@ -44,8 +41,15 @@ public class TimedModel extends Model
    */
   private Random rand;
 
+  /** The probability of timing-out, rather than choosing a random action. */
   private double timeoutProbability = 0.5;
 
+
+  /**
+   * Create a timed model from a real-time extended FSM model.
+   *
+   * @param model the real-time EFSM object.
+   */
   public TimedModel(TimedFsmModel model)
   {
     super(model);
@@ -129,6 +133,7 @@ public class TimedModel extends Model
 
     // Action name must correspond to an action method
     // TODO: relax this to allow it to be a non-action void method?
+    //       Or allow the @Action to have a 'timeout-only' flag?
     String actionName = field.getAnnotation(Timeout.class).value();
     for (Method method : fsm.getMethods()) {
       if (method.isAnnotationPresent(Action.class)) {
@@ -151,7 +156,7 @@ public class TimedModel extends Model
   @Override
   public int enabled(int index)
   {
-    if (timedOut) {
+    if (timeoutAction != null) {
       if (getActionName(index).equals(timeoutAction)) {
         return super.enabled(index);
       }
@@ -165,7 +170,7 @@ public class TimedModel extends Model
   public void doReset(String reason)
   {
     super.doReset(reason);
-    timedOut = false;
+    timeoutAction = null;
     fsmState_ = fsmModel_.getState();
   };
 
@@ -176,10 +181,11 @@ public class TimedModel extends Model
       return false;
     }
 
-    if (timedOut) {
+    if (timeoutAction != null) {
+      // this assumes that there is only one timeout enabled?
+      // TODO: generalize this to allow any timeout action to be chosen.
       assert getActionName(index).equals(timeoutAction);
-      timeoutAction = "";
-      timedOut = false;
+      timeoutAction = null;
     }
 
     int startTime = getTime();
@@ -286,7 +292,9 @@ public class TimedModel extends Model
       time_.setInt(getModel(), value);
     }
     catch (Exception ex) {
-      System.out.println(ex.getMessage());
+      throw new FsmException("error setting @Time field in model "
+          + getModel().getClass().getName() + " - make sure it is public",
+          ex);
     }
   }
 
@@ -330,9 +338,8 @@ public class TimedModel extends Model
       }
     }
     catch (IllegalAccessException ex) {
-      // TODO: is this because of public/private?
-      ex.printStackTrace();
-      return false;
+      throw new FsmException("error trying to increment time in model "
+          + getModel().getClass().getName(), ex);
     }
   }
 
@@ -399,13 +406,11 @@ public class TimedModel extends Model
     // set the time to the timeout value
     try {
       setTime(lowest.getInt(getModel()));
-
       timeoutAction = lowest.getAnnotation(Timeout.class).value();
-      timedOut = true;
     }
     catch (Exception e) {
-      e.printStackTrace();
-      return false;
+      throw new FsmException("error getting/setting @Time field of model "
+          + getModel().getClass().getName(), e);
     }
     return true;
   }
