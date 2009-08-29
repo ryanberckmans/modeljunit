@@ -149,7 +149,7 @@ public class Model
   }
 
   /** Returns the FSM class that is the test model. */
-  public Class getModelClass()
+  public Class<? extends FsmModel> getModelClass()
   {
 	  return fsmClass_;
   }
@@ -228,7 +228,7 @@ public class Model
   /** Loads the given class and finds its @Action methods.
    *  This method must be called before any fsm traversals are done.
    */
-  protected void loadModelClass(/*@non_null@*/ Class fsm)
+  protected void loadModelClass(/*@non_null@*/ Class<? extends FsmModel> fsm)
   {
     if (fsmClass_ == fsm)
       return;  // done already
@@ -237,7 +237,7 @@ public class Model
     fsmActions_ = new ArrayList<Method>();
     for (Method m : fsm.getMethods()) {
       if (m.isAnnotationPresent(Action.class)) {
-        Class[] paramTypes = m.getParameterTypes();
+        Class<?>[] paramTypes = m.getParameterTypes();
         if (paramTypes.length != 0)
           Assert.fail("ERROR: @Action method "+fsmName_+"."+m.getName()
               +" must have no parameters.");

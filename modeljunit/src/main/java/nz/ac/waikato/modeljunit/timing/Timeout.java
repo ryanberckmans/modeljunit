@@ -7,24 +7,26 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation for Timeouts. The parameter provided is the name of
- * the action method that will be called when the timeout expires.
- * @author Scott
+ * Annotation for Timeouts. The parameter provided is the name of the action
+ * method that will be called when the timeout expires.
  *
  * For example, a timeout is declared as:
+ *
  * <pre>
- * @Timeout("myAction") public int myTimer;
+ * &#064;Timeout(&quot;myAction&quot;)
+ * public int myTimer;
  * </pre>
  *
- * The action <code>myAction</code> will be triggered when the
- * timeout expires.
+ * The action <code>myAction</code> will be triggered when the timeout
+ * expires. Timeouts follow the following conventions:
  *
- * Timeouts follow the following conventions:
  * <pre>
  * value == 0 or -1                     == Not Set
- * value &gt; 0 && value &lt; current time    == Set
+ * value &gt; 0 &amp;&amp; value &lt; current time    == Set
  * value &gt; current time                 == Expired
  * </pre>
+ *
+ * @author Scott Thompson
  */
 
 @Retention(RetentionPolicy.RUNTIME)
