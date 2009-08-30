@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.lang.NumberFormatException;
-import java.util.LinkedList;
 import java.util.Arrays;
 
 public class GuessSuggestionStrategy
@@ -205,7 +204,6 @@ public class GuessSuggestionStrategy
          triples[i] = trip;
          i++;
       }
-      int last = -1;
       for (i = 0; i < values.length; i++) {
          Triple trip = i >= triples.length ? null : triples[i];
          /*if (last != -1 && (trip == null || !trip.allsame || !trip.mResult.equals(triples[last].mResult))) {

@@ -2,27 +2,39 @@ package nz.ac.waikato.modeljunit.storytest;
 
 import javax.swing.JScrollPane;
 
-import nz.ac.waikato.modeljunit.command.UndoThing;
-import nz.ac.waikato.modeljunit.command.UndoInterface;
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
-import java.util.Arrays;
-import javax.swing.WindowConstants;
-import java.awt.Component;
-import javax.swing.JPanel;
-import java.awt.Container;
-import javax.swing.JSplitPane;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JFileChooser;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JSplitPane;
+import javax.swing.WindowConstants;
+
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import javax.swing.Action;
+
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 import javax.swing.AbstractAction;
+
+import nz.ac.waikato.modeljunit.command.Command;
+import nz.ac.waikato.modeljunit.command.CreateCalcTableCommand;
+import nz.ac.waikato.modeljunit.command.UndoInterface;
+import nz.ac.waikato.modeljunit.command.UndoThing;
+
 import java.io.File;
+import java.util.Arrays;
+
 
 public class StoryTestPanel
 	extends JFrame
@@ -35,8 +47,10 @@ public class StoryTestPanel
    private final StoryTestGUIVisitor mVisitor;
    private final StoryTestSuggestionVisitor mSuggestionVisitor;
    private final Container mView;
+   private final JScrollPane mTopPane;
    private final JScrollPane mBottompane;
    private final JFileChooser mChooser;
+   private final JPopupMenu mPopup;
    private StoryTestGUIInterface mParent = null;
    
    public StoryTestPanel(StoryTest story, StoryTestGUIVisitor visitor,
@@ -50,8 +64,10 @@ public class StoryTestPanel
       menu.add(new JMenuItem(new LoadAction()));
       mbar.add(menu);
       mView = new JPanel();
+      mView.setLayout(new BoxLayout(mView, BoxLayout.Y_AXIS));
       mUndo = new UndoThing();
       mStory = story;
+      mStory.registerObserver(this);
       mVisitor = visitor;
       mSuggestionVisitor = suggestionVisitor;
       mStory.registerObserver(this);
@@ -60,13 +76,18 @@ public class StoryTestPanel
          mView.add(comp);
       }
       JScrollPane spane = new JScrollPane(mView);
+      mTopPane = spane;
       mBottompane = new JScrollPane();
       JSplitPane splitpane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
       splitpane.setTopComponent(spane);
       splitpane.setBottomComponent(mBottompane);
+      splitpane.resetToPreferredSizes();
       setJMenuBar(mbar);
       add(splitpane);
       pack();
+      mPopup = new JPopupMenu();
+      mPopup.add(new AddCalcTableAction());
+      spane.addMouseListener(new MyMouseListener());
    }
    
    public StoryTestInterface getStoryTestInterface()
@@ -92,7 +113,11 @@ public class StoryTestPanel
    
    public void update()
    {
-      System.out.println("implement StoryTestPanel's observer interface");
+      mView.removeAll();
+      for (StoryTestInterface sti : mStory.getComponents()) {
+        Component comp = (Component)mVisitor.visit(sti, this);
+        mView.add(comp);
+      }
    }
    
    public static void main(String args[])
@@ -115,6 +140,28 @@ public class StoryTestPanel
       frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
       frame.setSize(400, 400);
       frame.setVisible(true);
+   }
+   
+   private class AddCalcTableAction
+     extends AbstractAction
+     implements Action
+   {
+     /**
+      * 
+      */
+     private static final long serialVersionUID = 1L;
+
+     public AddCalcTableAction()
+     {
+        super("Add CalcTable");
+     }
+     
+     public void actionPerformed(ActionEvent e)
+     {
+       Command command = new CreateCalcTableCommand(mStory,
+                                                    new CalcTable());
+       getUndoInterface().execute(command);
+     }
    }
    
    private class SaveAction
@@ -181,4 +228,23 @@ public class StoryTestPanel
          }
       }
    }
+   
+   private class MyMouseListener
+     extends MouseAdapter
+    {
+       public void mousePressed( MouseEvent e )
+       {
+          checkForTriggerEvent( e );
+       }
+    
+       public void mouseReleased( MouseEvent e )
+       { checkForTriggerEvent( e ); } 
+    
+       private void checkForTriggerEvent( MouseEvent e )
+       {
+          if ( e.isPopupTrigger() ) 
+             mPopup.show( e.getComponent(),
+                             e.getX(), e.getY() );
+       }
+    }
 }
