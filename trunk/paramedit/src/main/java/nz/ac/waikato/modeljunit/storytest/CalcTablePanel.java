@@ -1,5 +1,6 @@
 package nz.ac.waikato.modeljunit.storytest;
 
+import nz.ac.waikato.modeljunit.command.ToggleResultColumnCommand;
 import nz.ac.waikato.modeljunit.command.UndoInterface;
 import nz.ac.waikato.modeljunit.command.AddColumnCommand;
 import nz.ac.waikato.modeljunit.command.AddRowCommand;
@@ -34,7 +35,6 @@ import javax.swing.event.ChangeEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import javax.swing.event.ListSelectionListener;
 
 public class CalcTablePanel
    extends JPanel
@@ -50,6 +50,8 @@ public class CalcTablePanel
    private static final Color ERRORCOLOR = new Color(0xde1f2f); // Eclipse JUnit red
    private static final Color HIGHLIGHTEDCOLOR = new Color(0x04fc04); // Eclipse JUnit green   
    private final Action mUA;
+   private final Action mARE;
+   private final Action mTR;
    private final Action mRA;
    private final Action mAR;
    private final Action mAC;
@@ -72,16 +74,18 @@ public class CalcTablePanel
       mUA = new UndoAction();
       mRA = new RedoAction();
       mAR = new AddRowAction();
+      mARE = new AddRowEnterAction();
       mAC = new AddColumnAction();
       mDR = new DeleteRowAction();
       mDC = new DeleteColumnAction();
+      mTR = new ToggleResultAction();
       CalcTableModel model = new CalcTableModel(mCalc);
       mTable = new JTable(model);
       mTable.setDefaultRenderer(String.class,
                                 new TextCellRenderer(mTable.getDefaultRenderer(String.class)));
       mTable.setDefaultEditor(String.class, new TextCellEditor());
-      mTable.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), mAR);
-      mTable.getActionMap().put(mAR, mAR);
+      mTable.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), mARE);
+      mTable.getActionMap().put(mARE, mARE);
       mTable.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK), mAC);
       mTable.getActionMap().put(mAC, mAC);
       this.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK),
@@ -98,6 +102,7 @@ public class CalcTablePanel
       mPopup.add(new JMenuItem(mDC));
       mPopup.add(new JMenuItem(mUA));
       mPopup.add(new JMenuItem(mRA));
+      mPopup.add(new JMenuItem(mTR));
       add(mTable);
       FocusListener focus = new MYFocusListener();
       mTable.addFocusListener(focus);
@@ -210,6 +215,7 @@ public class CalcTablePanel
          System.out.println(value);
          mRow = rowIndex;
          mColumn = vColIndex;
+         mTable.changeSelection(mRow, mColumn, false, false);
          mPrevious = (String)value;
          return mComponent;
      }
@@ -274,6 +280,32 @@ public class CalcTablePanel
       }
    }
    
+   private class AddRowEnterAction
+     extends MyAbstractAction
+     implements Action
+   {
+     public static final long serialVersionUID = 1;
+     
+     public AddRowEnterAction()
+     {
+        super("Add Row");
+     }
+     
+     public void actionPerformed(ActionEvent e)
+     {
+        super.actionPerformed(e);
+        int srow = mTable.getSelectedRow();
+        int scol = mTable.getSelectedColumn();
+        int row = mCalc.rows();
+        System.out.println(srow + ":" + row);
+        if (srow == row) {
+          Command command = new AddRowCommand(mCalc, row);
+          getUndoInterface().execute(command);
+        }
+        mTable.changeSelection(srow + 1, scol, false, false);
+     }
+   }
+   
    private class DeleteColumnAction
       extends MyAbstractAction
       implements Action
@@ -302,6 +334,31 @@ public class CalcTablePanel
          }
       }
    }
+   
+   private class ToggleResultAction
+     extends MyAbstractAction
+     implements Action
+  {
+     /**
+      * 
+      */
+     private static final long serialVersionUID = 1L;
+  
+     public ToggleResultAction()
+     {
+        super("Toggle Result");
+     }
+     
+     public void actionPerformed(ActionEvent e)
+     {
+        super.actionPerformed(e);
+        int scol = mTable.getSelectedColumn();
+        int column = scol == -1 ? mColumn : scol;
+        column = column == -1 ? mCalc.columns() - 1: column;
+        Command command = new ToggleResultColumnCommand(mCalc, mColumn);
+        getUndoInterface().execute(command);
+     }
+  }
    
    private class DeleteRowAction
       extends MyAbstractAction

@@ -8,7 +8,11 @@ public class StoryTest
    extends AbstractSubject
    implements StoryTestInterface
 {
-   private List<StoryTestInterface> mComponents;
+   /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+  private List<StoryTestInterface> mComponents;
    
    public StoryTest()
    {

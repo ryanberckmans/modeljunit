@@ -1,6 +1,7 @@
 package nz.ac.waikato.modeljunit.storytest;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.lang.IndexOutOfBoundsException;
 import java.lang.reflect.Constructor;
@@ -15,7 +16,11 @@ public class CalcTable
    extends AbstractSubject
    implements StoryTestInterface
 {
-   /** The name of this table */
+   /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+  /** The name of this table */
    private final String mName;
    /** The Column Names */
    private final List<String> mColumns;
@@ -27,7 +32,11 @@ public class CalcTable
    private final Set<Integer> mContradiction;
    /** Whether or not there is an Contradiction in a row */
    private final Set<Integer> mHighlighted;
-  
+
+   public CalcTable()
+   {
+     this("", Collections.singletonList("a"));
+   }
    /**
     *  Creates a CalcTable with the given Column headings
     *
@@ -95,6 +104,17 @@ public class CalcTable
          mContradiction.add(rows[i]);
       }
       inform();
+   }
+   
+   public void toggleResultColumn(int column)
+   {
+     String header = getColumnHeader(column);
+     if (isResult(column)) {
+       header = header.substring(0, header.length() - 1);
+     } else {
+       header = header + "?";
+     }
+     setColumnHeader(column, header);
    }
    
    public void updateType(int column)

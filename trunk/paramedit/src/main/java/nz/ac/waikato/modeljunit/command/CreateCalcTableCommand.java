@@ -1,41 +1,46 @@
 package nz.ac.waikato.modeljunit.command;
 
 import nz.ac.waikato.modeljunit.storytest.CalcTable;
+import nz.ac.waikato.modeljunit.storytest.MCDCSuggestionStrategy;
+import nz.ac.waikato.modeljunit.storytest.StoryTest;
+import nz.ac.waikato.modeljunit.storytest.StoryTestInterface;
 
 public class CreateCalcTableCommand
    extends AbstractUndoableCommand
 {
    public static final long serialVersionUID = 1;
    
-   private final CalcTable mTable;
-   private final int mRow;
+   private final StoryTestInterface mTable;
+   private final StoryTest mStory;
+   private final int mIndex;
 /**
 Basic constructor for SetValueCommand
 */
-   public CreateCalcTableCommand(CalcTable Table, int Row)
+   public CreateCalcTableCommand(StoryTest story, StoryTestInterface Table, int index)
    {
+      mStory = story;
       mTable = Table;
-      mRow = Row;
+      mIndex = index;
    }
    
-   public CreateCalcTableCommand(CalcTable Table)
+   public CreateCalcTableCommand(StoryTest story, StoryTestInterface Table)
    {
-      this(Table, Table.rows());
+      this(story, Table, story.getComponents().size());
    }
    
    public void execute()
    {
-      mTable.addRow(mRow);
+      mStory.add(mIndex, mTable);
    }
    
    public void undo()
    {
       super.undo();
-      mTable.removeRow(mRow);
+      mStory.remove(mIndex);
    }
    
    public String getName()
    {
-      return "Add Row";
+      return "Add Component";
    }
 }
