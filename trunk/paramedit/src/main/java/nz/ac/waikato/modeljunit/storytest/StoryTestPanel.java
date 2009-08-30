@@ -3,6 +3,7 @@ package nz.ac.waikato.modeljunit.storytest;
 import javax.swing.JScrollPane;
 
 import javax.swing.BoxLayout;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
@@ -11,6 +12,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
+import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
 import java.io.FileOutputStream;
@@ -22,6 +24,8 @@ import javax.swing.Action;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -49,9 +53,13 @@ public class StoryTestPanel
    private final Container mView;
    private final JScrollPane mTopPane;
    private final JScrollPane mBottompane;
+   private final JSplitPane mSPane;
    private final JFileChooser mChooser;
    private final JPopupMenu mPopup;
    private StoryTestGUIInterface mParent = null;
+   
+   private final Action mUA;
+   private final Action mRA;
    
    public StoryTestPanel(StoryTest story, StoryTestGUIVisitor visitor,
                          StoryTestSuggestionVisitor suggestionVisitor)
@@ -88,6 +96,15 @@ public class StoryTestPanel
       mPopup = new JPopupMenu();
       mPopup.add(new AddCalcTableAction());
       spane.addMouseListener(new MyMouseListener());
+      mSPane = splitpane;
+      mUA = getUndoInterface().getUndoAction();
+      mRA = getUndoInterface().getRedoAction();
+      mSPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK),
+          mUA);
+      mSPane.getActionMap().put(mUA, mUA);
+      mSPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK),
+                mRA);
+      mSPane.getActionMap().put(mRA, mRA);
    }
    
    public StoryTestInterface getStoryTestInterface()
@@ -118,6 +135,7 @@ public class StoryTestPanel
         Component comp = (Component)mVisitor.visit(sti, this);
         mView.add(comp);
       }
+      mSPane.resetToPreferredSizes();
    }
    
    public static void main(String args[])

@@ -1,5 +1,7 @@
 package nz.ac.waikato.modeljunit.command;
 
+import javax.swing.Action;
+
 import nz.ac.waikato.modeljunit.storytest.Subject;
 
 public interface UndoInterface
@@ -17,4 +19,8 @@ public interface UndoInterface
    public boolean canUndo();
    
    public boolean canRedo();
+   
+   public Action getUndoAction();
+   
+   public Action getRedoAction();
 }

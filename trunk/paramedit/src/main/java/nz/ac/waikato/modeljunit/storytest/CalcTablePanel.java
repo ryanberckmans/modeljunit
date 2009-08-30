@@ -1,5 +1,6 @@
 package nz.ac.waikato.modeljunit.storytest;
 
+import nz.ac.waikato.modeljunit.command.RemoveCalcTableCommand;
 import nz.ac.waikato.modeljunit.command.ToggleResultColumnCommand;
 import nz.ac.waikato.modeljunit.command.UndoInterface;
 import nz.ac.waikato.modeljunit.command.AddColumnCommand;
@@ -50,13 +51,14 @@ public class CalcTablePanel
    private static final Color ERRORCOLOR = new Color(0xde1f2f); // Eclipse JUnit red
    private static final Color HIGHLIGHTEDCOLOR = new Color(0x04fc04); // Eclipse JUnit green   
    private final Action mUA;
+   private final Action mRA;
    private final Action mARE;
    private final Action mTR;
-   private final Action mRA;
    private final Action mAR;
    private final Action mAC;
    private final Action mDR;
    private final Action mDC;
+   private final Action mRC;
    
    private final CalcTable mCalc;
    private final JTable mTable;
@@ -66,19 +68,22 @@ public class CalcTablePanel
    private int mRow;
    
    private final StoryTestGUIInterface mParent;
+   private final StoryTest mStory;
    
    public CalcTablePanel(CalcTable calc, StoryTestGUIInterface parent)
    {
+      mStory = (StoryTest)parent.getStoryTestInterface();
       mParent = parent;
       mCalc = calc;
-      mUA = new UndoAction();
-      mRA = new RedoAction();
+      mUA = mParent.getUndoInterface().getUndoAction();
+      mRA = mParent.getUndoInterface().getRedoAction();
       mAR = new AddRowAction();
       mARE = new AddRowEnterAction();
       mAC = new AddColumnAction();
       mDR = new DeleteRowAction();
       mDC = new DeleteColumnAction();
       mTR = new ToggleResultAction();
+      mRC = new RemoveCalcTableAction();
       CalcTableModel model = new CalcTableModel(mCalc);
       mTable = new JTable(model);
       mTable.setDefaultRenderer(String.class,
@@ -88,12 +93,6 @@ public class CalcTablePanel
       mTable.getActionMap().put(mARE, mARE);
       mTable.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK), mAC);
       mTable.getActionMap().put(mAC, mAC);
-      this.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK),
-                             mUA);
-      this.getActionMap().put(mUA, mUA);
-      this.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK),
-                             mRA);
-      this.getActionMap().put(mRA, mRA);
       mTable.addMouseListener(new MyMouseListener());
       mPopup = new JPopupMenu();
       mPopup.add(new JMenuItem(mAR));
@@ -103,6 +102,7 @@ public class CalcTablePanel
       mPopup.add(new JMenuItem(mUA));
       mPopup.add(new JMenuItem(mRA));
       mPopup.add(new JMenuItem(mTR));
+      mPopup.add(new JMenuItem(mRC));
       add(mTable);
       FocusListener focus = new MYFocusListener();
       mTable.addFocusListener(focus);
@@ -421,61 +421,27 @@ public class CalcTablePanel
       }
    }
    
-   private class UndoAction
-      extends MyAbstractAction
-      implements Action, Observer
-   {
-      /**
-       * 
-       */
-      private static final long serialVersionUID = 1L;
-
-      public UndoAction()
-      {
-         super("Undo");
-         getUndoInterface().registerObserver(this);
-         update();
-      }
-      
-      public void update()
-      {
-         setEnabled(getUndoInterface().canUndo());
-      }
-      
-      public void actionPerformed(ActionEvent e)
-      {
-         super.actionPerformed(e);
-         System.out.println("undo");
-         if (getUndoInterface().canUndo()) {getUndoInterface().undo();}
-      }
-   }
-   
-   private class RedoAction
-      extends AbstractAction
-      implements Action, Observer
-   {
-      /**
-       * 
-       */
-      private static final long serialVersionUID = 1L;
-
-      public RedoAction()
-      {
-         super("Redo");
-         getUndoInterface().registerObserver(this);
-         update();
-      }
-      
-      public void update()
-      {
-         setEnabled(getUndoInterface().canRedo());
-      }
-      
-      public void actionPerformed(ActionEvent e)
-      {
-         if (getUndoInterface().canRedo()) {getUndoInterface().redo();}
-      }
-   }
+   private class RemoveCalcTableAction
+     extends MyAbstractAction
+     implements Action
+  {
+     /**
+      * 
+      */
+     private static final long serialVersionUID = 1L;
+  
+     public RemoveCalcTableAction()
+     {
+        super("Remove CalcTable");
+     }
+     
+     public void actionPerformed(ActionEvent e)
+     {
+        super.actionPerformed(e);
+        Command command = new RemoveCalcTableCommand(mStory, mCalc);
+        getUndoInterface().execute(command);
+     }
+  }  
    
    public static void main(String args[])
    {
