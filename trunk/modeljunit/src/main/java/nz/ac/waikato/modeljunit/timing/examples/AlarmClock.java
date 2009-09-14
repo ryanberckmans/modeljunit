@@ -106,7 +106,7 @@ public class AlarmClock implements TimedFsmModel
     printAction("alarmOff");
   }
 
-  public int getNextTimeIncrement()
+  public int getNextTimeIncrement(Random ran)
   {
     return 1 + rand.nextInt(2);
   }

@@ -76,11 +76,6 @@ public class TrafficLight implements TimedFsmModel
   @Time
   public int now = 0;
 
-  /**
-   * Random generator for generating time increments.
-   */
-  private Random rand = new Random();
-
 
   public enum STATE {
     CARS_HOLD, //The period while the light is held green even if the button gets pressed
@@ -100,7 +95,7 @@ public class TrafficLight implements TimedFsmModel
   @Override
   public void reset(boolean testing)
   {
-    now = getNextTimeIncrement();
+    now = getNextTimeIncrement(null);
     buttonPressed = false;
     crossingTimer = 0;
     allowPedestriansTimer = 0;
@@ -224,8 +219,8 @@ public class TrafficLight implements TimedFsmModel
    * Take random steps of between 1 and 10 time units (inclusive)
    */
   @Override
-  public int getNextTimeIncrement()
+  public int getNextTimeIncrement(Random ran)
   {
-    return rand.nextInt(10) + 1;
+    return 1 + ran.nextInt(10);
   }
 }
