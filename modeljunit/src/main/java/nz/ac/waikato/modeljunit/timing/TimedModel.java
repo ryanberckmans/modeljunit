@@ -27,13 +27,17 @@ public class TimedModel extends Model
   /** The seed that is used for the default Random object for timeouts. */
   public static final long TIMEOUT_SEED = 12345L;
 
-  /** The Timeouts of the FSM. */
-  private ArrayList<Field> timeouts_;
-
   /** The single Time annotation. */
   private Field time_;
 
-  private String timeoutAction = null;
+  /** The Timeouts of the FSM. */
+  private ArrayList<Field> timeouts_;
+
+  /** When not equal to -1, this is the timeout we are about to take. */
+  private int chosenTimeout_;
+  
+  /** When chosenTimeout_ != -1, this is the number of its action. */
+  private int chosenTimeoutAction_;
 
   /**
    * Random generator for internal use. Used to decide whether to do a time
@@ -101,8 +105,8 @@ public class TimedModel extends Model
           time_ = field;
         }
         else {
-          printWarning("@Time field " + field.getName()
-              + "should be of type int.");
+          throw new FsmException("@Time field " + field.getName()
+              + " must be of type int.");
         }
       }
       else if (field.isAnnotationPresent(Timeout.class)) {
@@ -129,9 +133,9 @@ public class TimedModel extends Model
   {
     // Timeouts must be integers
     if (field.getType() != int.class) {
-      printWarning("Timeout: " + field.getName()
+      throw new FsmException("Timeout field " + field.getName()
           + "-Timeouts must be of type int");
-      return false;
+      //return false;
     }
 
     // Action name must correspond to an action method
@@ -147,23 +151,19 @@ public class TimedModel extends Model
     }
 
     // no corresponding action
-    printWarning("Timeout: " + field.getName()
+    throw new FsmException("Timeout: " + field.getName()
         + "-No corresponding action was found");
-    return false;
+    //return false;
   }
 
   /**
-   * The strengthens all guards to ensure that only timeout actions are
-   * enabled after a timeout has fired.
+   * This strengthens all guards so that after a timeout has fired,
+   * all other guards are disabled.
    */
   @Override
   public int enabled(int index)
   {
-    if (timeoutAction != null) {
-      if (getActionName(index).equals(timeoutAction)) {
-        return super.enabled(index);
-      }
-      else
+    if (chosenTimeout_ >= 0 && index != chosenTimeoutAction_) {
         return 0;
     }
     return super.enabled(index);
@@ -174,16 +174,12 @@ public class TimedModel extends Model
   {
     // reset @Time and @Timeout fields.
     setTime(0);
-    for (Field field : timeouts_) {
-      try {
-        field.setInt(getModel(), TimedFsmModel.TIMEOUT_DISABLED);
-      } catch (IllegalAccessException e) {
-        throw new FsmException("error setting @Timeout field " + field.getName()
-            + " - make sure it is public", e);
-      }
+    for (int i = 0; i < timeouts_.size(); i++) {
+      setTimeoutValue(i, TimedFsmModel.TIMEOUT_DISABLED);
     }
     super.doReset(reason);
-    timeoutAction = null;
+    chosenTimeout_ = -1;
+    chosenTimeoutAction_ = -1;
     fsmState_ = fsmModel_.getState();
   };
 
@@ -192,13 +188,6 @@ public class TimedModel extends Model
   {
     if (!isEnabled(index)) {
       return false;
-    }
-
-    if (timeoutAction != null) {
-      // this assumes that there is only one timeout enabled?
-      // TODO: generalize this to allow any timeout action to be chosen.
-      assert getActionName(index).equals(timeoutAction);
-      timeoutAction = null;
     }
 
     int startTime = getTime();
@@ -217,32 +206,50 @@ public class TimedModel extends Model
       return false;
     }
 
+    if (chosenTimeout_ >= 0) {
+      // the chosen timeout was the only one whose guard was enabled.
+      assert index == chosenTimeoutAction_;
+      // reset that timeout if the action has not set it again.
+      if (getTimeoutValue(chosenTimeout_) <= startTime) {
+        setTimeoutValue(chosenTimeout_, TimedFsmModel.TIMEOUT_DISABLED);
+      }
+      chosenTimeout_ = -1;
+      chosenTimeoutAction_ = -1;
+    }
+
     Object newState = fsmModel_.getState();
 
     // now either increment the time or do the lowest timeout
     if (rand.nextDouble() > timeoutProbability) {
       // try to increment the time
       if (!incrementTime()) {
-        // we could not increment the time so we must have a timeout to do
-        findLowestTimeout();
+        // we could not increment the time, so we must have a timeout to do
+        chooseLowestTimeout();
       }
     }
     else {
       // try to do the lowest timeout
-      if (!findLowestTimeout()) {
-        // no timeouts to do so increment the time
+      if (!chooseLowestTimeout()) {
+        // no timeouts to do, so increment the time
         incrementTime();
+        // reset ALL timeouts that are now in the past.
+        int now = getTime();
+        for (int i = 0; i < timeouts_.size(); i++) {
+          if (getTimeoutValue(i) < now) {
+            setTimeoutValue(i, TimedFsmModel.TIMEOUT_DISABLED);
+          }
+        }
       }
     }
     if (!newState.equals(fsmModel_.getState())) {
       // changing the time caused a state change
-      String failmsg = "Failure in action "
+      String failmsg = "Model problem detected after action "
           + m.getName()
-          + " from state "
-          + fsmState_
-          + ". Model state should not change "
-          + "when changing the time. Use Timeouts to control time dependant states.";
-      createTestFailure(failmsg, m.getName());
+          + " - state changed from "
+          + fsmState_ + " to " + fsmModel_.getState()
+          + " when only time changed.  "
+          + "Use Timeouts to control time dependant states.";
+      throw new FsmException(failmsg);
     }
 
     Transition done = new TimedTransition(startTime, fsmState_, m.getName(),
@@ -256,8 +263,6 @@ public class TimedModel extends Model
   }
 
   /**
-   * TODO: Change TestFailureException to FsmException in case where changing
-   * time causes a state change
    * TODO: move this up to parent Model class and/or add a
    * TestFailureException(Model) constructor.
    *
@@ -297,10 +302,13 @@ public class TimedModel extends Model
   /**
    * Sets the Time field in the timed FSM model.
    *
-   * @param value
+   * @param value Must be zero or greater.
    */
   public void setTime(int value)
   {
+    if (value < 0) {
+      throw new IllegalArgumentException("setTime(" + value + ") is illegal");
+    }
     try {
       time_.setInt(getModel(), value);
     }
@@ -323,60 +331,58 @@ public class TimedModel extends Model
    */
   public boolean incrementTime()
   {
-    Field lowest = getLowestTimeout();
+    int lowest = getLowestTimeout();
     int currTime = getTime();
     int increment = ((TimedFsmModel) fsmModel_).getNextTimeIncrement(rand);
     if (increment <= 0) {
       createTestFailure("Invalid time increment: " + increment
-          + ". All time increments must be greater than zero.", "tick");
+          + ". All time increments must be greater than zero.",
+          "getNextTimeIncrement");
     }
 
-    try {
-      if (lowest == null) {
-        // no timeouts set
+    if (lowest < 0) {
+      // no timeouts set
+      setTime(currTime + increment);
+      return true;
+    }
+    else {
+      int limit = getTimeoutValue(lowest);
+      if (currTime + increment < limit) {
+        // The increment will not go past the lowest timeout
         setTime(currTime + increment);
         return true;
       }
       else {
-        int maxTime = lowest.getInt(getModel()) - 1;
-        if (currTime + increment <= maxTime) {
-          // The increment will not go past the lowest timeout
-          setTime(currTime + increment);
-          return true;
-        }
-        else {
-          // incrementing time will take us past a timeout
-          return false;
-        }
+        // incrementing time will take us up to or past a timeout
+        return false;
       }
-    }
-    catch (IllegalAccessException ex) {
-      throw new FsmException("error trying to increment time in model "
-          + getModel().getClass().getName(), ex);
     }
   }
 
   /**
    * Gets the timeout that will expire next in the model.
-   * If no timeouts are set then null is returned.
+   * If no timeouts are set then -1 is returned.
    * If more than one timeout will expire at exactly the same time,
    * one is chosen arbitrarily (in some fixed priority order for each model).
    *
-   * @return first timeout field, or null
+   * @return the number of the first enabled timeout, else -1.
    */
-  public Field getLowestTimeout()
+  public int getLowestTimeout()
   {
+    int now = getTime();
     int lowestTimeout = Integer.MAX_VALUE;
-    Field lowest = null;
+    int lowest = -1;
     try {
       // find the lowest timeout first
-      for (Field field : timeouts_) {
+      for (int i = 0; i < timeouts_.size(); i++) {
+        Field field = timeouts_.get(i);
         int value = field.getInt(getModel());
-        if (value > 0) {  // TODO: allow timeouts at time 0?
+        if (value > 0 && value >= now) {  // TODO: allow timeouts at time 0?
+          // TODO: check its guard as well.
           // timer is set
           if (value < lowestTimeout) {
             lowestTimeout = value;
-            lowest = field;
+            lowest = i;
           }
         }
       }
@@ -395,13 +401,13 @@ public class TimedModel extends Model
    */
   public int getLowestTimeoutValue()
   {
-    Field lowest = getLowestTimeout();
-    if (lowest == null) {
+    int lowest = getLowestTimeout();
+    if (lowest < 0) {
       return TimedFsmModel.TIMEOUT_DISABLED;
     }
     else {
       try {
-        return lowest.getInt(getModel());
+        return timeouts_.get(lowest).getInt(getModel());
       }
       catch (IllegalAccessException e) {
         return TimedFsmModel.TIMEOUT_DISABLED;  // or we could throw exceptions
@@ -412,34 +418,87 @@ public class TimedModel extends Model
   /**
    * Sets the model time variable to the first enabled timeout.
    * If several timeouts are enabled at exactly the same time,
+   * one of them is chosen non-deterministically (using a priority
+   * order that is arbitrary, but fixed for each model). 
    *
    * @return true if some timeout has been chosen.
    */
-  private boolean findLowestTimeout()
+  private boolean chooseLowestTimeout()
   {
-    Field lowest = getLowestTimeout();
+    int lowest = getLowestTimeout();
 
-    if (lowest == null)
+    if (lowest < 0) {
       return false;
+    }
 
-    // set the time to the timeout value
-    try {
-      setTime(lowest.getInt(getModel()));
-      timeoutAction = lowest.getAnnotation(Timeout.class).value();
-    }
-    catch (Exception e) {
-      throw new FsmException("error getting/setting @Time field of model "
-          + getModel().getClass().getName(), e);
-    }
+    // set the time field to the timeout value
+    setTime(getTimeoutValue(lowest));
+    chosenTimeout_ = lowest;
+    chosenTimeoutAction_ = getActionNumber(getTimeoutAction(lowest));
     return true;
   }
 
-  public String getTimeoutName(int index)
+  /** @return the number of @Timeout fields in the timed model. */
+  public int getNumTimeouts() {
+    return timeouts_.size();
+  }
+
+  /**
+   * @param timeoutIndex a number from 0 up to getNumTimeouts() - 1.
+   * @return the name of a @Timeout field.
+   */
+  public String getTimeoutName(int timeoutIndex)
   {
-    if (timeouts_ == null || index >= timeouts_.size())
+    if (timeouts_ == null || timeoutIndex >= timeouts_.size())
       return "";
 
-    return timeouts_.get(index).getName();
+    return timeouts_.get(timeoutIndex).getName();
+  }
+
+  /**
+   * Gets the name of the action that will be taken when this timeout expires.
+   * @param timeoutIndex 0 .. getNumTimeouts() - 1.
+   * @return the name of the associated @Action method.
+   */
+  public String getTimeoutAction(int timeoutIndex) {
+    Timeout to = timeouts_.get(timeoutIndex).getAnnotation(Timeout.class);
+    return to.value();
+  }
+
+  /**
+   * @param timeoutIndex a number from 0 up to getNumTimeouts() - 1.
+   * @return the current value of the @Timeout field.
+   */
+  public int getTimeoutValue(int timeoutIndex)
+  {
+    Field field = timeouts_.get(timeoutIndex);
+    try {
+      return field.getInt(getModel());
+    }
+    catch (IllegalArgumentException e) {
+      throw new FsmException("bad @Timeout field: " + field.getName(), e);
+    }
+    catch (IllegalAccessException e) {
+      throw new FsmException("cannot read @Timeout field: " + field.getName(), e);
+    }
+  }
+
+  /**
+   * @param timeoutIndex a number from 0 up to getNumTimeouts() - 1.
+   * @param the new value of the @Timeout field.
+   */
+  public void setTimeoutValue(int timeoutIndex, int value)
+  {
+    Field field = timeouts_.get(timeoutIndex);
+    try {
+      field.setInt(getModel(), value);
+    }
+    catch (IllegalArgumentException e) {
+      throw new FsmException("bad @Timeout field: " + field.getName(), e);
+    }
+    catch (IllegalAccessException e) {
+      throw new FsmException("cannot write to @Timeout field: " + field.getName(), e);
+    }
   }
 
   /**

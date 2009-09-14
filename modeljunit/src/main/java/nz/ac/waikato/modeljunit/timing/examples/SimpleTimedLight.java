@@ -43,13 +43,12 @@ public class SimpleTimedLight implements TimedFsmModel
   public boolean autoOffGuard() { return time == offTimeout; }
   @Action public void autoOff() {
     on = false;
-    offTimeout = TIMEOUT_DISABLED;
   }
 
   @Override
   public int getNextTimeIncrement(Random ran)
   {
-    return ran.nextInt(200);
+    return 1 + ran.nextInt(200);
   }
 
   /**
