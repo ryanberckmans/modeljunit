@@ -258,7 +258,7 @@ public class Model
     }
     int nActions = fsmActions_.size();
     if (nActions == 0) {
-      Assert.fail("ERROR: FSM model "+fsmName_+" has no methods annotated with @Action.");
+      throw new FsmException("ERROR: FSM model "+fsmName_+" has no methods annotated with @Action.");
     }
     // Now look for guards of the Action methods.
     fsmGuards_ = new ArrayList<Method>(nActions);
