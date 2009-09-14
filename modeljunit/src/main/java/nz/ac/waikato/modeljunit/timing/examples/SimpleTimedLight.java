@@ -22,10 +22,9 @@ import nz.ac.waikato.modeljunit.timing.Timeout;
  */
 public class SimpleTimedLight implements TimedFsmModel
 {
-  private Random ran = new Random(12345);
   private boolean on = false;
   @Time public int time = 0;
-  @Timeout("autoOff") public int offTimeout = -1;
+  @Timeout("autoOff") public int offTimeout;
 
   @Override
   public Object getState() {
@@ -34,8 +33,6 @@ public class SimpleTimedLight implements TimedFsmModel
 
   @Override public void reset(boolean testing) {
     on = false;
-    time = 0;
-    offTimeout = -1;
   }
 
   @Action public void pushButton() {
@@ -46,13 +43,13 @@ public class SimpleTimedLight implements TimedFsmModel
   public boolean autoOffGuard() { return time == offTimeout; }
   @Action public void autoOff() {
     on = false;
-    offTimeout = -1;
+    offTimeout = TIMEOUT_DISABLED;
   }
 
   @Override
-  public int getNextTimeIncrement()
+  public int getNextTimeIncrement(Random ran)
   {
-    return ran.nextInt(300);
+    return ran.nextInt(200);
   }
 
   /**
@@ -62,6 +59,6 @@ public class SimpleTimedLight implements TimedFsmModel
   {
     Tester tester = new RandomTester(new SimpleTimedLight());
     tester.addListener(new VerboseListener());
-    tester.generate(200);
+    tester.generate(20);
   }
 }

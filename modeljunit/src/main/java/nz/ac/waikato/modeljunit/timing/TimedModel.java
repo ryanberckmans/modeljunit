@@ -17,7 +17,7 @@ import nz.ac.waikato.modeljunit.Transition;
 import junit.framework.Assert;
 
 /**
- * An extension of the model class which supports timed models.
+ * An extension of the Model class that supports timed models.
  *
  * @author Scott Thompson
  */
@@ -111,6 +111,9 @@ public class TimedModel extends Model
         }
       }
     }
+    if (time_ == null) {
+      throw new FsmException("No @Time field in TimedFsmModel " + fsm.getName());
+    }
   }
 
   /**
@@ -169,6 +172,16 @@ public class TimedModel extends Model
   @Override
   public void doReset(String reason)
   {
+    // reset @Time and @Timeout fields.
+    setTime(0);
+    for (Field field : timeouts_) {
+      try {
+        field.setInt(getModel(), TimedFsmModel.TIMEOUT_DISABLED);
+      } catch (IllegalAccessException e) {
+        throw new FsmException("error setting @Timeout field " + field.getName()
+            + " - make sure it is public", e);
+      }
+    }
     super.doReset(reason);
     timeoutAction = null;
     fsmState_ = fsmModel_.getState();
@@ -210,13 +223,13 @@ public class TimedModel extends Model
     if (rand.nextDouble() > timeoutProbability) {
       // try to increment the time
       if (!incrementTime()) {
-        // we cound't increment the time so we must have a timeout to do
-        doLowestTimeout();
+        // we could not increment the time so we must have a timeout to do
+        findLowestTimeout();
       }
     }
     else {
       // try to do the lowest timeout
-      if (!doLowestTimeout()) {
+      if (!findLowestTimeout()) {
         // no timeouts to do so increment the time
         incrementTime();
       }
@@ -312,7 +325,7 @@ public class TimedModel extends Model
   {
     Field lowest = getLowestTimeout();
     int currTime = getTime();
-    int increment = ((TimedFsmModel) fsmModel_).getNextTimeIncrement();
+    int increment = ((TimedFsmModel) fsmModel_).getNextTimeIncrement(rand);
     if (increment <= 0) {
       createTestFailure("Invalid time increment: " + increment
           + ". All time increments must be greater than zero.", "tick");
@@ -344,8 +357,10 @@ public class TimedModel extends Model
   }
 
   /**
-   * Gets the timeout that will expire next in the model. If no timeouts are set
-   * then null is returned
+   * Gets the timeout that will expire next in the model.
+   * If no timeouts are set then null is returned.
+   * If more than one timeout will expire at exactly the same time,
+   * one is chosen arbitrarily (in some fixed priority order for each model).
    *
    * @return first timeout field, or null
    */
@@ -357,7 +372,7 @@ public class TimedModel extends Model
       // find the lowest timeout first
       for (Field field : timeouts_) {
         int value = field.getInt(getModel());
-        if (value > 0) {
+        if (value > 0) {  // TODO: allow timeouts at time 0?
           // timer is set
           if (value < lowestTimeout) {
             lowestTimeout = value;
@@ -366,14 +381,14 @@ public class TimedModel extends Model
         }
       }
     }
-    catch (Exception ex) {
-      ex.printStackTrace();
+    catch (IllegalAccessException ex) {
+      throw new FsmException("@Timeout fields must be public");
     }
     return lowest;
   }
 
   /**
-   * Gets the value of the lowest enabled timeout. Returns Integer.MIN_VALUE if
+   * Gets the value of the lowest enabled timeout. Returns TIMEOUT_DISABLED if
    * no timeouts are set.
    *
    * @return next timeout value.
@@ -382,21 +397,25 @@ public class TimedModel extends Model
   {
     Field lowest = getLowestTimeout();
     if (lowest == null) {
-      return Integer.MIN_VALUE;
+      return TimedFsmModel.TIMEOUT_DISABLED;
     }
     else {
       try {
         return lowest.getInt(getModel());
       }
-      catch (Exception e) {
-        e.printStackTrace();
-        return Integer.MIN_VALUE;
+      catch (IllegalAccessException e) {
+        return TimedFsmModel.TIMEOUT_DISABLED;  // or we could throw exceptions
       }
-
     }
   }
 
-  private boolean doLowestTimeout()
+  /**
+   * Sets the model time variable to the first enabled timeout.
+   * If several timeouts are enabled at exactly the same time,
+   *
+   * @return true if some timeout has been chosen.
+   */
+  private boolean findLowestTimeout()
   {
     Field lowest = getLowestTimeout();
 

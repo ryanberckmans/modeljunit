@@ -25,7 +25,7 @@ import nz.ac.waikato.modeljunit.VerboseListener;
 @Deprecated
 public class SimpleNaiveLight implements FsmModel
 {
-  private Random ran = new Random(12345);
+  private Random ran = new Random(12345L);
   private boolean on = false;
   private int time = 0;
   private int offTimeout = 0;

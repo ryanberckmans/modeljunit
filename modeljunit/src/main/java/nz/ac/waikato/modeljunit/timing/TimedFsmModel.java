@@ -4,6 +4,8 @@
 
 package nz.ac.waikato.modeljunit.timing;
 
+import java.util.Random;
+
 import nz.ac.waikato.modeljunit.FsmModel;
 
 /**
@@ -23,16 +25,19 @@ import nz.ac.waikato.modeljunit.FsmModel;
  */
 public interface TimedFsmModel extends FsmModel {
 
-	/**
-	 * Get the amount of time to move forward the next time
-	 * that the time is advanced.  The framework will check whether this
-	 * increment would advance the time past any enabled timeout(s), and
-	 * will automatically execute one of those timeouts rather than a
-	 * normal action when that happens.
-	 * 
-	 * TODO: pass the Random object as a parameter?
-	 *
-	 * @return an integer value greater than zero.
-	 */
-	public int getNextTimeIncrement();
+  /** This value indicates that a timeout is not enabled. */
+  public static final int TIMEOUT_DISABLED = -1;
+
+  /**
+   * Get the amount of time to move forward the next time
+   * that the time is advanced.  The framework will check whether this
+   * increment would advance the time past any enabled timeout(s), and
+   * will automatically execute one of those timeouts rather than a
+   * normal action when that happens.
+   * 
+   * @param ran can be used to choose random time distributions
+   *
+   * @return an integer value greater than zero.
+   */
+  public int getNextTimeIncrement(Random ran);
 }
