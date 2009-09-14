@@ -20,8 +20,11 @@ public class TimedModelTest
 
     //make sure the Time and 2 Timeouts were read properly
     assertEquals(0, model.getTime());
+    assertEquals(2, model.getNumTimeouts());
     assertEquals("dialTimeout", model.getTimeoutName(0));
+    assertEquals("dial", model.getTimeoutAction(0));
     assertEquals("hangUpTimeout", model.getTimeoutName(1));
+    assertEquals("hangUp", model.getTimeoutAction(1));
   }
 
   @Test(expected = FsmException.class)
@@ -31,9 +34,25 @@ public class TimedModelTest
   }
 
   @Test(expected = FsmException.class)
-  public void testInvalidTimeouts()
+  public void testInvalidTimeout1()
   {
-    new TimedModel(new BogusFSM());
+    new TimedModel(new BadTimeout1());
+  }
+
+  @Test
+  public void testInvalidTimeout2()
+  {
+    TimedModel model = new TimedModel(new BadTimeout2());
+    // the protected field is not visible
+    // (it would be nice to throw an error for this,
+    //  but there seems to be no way to see non-public fields).
+    assertEquals(0, model.getNumTimeouts());
+  }
+
+  @Test(expected = FsmException.class)
+  public void testInvalidTimeout3()
+  {
+    new TimedModel(new BadTimeout3());
   }
 
   @Test
@@ -137,13 +156,13 @@ public class TimedModelTest
     simpleFSM.action2Timer = 10;
     simpleFSM.action3Timer = 15;
 
-    assertEquals("action2Timer", model.getLowestTimeout().getName());
+    assertEquals("action2Timer", model.getTimeoutName(model.getLowestTimeout()));
 
     simpleFSM.action1Timer = 0;
     simpleFSM.action2Timer = 0;
     simpleFSM.action3Timer = 0;
 
-    assertNull(model.getLowestTimeout());
+    assertEquals(-1, model.getLowestTimeout());
   }
 }
 
@@ -234,46 +253,24 @@ class MissingTimeFSM implements TimedFsmModel
   }
 }
 
-class BogusFSM implements TimedFsmModel
-{
 
-  private String state = "";
-
-  @Timeout("")
+class BadTimeout1 extends MissingTimeFSM {
+  @Time public int time;
+  
+  @Timeout("badAction")
   public int t1;
+}
 
-  @Timeout("action2")
+class BadTimeout2 extends MissingTimeFSM {
+  @Time public int time;
+
+  @Timeout("action")
   protected int t2;
+}
 
-  @Timeout("action3")
+class BadTimeout3 extends MissingTimeFSM {
+  @Time public int time;
+  
+  @Timeout("action")
   public float t3;
-
-  @Override
-  public int getNextTimeIncrement(Random ran)
-  {
-    return 0;
-  }
-
-  @Override
-  public Object getState()
-  {
-    return state;
-  }
-
-  @Override
-  public void reset(boolean testing)
-  {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Action
-  public void action2()
-  {
-  }
-
-  @Action
-  public void action3()
-  {
-  }
 }
