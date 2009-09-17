@@ -22,14 +22,15 @@ public class MCDCSuggestionStrategy
    private void MCDC()
    {
       CalcTable calc = getCalcTable();
-      Set<Suggestion> suggestionset = new HashSet<Suggestion>();
+      Set<Suggestion> alreadythier = new HashSet<Suggestion>();
       for (int r = 0; r < calc.rows(); r++) {
          List<String> thing = new ArrayList<String>(calc.getRow(r));
          for (int c = 0; c < calc.columns(); c++) {
             if (calc.isResult(c)) {thing.set(c, "?");}
          }
-         suggestionset.add(new DefaultSuggestion(thing));
+         alreadythier.add(new DefaultSuggestion(thing));
       }
+      Set<Suggestion> suggestionset = new HashSet<Suggestion>(alreadythier);
       List<Suggestion> suggestions = new ArrayList<Suggestion>();
       for (int c = 0; c < calc.columns(); c++) {
          if (calc.isResult(c)) {continue;}
@@ -47,10 +48,10 @@ public class MCDCSuggestionStrategy
                }
                Suggestion suggestion1 = new DefaultSuggestion(possible1);
                Suggestion suggestion2 = new DefaultSuggestion(possible2);
-               if (suggestionset.add(suggestion1)
-                   && suggestionset.add(suggestion2)) {
-                  suggestions.add(suggestion1);
-                  suggestions.add(suggestion2);
+               if (alreadythier.add(suggestion1)
+                   && alreadythier.add(suggestion2)) {
+                  if (suggestionset.add(suggestion1)) {suggestions.add(suggestion1);}
+                  if (suggestionset.add(suggestion2)) {suggestions.add(suggestion2);}
                }
             } catch (NumberFormatException ex) {}
          }

@@ -50,4 +50,17 @@ public class StoryTest
    {
       return visitor.visit(this, other);
    }
+
+  public String toHTML()
+  {
+    StringBuffer sb = new StringBuffer();
+    sb.append("<html>\n");
+    sb.append("<body>\n");
+    for (StoryTestInterface sti : mComponents) {
+      sb.append(sti.toHTML());
+    }
+    sb.append("</body>\n");
+    sb.append("</html>\n");
+    return sb.toString();
+  }
 }

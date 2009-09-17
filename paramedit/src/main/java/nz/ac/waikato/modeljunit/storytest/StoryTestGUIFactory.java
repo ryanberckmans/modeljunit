@@ -12,5 +12,6 @@ public interface StoryTestGUIFactory
                                              StoryTestSuggestionVisitor svisitor);
    
    public Component createCalcTableSuggestionComponent(CalcTable calc,
-                                                       StoryTestGUIInterface par);
+                                                       StoryTestGUIInterface par,
+                                                       SuggestionStrategyFactory factory);
 }

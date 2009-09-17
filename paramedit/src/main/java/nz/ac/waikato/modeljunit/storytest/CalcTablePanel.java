@@ -1,5 +1,6 @@
 package nz.ac.waikato.modeljunit.storytest;
 
+import nz.ac.waikato.modeljunit.command.Command;
 import nz.ac.waikato.modeljunit.command.RemoveCalcTableCommand;
 import nz.ac.waikato.modeljunit.command.ToggleResultColumnCommand;
 import nz.ac.waikato.modeljunit.command.UndoInterface;
@@ -23,8 +24,6 @@ import javax.swing.Action;
 import javax.swing.KeyStroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
-import javax.swing.JComponent;
-import nz.ac.waikato.modeljunit.command.Command;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import java.awt.event.MouseAdapter;

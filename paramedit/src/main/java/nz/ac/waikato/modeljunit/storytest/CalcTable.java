@@ -179,6 +179,11 @@ public class CalcTable
       inform();
    }
    
+   public void addRow(List<String> row)
+   {
+     addRow(rows(), row);
+   }
+   
    /**
     * Adds a row at index the end of the matrix
     *
@@ -393,6 +398,30 @@ public class CalcTable
       return sb.toString();
    }
    
+   public String toHTML()
+   {
+     StringBuffer sb = new StringBuffer();
+     sb.append("<table border=\"1\" cellspacing=\"1\" cellpadding=\"5\">\n");
+     sb.append("\t<tr>\n");
+     for (int c = 0; c < columns(); c++) {
+       sb.append("\t\t<th>");
+       sb.append(getColumnHeader(c));
+       sb.append("</th>\n");
+     }
+     sb.append("\t</tr>\n");
+     for (int r = 0; r < rows(); r++) {
+       sb.append("\t<tr>\n");
+       for (int c = 0; c < columns(); c++) {
+         sb.append("\t\t<td>");
+         sb.append(getValue(r, c));
+         sb.append("</td>\n");
+       }
+       sb.append("\t</tr>\n");
+     }
+     sb.append("</table>\n");
+     return sb.toString();
+   }
+   
    public Object accept(StoryTestVisitor<?> visitor, Object other)
    {
       return visitor.visit(this, other);
@@ -446,6 +475,7 @@ public class CalcTable
             // TODO Auto-generated catch block
             e.printStackTrace();
          } catch (InvocationTargetException e) {
+           System.out.println(s);
             // TODO Auto-generated catch block
             e.printStackTrace();
          }
