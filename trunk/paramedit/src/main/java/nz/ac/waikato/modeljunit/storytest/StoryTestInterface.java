@@ -6,4 +6,6 @@ public interface StoryTestInterface
    extends Subject, Serializable
 {
    public Object accept(StoryTestVisitor<?> visitor, Object other);
+   
+   public String toHTML();
 }

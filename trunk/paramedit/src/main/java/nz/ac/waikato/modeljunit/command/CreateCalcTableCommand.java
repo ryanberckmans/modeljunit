@@ -1,7 +1,5 @@
 package nz.ac.waikato.modeljunit.command;
 
-import nz.ac.waikato.modeljunit.storytest.CalcTable;
-import nz.ac.waikato.modeljunit.storytest.MCDCSuggestionStrategy;
 import nz.ac.waikato.modeljunit.storytest.StoryTest;
 import nz.ac.waikato.modeljunit.storytest.StoryTestInterface;
 

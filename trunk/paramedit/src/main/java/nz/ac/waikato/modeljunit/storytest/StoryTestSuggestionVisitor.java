@@ -8,9 +8,17 @@ public class StoryTestSuggestionVisitor
 {
    public StoryTestGUIFactory mFactory;
    
+   private SuggestionStrategyFactory mSuggestionStrategyFactory =
+     GuessSuggestionStrategyFactory.INSTANCE;
+   
    public StoryTestSuggestionVisitor(StoryTestGUIFactory factory)
    {
       mFactory = factory;
+   }
+   
+   public void setSuggestionStrategyFactory(SuggestionStrategyFactory factory)
+   {
+     mSuggestionStrategyFactory = factory;
    }
    
    public Component visit(StoryTestInterface story, Object other)
@@ -22,7 +30,7 @@ public class StoryTestSuggestionVisitor
    {
       System.out.println("CalcTable");
       StoryTestGUIInterface parent = (StoryTestGUIInterface)other;
-      return (Component)mFactory.createCalcTableSuggestionComponent(table, parent);
+      return (Component)mFactory.createCalcTableSuggestionComponent(table, parent, mSuggestionStrategyFactory);
    }
    
    public Component visit(StoryTest story, Object other)

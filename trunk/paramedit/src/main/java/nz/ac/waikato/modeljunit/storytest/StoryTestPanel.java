@@ -15,7 +15,9 @@ import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
+import java.io.BufferedWriter;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.ObjectOutputStream;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
@@ -57,6 +59,7 @@ public class StoryTestPanel
    private final JFileChooser mChooser;
    private final JPopupMenu mPopup;
    private StoryTestGUIInterface mParent = null;
+   private StoryTestInterface mSuggestionInterface = null;
    
    private final Action mUA;
    private final Action mRA;
@@ -70,6 +73,12 @@ public class StoryTestPanel
       JMenu menu = new JMenu("File");
       menu.add(new JMenuItem(new SaveAction()));
       menu.add(new JMenuItem(new LoadAction()));
+      menu.add(new JMenuItem(new HTMLSaveAction()));
+      mbar.add(menu);
+      menu = new JMenu("Suggestion");
+      menu.add(new JMenuItem(new SetGuessAction()));
+      menu.add(new JMenuItem(new SetMCDCAction()));
+      menu.add(new JMenuItem(new SetPairWiseAction()));
       mbar.add(menu);
       mView = new JPanel();
       mView.setLayout(new BoxLayout(mView, BoxLayout.Y_AXIS));
@@ -119,6 +128,7 @@ public class StoryTestPanel
    
    public void requestSuggestions(StoryTestInterface sti)
    {
+      mSuggestionInterface = sti;
       Component sug = (Component)mSuggestionVisitor.visit(sti, this);
       if (sug != null) {mBottompane.setViewportView(sug);}
    }
@@ -246,6 +256,100 @@ public class StoryTestPanel
          }
       }
    }
+   
+   private class SetMCDCAction
+     extends AbstractAction
+     implements Action
+  {
+     /**
+      * 
+      */
+     private static final long serialVersionUID = 1L;
+  
+     public SetMCDCAction()
+     {
+        super("MCDC");
+     }
+     
+     public void actionPerformed(ActionEvent e)
+     {         
+        mSuggestionVisitor.setSuggestionStrategyFactory(MCDCSuggestionStrategyFactory.INSTANCE);
+        requestSuggestions(mSuggestionInterface);
+     }
+  }
+   
+   private class SetPairWiseAction
+       extends AbstractAction
+       implements Action
+    {
+       /**
+        * 
+        */
+       private static final long serialVersionUID = 1L;
+    
+       public SetPairWiseAction()
+       {
+          super("PairWise");
+       }
+       
+       public void actionPerformed(ActionEvent e)
+       {         
+          mSuggestionVisitor.setSuggestionStrategyFactory(PairWiseSuggestionStrategyFactory.INSTANCE);
+          requestSuggestions(mSuggestionInterface);
+       }
+    }
+   
+   private class SetGuessAction
+     extends AbstractAction
+     implements Action
+  {
+     /**
+      * 
+      */
+     private static final long serialVersionUID = 1L;
+  
+     public SetGuessAction()
+     {
+        super("Guess");
+     }
+     
+     public void actionPerformed(ActionEvent e)
+     {         
+        mSuggestionVisitor.setSuggestionStrategyFactory(GuessSuggestionStrategyFactory.INSTANCE);
+        requestSuggestions(mSuggestionInterface);
+     }
+  }
+   
+   private class HTMLSaveAction
+     extends AbstractAction
+     implements Action
+  {
+     /**
+      * 
+      */
+     private static final long serialVersionUID = 1L;
+  
+     public HTMLSaveAction()
+     {
+        super("Save as HTML");
+     }
+     
+     public void actionPerformed(ActionEvent e)
+     {         
+        int returnVal = mChooser.showSaveDialog(StoryTestPanel.this);
+        if(returnVal == JFileChooser.APPROVE_OPTION) {
+          try{
+           File saveto = mChooser.getSelectedFile();
+           FileWriter fw = new FileWriter(saveto);
+           BufferedWriter bw = new BufferedWriter(fw);
+           bw.write(mStory.toHTML());
+           bw.close();
+           } catch (Exception ex) {
+            ex.printStackTrace();
+          }
+        }
+     }
+  }
    
    private class MyMouseListener
      extends MouseAdapter

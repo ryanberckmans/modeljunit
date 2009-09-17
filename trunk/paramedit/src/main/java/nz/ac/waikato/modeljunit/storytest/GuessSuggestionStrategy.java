@@ -27,6 +27,8 @@ public class GuessSuggestionStrategy
       mSuggestions.clear();
       int result = -1;
       CalcTable calc = getCalcTable();
+      if (calc.rows() == 0) {return;}
+      System.out.println(calc.toString());
       for (int c = 0; c < calc.columns(); c++) {
          if (calc.isResult(c)) {
             result = c; break;
@@ -41,7 +43,7 @@ public class GuessSuggestionStrategy
       boolean[] isBoolean = new boolean[calc.columns()];
       int count = 0;
       for (int c = 0; c < calc.columns(); c++) {
-         if (!calc.isResult(c) && !columnsdone[c]) {
+         if (!calc.isResult(c) && !columnsdone[c] && calc.getType(c) != null) {
             if (calc.getType(c).equals(Boolean.class)) {
                columnsdone[c] = true; columnorder[count] = c;
                isBoolean[c] = true;
@@ -50,7 +52,7 @@ public class GuessSuggestionStrategy
          }
       }
       for (int c = 0; c < calc.columns(); c++) {
-         if (!calc.isResult(c) && !columnsdone[c]) {
+         if (!calc.isResult(c) && !columnsdone[c] && calc.getType(c) != null) {
             if (calc.getType(c).equals(Double.class)) {
                columnsdone[c] = true; columnorder[count] = c;
                count++;
@@ -293,8 +295,8 @@ public class GuessSuggestionStrategy
             alltrue = alltrue && trueres.equals(result);
             trues.add(row);
          } else {
-            falseres = trueres == null ? result : trueres;
-            allfalse = alltrue && falseres.equals(result);
+            falseres = falseres== null ? result : falseres;
+            allfalse = allfalse && falseres.equals(result);
             falses.add(row);
          }
       }

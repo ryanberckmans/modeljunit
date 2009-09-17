@@ -24,12 +24,11 @@ public class DefaultStoryTestGUIFactory
       return new StoryTestPanel(story, visitor, svisitor);
    }
    
-   public CalcTableSuggestionPanel createCalcTableSuggestionComponent(CalcTable table, StoryTestGUIInterface parent)
+   public CalcTableSuggestionPanel createCalcTableSuggestionComponent(CalcTable table, StoryTestGUIInterface parent,
+                                                                      SuggestionStrategyFactory factory)
    {
       List<SuggestionStrategy> strats = new ArrayList<SuggestionStrategy>();
-      strats.add(new GuessSuggestionStrategy(table));
-      //strats.add(new MCDCSuggestionStrategy(table));
-      //JTable jtable = new JTable(new SuggestionsTableModel(strats, table));
+      strats.add(factory.createSuggestionStrategy(table));
       CalcTableSuggestionPanel mPan = new CalcTableSuggestionPanel(table,
                                                                    strats,
                                                                    parent);
