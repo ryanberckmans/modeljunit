@@ -1,9 +1,11 @@
 package nz.ac.waikato.modeljunit.timing.examples;
 
+import java.io.FileNotFoundException;
 import java.util.Random;
 
 import nz.ac.waikato.modeljunit.Action;
 import nz.ac.waikato.modeljunit.FsmModel;
+import nz.ac.waikato.modeljunit.GraphListener;
 import nz.ac.waikato.modeljunit.RandomTester;
 import nz.ac.waikato.modeljunit.Tester;
 import nz.ac.waikato.modeljunit.VerboseListener;
@@ -28,7 +30,7 @@ public class SimpleNaiveLight implements FsmModel
   private Random ran = new Random(12345L);
   private boolean on = false;
   private int time = 0;
-  private int offTimeout = 0;
+  private int offTimeout = -1;
 
   @Override
   public Object getState() {
@@ -56,7 +58,7 @@ public class SimpleNaiveLight implements FsmModel
 
   public boolean delayGuard() { return time < offTimeout; }
   @Action public void delay() {
-    time += ran.nextInt(300);
+    time += 1 + ran.nextInt(300);
     System.out.println("     time := " + time + " but offTimeout=" + offTimeout);
     if (offTimeout != 0 && time > offTimeout) {
       time = offTimeout; // don't go past the timeout
@@ -64,12 +66,15 @@ public class SimpleNaiveLight implements FsmModel
   }
 
   /**
+   * An example of generating tests from the above model.
    * @param args
+   * @throws FileNotFoundException 
    */
-  public static void main(String[] args)
-  {
+  public static void main(String[] args) throws FileNotFoundException {
     Tester tester = new RandomTester(new SimpleNaiveLight());
     tester.addListener(new VerboseListener());
-    tester.generate(200);
+    GraphListener graph = tester.buildGraph();
+    tester.generate(50);
+    graph.printGraphDot("SimpleNaiveLight.dot");
   }
 }

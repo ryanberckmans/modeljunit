@@ -16,17 +16,13 @@ public class AlarmClock implements TimedFsmModel
 {
 
   /** The time that the alarm will go off. (-1 == not set) */
-  @Timeout("alarmOn")
-  public int alarmTimer;
+  @Timeout("alarmOn") public int alarmTimer;
 
   /** The current time of the clock */
-  @Time
-  public int currentTime;
+  @Time public int currentTime;
 
   /** Whether the alarm is currently sounding */
   private boolean alarmActive;
-
-  private Random rand = new Random();
 
   @Override
   public Object getState()
@@ -108,7 +104,7 @@ public class AlarmClock implements TimedFsmModel
 
   public int getNextTimeIncrement(Random ran)
   {
-    return 1 + rand.nextInt(2);
+    return 1 + ran.nextInt(2);
   }
 
   public void printAction(String action)

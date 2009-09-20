@@ -46,12 +46,12 @@ public class SimpleTimedLight implements TimedFsmModel
   }
 
   @Override
-  public int getNextTimeIncrement(Random ran)
-  {
+  public int getNextTimeIncrement(Random ran) {
     return 1 + ran.nextInt(200);
   }
 
   /**
+   * An example of generating tests from the above model.
    * @param args
    */
   public static void main(String[] args)
