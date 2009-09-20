@@ -46,7 +46,7 @@ public abstract class Tester
   public static final long FIXEDSEED = 123456789L;
 
   /**
-   * The model from which tests will be generated.
+   * The model from which tests will be generated.  Always non-null.
    */
   protected Model model_;
 
@@ -87,6 +87,7 @@ public abstract class Tester
 
   /**
    * @return The model that is driving the test generation.
+   *         This will always be non-null.
    */
   public Model getModel()
   {
