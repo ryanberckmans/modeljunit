@@ -42,6 +42,9 @@ import org.objectweb.asm.ClassReader;
 /*
  * PanelTestDesign.java
  * @author rong ID : 1005450 26th Jul 2007
+ * 
+ * TODO: move a lot of the state variables from this class into
+ * the Project or Configuration/Parameter classes.
  */
 public class PanelTestDesign extends PanelAbstract
     implements
@@ -331,7 +334,7 @@ public class PanelTestDesign extends PanelAbstract
       m_checkCoverage[i].addActionListener(this);
       m_panelReport.add(m_checkCoverage[i]);
     }
-    
+
     // set border
    // m_panelReport.setBackground(bg[2]);
     m_panelReport.setBorder(new TitledBorder(new EtchedBorder(
@@ -344,7 +347,7 @@ public class PanelTestDesign extends PanelAbstract
                                      public void actionPerformed(ActionEvent e) {
                                         getTopLevelAncestor().setVisible(false);
                                      }
-                                   }); 
+                                   });
 
     this.add(closeButton);
   }
@@ -358,11 +361,11 @@ public class PanelTestDesign extends PanelAbstract
      for (int i = 0; i < NUM_GRAPH_CHECKBOX; i++) {
         m_checkCoverage[i].setSelected(Parameter.getCoverageOption()[i]);
      }
-     
+
      m_checkCoverage[CHECKBOX_PAINTGRAPH].setSelected(Parameter.getGenerateGraph());
 
      m_checkFailureVerbosity.setSelected(Parameter.getFailureVerbosity());
-     
+
      m_combAlgorithmSelection.setSelectedIndex(Project.getInstance().getAlgorithm());
      Parameter.setAlgorithmName(m_panelAlgorithm[Project.getInstance().getAlgorithm()].getAlgorithmName());
 
@@ -576,10 +579,15 @@ public class PanelTestDesign extends PanelAbstract
       m_modelInfo1.setText("Model:   "+cName);
       m_modelInfo2.setText("Path:     "+Parameter.getPackageLocation());
       m_modelInfo3.setText("Actions: "+actionNumber + " actions were loaded.");
- 
+
       updatePanelSettings();
   }
 
+  /** TODO: move this somewhere, perhaps a Visitor class
+   *  that runs over the Tester objects.
+   *
+   * @return
+   */
   public String generateCode()
   {
     // Random walking length
@@ -779,7 +787,7 @@ public class PanelTestDesign extends PanelAbstract
        mCodeView.setText("There was a problem generating code at this time:\n" + x.getMessage());
     }
 
-    mCodeView.setPreferredSize(mScrollPane.getViewport().getExtentSize()); 
+    mCodeView.setPreferredSize(mScrollPane.getViewport().getExtentSize());
   }
 
   @Override
