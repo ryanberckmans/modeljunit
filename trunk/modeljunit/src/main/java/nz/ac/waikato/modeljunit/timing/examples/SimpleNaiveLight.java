@@ -54,13 +54,14 @@ public class SimpleNaiveLight implements FsmModel
   @Action public void autoOff() {
     on = false;
     time += 1;
+    offTimeout = -1;
   }
 
-  public boolean delayGuard() { return time < offTimeout; }
+  public boolean delayGuard() { return time != offTimeout; }
   @Action public void delay() {
-    time += 1 + ran.nextInt(300);
-    System.out.println("     time := " + time + " but offTimeout=" + offTimeout);
-    if (offTimeout != 0 && time > offTimeout) {
+    time += 1 + ran.nextInt(200);
+    //System.out.println("     time := " + time + " but offTimeout=" + offTimeout);
+    if (offTimeout >= 0 && time > offTimeout) {
       time = offTimeout; // don't go past the timeout
     }
   }
