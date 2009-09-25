@@ -46,7 +46,7 @@ public class TimedModel extends Model
   private Random rand;
 
   /** The probability of timing-out, rather than choosing a random action. */
-  private double timeoutProbability = 0.5;
+  private double timeoutProbability = 0.25;
 
 
   /**
@@ -232,13 +232,14 @@ public class TimedModel extends Model
       if (!chooseLowestTimeout()) {
         // no timeouts to do, so increment the time
         incrementTime();
-        // reset ALL timeouts that are now in the past.
-        int now = getTime();
-        for (int i = 0; i < timeouts_.size(); i++) {
-          if (getTimeoutValue(i) < now) {
-            setTimeoutValue(i, TimedFsmModel.TIMEOUT_DISABLED);
-          }
-        }
+      }
+    }
+    // reset ALL timeouts that are now in the past.
+    int now = getTime();
+    for (int i = 0; i < timeouts_.size(); i++) {
+      int timeout = getTimeoutValue(i);
+      if (0 <= timeout && timeout < now) {
+        setTimeoutValue(i, TimedFsmModel.TIMEOUT_DISABLED);
       }
     }
     if (!newState.equals(fsmModel_.getState())) {
