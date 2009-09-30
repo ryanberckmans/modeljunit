@@ -127,8 +127,8 @@ public class SimCard implements FsmModel
     return DF.name.toString()
       + "," + (EF==null ? "null" : EF.name.toString())
       + ",PIN="+PIN
-      //+ "," + counter_PIN_try
-      //+ "," + counter_PUK_try
+      + "," + counter_PIN_try
+      + "," + counter_PUK_try
       + "," + status_en
       + "," + (status_PIN_block==B_Status.Blocked ? "PINBLOCKED" : "")
       + "," + (status_PUK_block==B_Status.Blocked ? "PUKBLOCKED" : "")
@@ -140,7 +140,7 @@ public class SimCard implements FsmModel
    */
   public void reset(boolean testing)
   {
-	initFiles();
+    initFiles();
     PIN = 11;
     status_en = E_Status.Enabled;
     status_PIN_block = B_Status.Unblocked;
@@ -186,7 +186,7 @@ public class SimCard implements FsmModel
       status_PIN_block = B_Status.Blocked;
       perm_session = false;
       result = Status_Word.sw_9840; /*@REQ: REQ6, VERIFY_CHV4 @*/
-      //System.out.println("PIN Blocked!");
+      System.out.println("PIN blocked in Verify_PIN!");
     }
     else {
       counter_PIN_try = counter_PIN_try + 1;
@@ -200,6 +200,10 @@ public class SimCard implements FsmModel
 
   @Action public void unblockPINGood12() {Unblock_PIN(GOOD_PUK,12);}
   @Action public void unblockPINBad()    {Unblock_PIN(12233446,11);}
+  //@Action public void unblockPINBad2()    {Unblock_PIN(12233446,11);}
+  //@Action public void unblockPINBad3()    {Unblock_PIN(12233446,11);}
+  //@Action public void unblockPINBad4()    {Unblock_PIN(12233446,11);}
+  //@Action public void unblockPINBad5()    {Unblock_PIN(12233446,11);}
   /**
    * User enters a PUK code to try and unblock a blocked PIN.
    * This is called UNBLOCK_CHV(code_unblock, new_code) in the PMBT book.
@@ -227,11 +231,11 @@ public class SimCard implements FsmModel
         //  UML/OCL model set status_en to Disabled rather than Enabled.)
         // status_en = E_Status.Disabled; /*@REQ: Unblock5 @*/
         status_en = E_Status.Enabled; /*@REQ: Unblock5 @*/
-        //System.out.println("unBLOCKED PUK and set status Enabled");
+        System.out.println("PIN unblocked, setting status Enabled");
       }
       else {
         // leave status_en unchanged
-          //System.out.println("unBLOCKED PUK, leaving status Enabled");
+        System.out.println("PIN unblocked, leaving status Enabled");
       }/*@REQ: Unblock7,Unblock2 @*/
     }
     else if (counter_PUK_try == Max_Puk_Try - 1) {
@@ -239,7 +243,7 @@ public class SimCard implements FsmModel
       status_PUK_block = B_Status.Blocked;
       perm_session = false;
       result = Status_Word.sw_9840; /*@REQ: REQ7, Unblock4 @*/
-      System.out.println("BLOCKED PUK!!! (after " + counter_PUK_try + " bad attempts)");
+      System.out.println("PUK BLOCKED!!! (after " + counter_PUK_try + " bad attempts)");
     }
     else {
       counter_PUK_try = counter_PUK_try + 1;
@@ -251,7 +255,7 @@ public class SimCard implements FsmModel
     }
   }
 
-  // When the correct PIN is 12, this will also test the invalid-PIN case
+  //When the correct PIN is 12, this will also test the invalid-PIN case
   @Action public void enablePIN11() {Enabled_PIN(11);}
   /**
    * This turns PIN checking on.
@@ -280,6 +284,7 @@ public class SimCard implements FsmModel
       status_PIN_block = B_Status.Blocked;
       perm_session = false;
       result = Status_Word.sw_9840; /*@REQ: ENABLE4 @*/
+      System.out.println("PIN blocked in Enabled_PIN!");
     }
     else {
       counter_PIN_try = counter_PIN_try + 1;
@@ -291,8 +296,9 @@ public class SimCard implements FsmModel
     }
   }
 
-  // When the correct PIN is 12, this will also test the invalid-PIN case
+  //When the correct PIN is 12, this will also test the invalid-PIN case
   @Action public void disablePINGood() { Disabled_PIN(11); }
+  //@Action public void disablePIN12() { Disabled_PIN(12); }
   /**
    * This turns PIN checking off.
    * This operation is not included in the model in the PMBT book.
@@ -320,6 +326,7 @@ public class SimCard implements FsmModel
       status_PIN_block = B_Status.Blocked;
       perm_session = false;
       result = Status_Word.sw_9840; /*@REQ: DISABLE4 @*/
+      System.out.println("PIN blocked in Disabled_PIN!");
     }
     else {
       counter_PIN_try = counter_PIN_try + 1;
@@ -363,6 +370,7 @@ public class SimCard implements FsmModel
       status_PIN_block = B_Status.Blocked;
       perm_session = false;
       result = Status_Word.sw_9840; /*@REQ: CHANGE4 @*/
+      System.out.println("PIN blocked in Change_PIN!");
     }
     else {
       counter_PIN_try = counter_PIN_try + 1;
