@@ -30,7 +30,7 @@ public class AlarmClock implements TimedFsmModel
     if (alarmActive) {
       return "Alarm";
     }
-    else if (alarmTimer == -1) {
+    else if (alarmTimer == TIMEOUT_DISABLED) {
       return "Not Set";
     }
     else {
@@ -41,8 +41,6 @@ public class AlarmClock implements TimedFsmModel
   @Override
   public void reset(boolean testing)
   {
-    currentTime = 0;
-    alarmTimer = -1;
     alarmActive = false;
   }
 
@@ -53,7 +51,7 @@ public class AlarmClock implements TimedFsmModel
    */
   public boolean setAlarmGuard()
   {
-    return alarmTimer == -1 && !alarmActive;
+    return alarmTimer == TIMEOUT_DISABLED && !alarmActive;
   }
 
   @Action
@@ -66,13 +64,13 @@ public class AlarmClock implements TimedFsmModel
 
   public boolean cancelAlarmGuard()
   {
-    return alarmTimer != -1;
+    return alarmTimer != TIMEOUT_DISABLED;
   }
 
   @Action
   public void cancelAlarm()
   {
-    alarmTimer = -1;
+    alarmTimer = TIMEOUT_DISABLED;
     printAction("cancelAlarm");
   }
 
@@ -86,7 +84,6 @@ public class AlarmClock implements TimedFsmModel
   {
     currentTime = alarmTimer;
     alarmActive = true;
-    alarmTimer = -1;
     printAction("alarmOn");
   }
 

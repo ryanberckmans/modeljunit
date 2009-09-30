@@ -6,6 +6,7 @@ import java.util.Random;
 import nz.ac.waikato.modeljunit.Action;
 import nz.ac.waikato.modeljunit.GraphListener;
 import nz.ac.waikato.modeljunit.GreedyTester;
+import nz.ac.waikato.modeljunit.RandomTester;
 import nz.ac.waikato.modeljunit.Tester;
 import nz.ac.waikato.modeljunit.timing.Time;
 import nz.ac.waikato.modeljunit.timing.TimedFsmModel;
@@ -45,14 +46,14 @@ public class TrafficLight implements TimedFsmModel
    * the minimumWaitElapsed action will be called
    */
   @Timeout("minimumWaitElapsed")
-  public int trafficFlowTimer = 0;
+  public int trafficFlowTimer;
 
   /**
    * This timer controls the period in which the light is green for
    * pedestrians to cross.
    */
   @Timeout("finishPedestrianPeriod")
-  public int crossingTimer = 0;
+  public int crossingTimer;
 
   /**
    * Timer to control the saftey period where both lights are red
@@ -60,7 +61,7 @@ public class TrafficLight implements TimedFsmModel
    * to allowing predestrians to cross
    */
   @Timeout("allowPedestrians")
-  public int allowPedestriansTimer = 0;
+  public int allowPedestriansTimer;
 
   /**
    * Timer to control the safety period where both lights are red
@@ -68,7 +69,7 @@ public class TrafficLight implements TimedFsmModel
    * to allowing cars through
    */
   @Timeout("allowCars")
-  public int allowCarsTimer = 0;
+  public int allowCarsTimer;
 
   /**
    * The current time of the model
@@ -95,11 +96,7 @@ public class TrafficLight implements TimedFsmModel
   @Override
   public void reset(boolean testing)
   {
-    now = getNextTimeIncrement(null);
     buttonPressed = false;
-    crossingTimer = 0;
-    allowPedestriansTimer = 0;
-
     state = STATE.CARS_HOLD;
     trafficFlowTimer = now + MINIMUM_TRAFFIC_PERIOD;
   }
@@ -139,9 +136,6 @@ public class TrafficLight implements TimedFsmModel
   @Action
   public void allowPedestrians()
   {
-    //clear the timer
-    allowPedestriansTimer = 0;
-
     //we now move to the state where pedestrians can cross
     state = STATE.PEDESTRIANS;
     //set the timer for when the light should finish
@@ -158,8 +152,6 @@ public class TrafficLight implements TimedFsmModel
   @Action
   public void allowCars()
   {
-    allowCarsTimer = 0;
-
     //move to the state where the light must remain green for cars
     state = STATE.CARS_HOLD;
     //set the timer for when this period ends
@@ -174,8 +166,6 @@ public class TrafficLight implements TimedFsmModel
   @Action
   public void minimumWaitElapsed()
   {
-    trafficFlowTimer = 0;
-
     if (buttonPressed) {
       //the pedestrian button has been pressed.
       //go to the safety period so we can let the pedestrians cross
@@ -196,7 +186,6 @@ public class TrafficLight implements TimedFsmModel
   @Action
   public void finishPedestrianPeriod()
   {
-    crossingTimer = 0;
     state = STATE.WAIT_PEDS;
     allowCarsTimer = now + SAFETY_PERIOD;
   }
@@ -204,11 +193,16 @@ public class TrafficLight implements TimedFsmModel
   public static void main(String[] args)
   {
     TimedModel model = new TimedModel(new TrafficLight());
-    Tester tester = new GreedyTester(model);
-    tester.addListener("verbose");
-    GraphListener graphListener = tester.buildGraph();
+    Tester tester = new RandomTester(model);
+    //tester.addListener("verbose");
+    //GraphListener graphListener = tester.buildGraph();
+    
     try {
-      graphListener.printGraphDot("TrafficLight.dot");
+      for (int count = 0; count < 1000000; count += 1000) {
+        tester.generate(1000);
+        System.out.println(count);
+      }
+      //graphListener.printGraphDot("TrafficLight.dot");
     }
     catch (Exception ex) {
       System.out.println(ex.getMessage());
