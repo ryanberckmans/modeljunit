@@ -43,7 +43,7 @@ public class GSM11Impl
   private boolean puk_blocked  = false; // true after 10 bad attempts
   private int     puk_attempts = 10;
   private byte[] chv1 = new byte[] {0x30,0x30,0x30,0x30,0x30,0x30,0x31,0x31};//"00000011"
-  private byte[] puk  = new byte[] {0x30,0x30,0x30,0x30,0x30,0x30,0x32,0x32};//"00000022"
+  private byte[] puk  = new byte[] {0x31,0x32,0x32,0x33,0x33,0x34,0x34,0x35};//"12233445"
 
   public static final int MF = 0x3F00;
   /** This defines all the files in the SIM.
