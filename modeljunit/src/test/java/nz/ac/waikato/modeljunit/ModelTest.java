@@ -152,6 +152,7 @@ public class ModelTest extends TestCase
   {
     SimpleSetWithAdaptor sut = new SimpleSetWithAdaptor(new StringSetBuggy());
     Model model = new Model(sut);
+    model.addListener(new VerboseListener());
     int addS1 = model.getActionNumber("addS1");
     try {
       assertTrue(model.doAction(addS1));

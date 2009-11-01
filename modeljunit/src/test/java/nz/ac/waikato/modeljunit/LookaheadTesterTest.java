@@ -67,13 +67,8 @@ public class LookaheadTesterTest extends TestCase
     }
     );
   }
-
-  public void testGetDepth()
-  {
-    assertEquals(3, tester.getDepth());
-  }
-
-  public void testSetDepth()
+  
+  public void testDepth()
   {
     tester.setDepth(10);
     assertEquals(10, tester.getDepth());
@@ -81,6 +76,16 @@ public class LookaheadTesterTest extends TestCase
     assertEquals(1, tester.getDepth());
   }
 
+  public void testNewActionValue() {
+    tester.setNewActionValue(10);
+    assertEquals(10, tester.getNewActionValue());
+  }
+  
+  public void testNewTransValue() {
+    tester.setNewTransValue(10);
+    assertEquals(10, tester.getNewTransValue());
+  }
+  
   public void testGraph() throws FileNotFoundException
   {
     Tester test = new GreedyTester(new SimpleSet());
@@ -186,5 +191,16 @@ public class LookaheadTesterTest extends TestCase
     assertEquals("(TF, addS1, TF)", path.get(28).toString());
 
     assertEquals(16, transitions.getCoverage());
+    assertEquals(4, tester.getMaxLength());
+  }
+  
+  public void testConstructor() {
+    LookaheadTester tester = new LookaheadTester(new Model(new SimpleSet()));
+    assertEquals("Lookahead Walk", tester.getName());
+    assertEquals("At each state, this test generator looks ahead through all" +
+        " the known paths, upto a fixed DEPTH, to find the path" +
+        " that leads to an Action or a Transition that has not yet" +
+        " been explored.  Can be exponentially slow if DEPTH is set" +
+        " too large.", tester.getDescription());
   }
 }

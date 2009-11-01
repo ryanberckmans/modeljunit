@@ -56,7 +56,9 @@ public class RandomTesterTest extends TestCase
     CoverageHistory metric =
       new CoverageHistory(new ActionCoverage(), 1);
     tester.addListener(metric);
-    tester.setRandom(new Random(3));
+    
+    Random random = new Random(3);
+    tester.setRandom(random);
     tester.generate(5);
     int coverage = metric.getCoverage();
     Assert.assertEquals(1, coverage);
