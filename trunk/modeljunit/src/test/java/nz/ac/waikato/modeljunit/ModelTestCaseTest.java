@@ -20,7 +20,6 @@
 package nz.ac.waikato.modeljunit;
 
 import java.util.BitSet;
-import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -62,6 +61,35 @@ public class ModelTestCaseTest extends TestCase
     return new TestSuite(ModelTestCaseTest.class);
   }
 
+  public static void testProperties() {
+    FSM fsm = new FSM();
+    ModelTestCase model = new ModelTestCase(fsm);
+    model.allRoundTrips(100);
+    model.randomWalk(4);
+    model.setVerbosity(3);
+    model.setResetProbability(0.1);
+    model.setFailureVerbosity(3);
+    
+    Assert.assertEquals(FSM.class, model.getModelClass());
+    Assert.assertEquals(FSM.class.getName(), model.getModelName());
+    Assert.assertEquals(fsm, model.getModel());
+    Assert.assertEquals(0, model.getFailedTests());
+    Assert.assertEquals(3, model.getVerbosity());
+    Assert.assertEquals(new Double(0.1), model.getResetProbability());
+    Assert.assertEquals(3, model.getFailureVerbosity());
+    
+    
+  }
+  
+  public static void testSetInvalidResetProbablility() {
+    ModelTestCase model = new ModelTestCase(new FSM());
+    try {
+      model.setResetProbability(2);
+    } catch (IllegalArgumentException e) {
+      Assert.assertEquals("illegal reset probability: 2.0", e.getMessage());
+    }  
+  }
+  
   public static void testEnabled()
   {
     ModelTestCase model = new ModelTestCase(new FSM());
@@ -127,6 +155,9 @@ public class ModelTestCaseTest extends TestCase
     Assert.assertNotNull(hist);
     Assert.assertEquals("History not reset.", 1, hist.size());
     Assert.assertEquals(new Integer(0), hist.get(0));
+    
+    model.removeCoverageMetric(metric);
+    assertEquals(0, model.getCoverageMetrics().size());
   }
 
   /** This tests a greedy random walk, plus TransitionCoverage metric with history */
@@ -145,7 +176,7 @@ public class ModelTestCaseTest extends TestCase
     Assert.assertEquals(new Integer(0), hist.get(0));
     Assert.assertEquals(new Integer(coverage), hist.get(hist.size() - 1));
   }
-
+  
   public static void testBuildGraph()
   {
     ModelTestCase model = new ModelTestCase(new FSM());
@@ -219,7 +250,7 @@ public class ModelTestCaseTest extends TestCase
       Assert.assertEquals((100.0F * cov)/max, metric.getPercentage(), 0.1F);
     }
   }
-
+  
   /** This test is a bit dependent on the path of the random walk.
    *  It may need adjusting when the seed or random walk algorithm changes.
    */

@@ -22,15 +22,11 @@ package nz.ac.waikato.modeljunit;
 import java.util.List;
 import java.util.Random;
 
-import nz.ac.waikato.modeljunit.coverage.ActionCoverage;
-import nz.ac.waikato.modeljunit.coverage.CoverageHistory;
-import nz.ac.waikato.modeljunit.coverage.CoverageMetric;
-import nz.ac.waikato.modeljunit.coverage.StateCoverage;
-import nz.ac.waikato.modeljunit.coverage.TransitionCoverage;
-import nz.ac.waikato.modeljunit.coverage.TransitionPairCoverage;
-import nz.ac.waikato.modeljunit.examples.FSM;
 import junit.framework.Assert;
 import junit.framework.TestCase;
+import nz.ac.waikato.modeljunit.coverage.ActionCoverage;
+import nz.ac.waikato.modeljunit.coverage.CoverageHistory;
+import nz.ac.waikato.modeljunit.examples.FSM;
 
 public class GreedyTesterTest extends TestCase
 {
@@ -38,6 +34,7 @@ public class GreedyTesterTest extends TestCase
   public static void testGreedyWalk()
   {
     Tester tester = new GreedyTester(new FSM());
+    tester.addListener(new VerboseListener());
     CoverageHistory metric =
       new CoverageHistory(new ActionCoverage(), 1);
     tester.addCoverageMetric(metric);
@@ -51,6 +48,10 @@ public class GreedyTesterTest extends TestCase
     Assert.assertEquals("Incorrect history size.", 8, hist.size());
     Assert.assertEquals(new Integer(0), hist.get(0));
     Assert.assertEquals(new Integer(coverage), hist.get(hist.size() - 1));
+    Assert.assertEquals("Similar to a random walk, but always takes an unexplored" +
+        " transition if one is enabled in the current state. " +
+        " This gives faster transition coverage initially, then" +
+        " has the same behaviour as a random walk.", tester.getDescription());
 
     // we print this just for interest
     //    System.out.println("Action coverage: " + metric.getPercentage());

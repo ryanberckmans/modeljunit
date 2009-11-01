@@ -22,45 +22,49 @@ package nz.ac.waikato.modeljunit;
 import java.util.List;
 import java.util.Random;
 
-import nz.ac.waikato.modeljunit.coverage.ActionCoverage;
-import nz.ac.waikato.modeljunit.coverage.CoverageHistory;
-import nz.ac.waikato.modeljunit.coverage.CoverageMetric;
-import nz.ac.waikato.modeljunit.coverage.StateCoverage;
-import nz.ac.waikato.modeljunit.coverage.TransitionCoverage;
-import nz.ac.waikato.modeljunit.coverage.TransitionPairCoverage;
-import nz.ac.waikato.modeljunit.examples.FSM;
 import junit.framework.Assert;
 import junit.framework.TestCase;
+import nz.ac.waikato.modeljunit.coverage.CoverageHistory;
+import nz.ac.waikato.modeljunit.coverage.TransitionCoverage;
+import nz.ac.waikato.modeljunit.examples.FSM;
 
 public class AllRoundTesterTest extends TestCase
 {
-  /** This tests a random walk, plus ActionCoverage metric with history.*/
+  /** This tests a random walk, plus TransitionCoverage metric with history.*/
   public static void testAllRoundWalk()
   {
-    Tester tester = new AllRoundTester(new FSM());
+    AllRoundTester tester = new AllRoundTester(new FSM());
+    CoverageHistory metric = new CoverageHistory(new TransitionCoverage(), 1);
+    //tester.addListener(new VerboseListener());
+    tester.addCoverageMetric(metric);
+    tester.setLoopTolerance(1);
     tester.setRandom(new Random(3));
-    //tester.addListener("verbose");
-    tester.generate(50);
-    //int coverage = metric.getCoverage();
-    //Assert.assertEquals(2, coverage);
-    //Assert.assertEquals(4, metric.getMaximum());
-    //List<Integer> hist = metric.getHistory();
-    //Assert.assertNotNull(hist);
-    //Assert.assertEquals("Incorrect history size.", 6, hist.size());
-    //Assert.assertEquals(new Integer(0), hist.get(0));
-    //Assert.assertEquals(new Integer(coverage), hist.get(hist.size() - 1));
+    tester.generate(10);
+    int coverage = metric.getCoverage();
+    Assert.assertEquals("Loop-limited Greedy Random Walk", tester.getName());
+    Assert.assertEquals("This tester limits another tester (Greedy Random Walk)" +
+        " so that it goes around loops a maximum number of times" +
+        " (once by default).", tester.getDescription());
+    Assert.assertEquals(1, tester.getLoopTolerance());
+    Assert.assertEquals(5, coverage);
+    Assert.assertEquals(5, metric.getMaximum());
+    List<Integer> hist = metric.getHistory();
+    Assert.assertNotNull(hist);
+    Assert.assertEquals("Incorrect history size.", 15, hist.size());
+    Assert.assertEquals(new Integer(0), hist.get(0));
+    Assert.assertEquals(new Integer(coverage), hist.get(hist.size() - 1));
 
     // we print this just for interest
-    //    System.out.println("Action coverage: " + metric.getPercentage());
-    //    System.out.print("History: ");
-    //    for (Integer cov : metric.getHistory())
-    //      System.out.print(cov + ", ");
-    //    System.out.println();
+    System.out.println("Action coverage: " + metric.getPercentage());
+    System.out.print("History: ");
+    for (Integer cov : metric.getHistory())
+      System.out.print(cov + ", ");
+    System.out.println();
 
-    //metric.clear();
-    //hist = metric.getHistory();
-    //Assert.assertNotNull(hist);
-    //Assert.assertEquals("History not reset.", 1, hist.size());
-    //Assert.assertEquals(new Integer(0), hist.get(0));
+    metric.clear();
+    hist = metric.getHistory();
+    Assert.assertNotNull(hist);
+    Assert.assertEquals("History not reset.", 1, hist.size());
+    Assert.assertEquals(new Integer(0), hist.get(0));
   }
 }
