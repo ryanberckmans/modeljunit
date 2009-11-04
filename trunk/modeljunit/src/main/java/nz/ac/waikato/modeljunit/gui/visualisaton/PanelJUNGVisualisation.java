@@ -20,6 +20,7 @@ package nz.ac.waikato.modeljunit.gui.visualisaton;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -67,6 +68,8 @@ import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.JTree;
 import javax.swing.LayoutStyle;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -114,7 +117,7 @@ import edu.uci.ics.jung.visualization.util.Animator;
  *
  */
 public class PanelJUNGVisualisation extends PanelAbstract
-implements ActionListener, MouseListener{
+implements ActionListener, MouseListener {
 	/** serial version ID */
 	private static final long serialVersionUID = -1433533076588100620L;
 
@@ -180,14 +183,15 @@ implements ActionListener, MouseListener{
 	private JPanel mergePanel;
 	private JPanel capturePanel;
 	private JButton animationButton;
-    private JPanel animationPanel;
-    private JSlider animationSlider;
-    private JCheckBox animationCheckBox;
-    private JToggleButton animationToggleButton;
+	private JPanel animationPanel;
+	private JSlider animationSlider;
+	private JCheckBox animationCheckBox;
+	private JToggleButton animationToggleButton;
 
 	// Variables for animations
 	protected Boolean showAnimation_;
 	protected Thread animationThread_;
+	protected int animationSleepTime_;
 	// End of variables declaration
 
 	/**
@@ -214,7 +218,7 @@ implements ActionListener, MouseListener{
 				return exclusions.contains(e);
 			}});
 		vv.getRenderContext().setParallelEdgeIndexFunction(eif);
-		*/
+		 */
 
 		//A GraphCollapser to handle merging of vertices.
 		collapser = new GraphCollapser(jView_.getGraph());
@@ -287,13 +291,13 @@ implements ActionListener, MouseListener{
 		vizAndInfo.setOneTouchExpandable(true);
 
 		vizAndControls = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, vizAndInfo, getControlPanel());
-                getControlPanel().setMinimumSize(new Dimension(0,0));
-                getControlPanel().setPreferredSize(new Dimension(0,0));
-                getControlPanel().setMaximumSize(new Dimension(0,0));
+		getControlPanel().setMinimumSize(new Dimension(0,0));
+		getControlPanel().setPreferredSize(new Dimension(0,0));
+		getControlPanel().setMaximumSize(new Dimension(0,0));
 
 		vizAndControls.setResizeWeight(1.0);
 		vizAndControls.setOneTouchExpandable(true);
-                vizAndControls.setDividerLocation(1.0);
+		vizAndControls.setDividerLocation(1.0);
 
 		treeAndViz = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, getTreeControls(), vizAndControls);
 		treeAndViz.setResizeWeight(0.0);
@@ -337,7 +341,7 @@ implements ActionListener, MouseListener{
 	 */
 	public void newModel()
 	{
-	  resetRunTimeInformation();
+		resetRunTimeInformation();
 	}
 
 	/**
@@ -448,7 +452,7 @@ implements ActionListener, MouseListener{
 				infoGraph.addEdge((EdgeInfo)obj, destVertex, destVertex);
 				infoLayout.setLocation(destVertex, new Point(30, 65));
 			}
-			
+
 
 			infoTextArea.append("Action selected: " + ((EdgeInfo)obj).getAction() + "\n");
 			if(null != ((EdgeInfo)obj).getFailedMsg()){
@@ -477,19 +481,34 @@ implements ActionListener, MouseListener{
 	@SuppressWarnings("unchecked")
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		AbstractButton source = (AbstractButton)e.getSource();
+		String actionCommand = e.getActionCommand();
 		// The show vertex labels checkbox
-		if (source == vertLabelCheckBox){
+		if (actionCommand.equals("vertLabelCheckBox")){
+			if (vertLabelCheckBox.isSelected()) {
+				vertLabelCheckBox.setSelected(false);
+			} else {
+				vertLabelCheckBox.setSelected(true);
+			}
 			v_vlt.setShowLabels(vertLabelCheckBox.isSelected());
 			// The show vertex labels checkbox
-		} else if (source == edgeLabelCheckBox){
+		} else if (actionCommand.equals("edgeLabelCheckBox")){
+			if (edgeLabelCheckBox.isSelected()) {
+				edgeLabelCheckBox.setSelected(false);
+			} else {
+				edgeLabelCheckBox.setSelected(true);
+			}
 			e_elt.showEdgeLabels(edgeLabelCheckBox.isSelected());
 			// The show explored label checkbox
-		} else if (source == showExploredCheckBox){
+		} else if (actionCommand.equals("showExploredCheckBox")){
+			if (showExploredCheckBox.isSelected()) {
+				showExploredCheckBox.setSelected(false);
+			} else {
+				showExploredCheckBox.setSelected(true);
+			}
 			v_vdp.showExplored(!showExploredCheckBox.isSelected());
 			e_edp.showExplored(!showExploredCheckBox.isSelected());
 			// Merge vertices button
-		} else if (source == mergeVerticesButton){
+		} else if (actionCommand.equals("mergeVerticesButton")){
 			Collection<VertexInfo> picked = new HashSet(vv.getPickedVertexState().getPicked());
 			if(picked.size() > 1) {
 				Graph<Object, Object> inGraph = layout.getGraph();
@@ -512,7 +531,7 @@ implements ActionListener, MouseListener{
 			}
 
 			// Expand vertices button
-		} else if (source == expandVerticesButton){
+		} else if (actionCommand.equals("expandVerticesButton")){
 			Collection<VertexInfo> picked = new HashSet(vv.getPickedVertexState().getPicked());
 			for(Object v : picked) {
 				if(v instanceof Graph) {
@@ -525,7 +544,7 @@ implements ActionListener, MouseListener{
 			}
 
 			// Merge Edges button
-		} else if (source == mergeEdgesButton){
+		} else if (actionCommand.equals("mergeEdgesButton")){
 			Collection<Object> picked = vv.getPickedVertexState().getPicked();
 			if(picked.size() == 2) {
 				Pair<Object> pair = new Pair<Object>(picked);
@@ -560,7 +579,7 @@ implements ActionListener, MouseListener{
 				}
 			}
 			// Expand edges button
-		} else if (source == expandEdgesButton){
+		} else if (actionCommand.equals("expandEdgesButton")){
 			Collection<Object> picked = vv.getPickedVertexState().getPicked();
 			if(picked.size() == 2) {
 				Pair<Object> pair = new Pair<Object>(picked);
@@ -587,7 +606,7 @@ implements ActionListener, MouseListener{
 			}
 
 			// The reset button
-		} else if (source == resetButton){
+		} else if (actionCommand.equals("resetButton")){
 			Collection<Object> vertices = layout.getGraph().getVertices();
 			for(Object v : vertices) {
 				if(v instanceof Graph) {
@@ -601,7 +620,7 @@ implements ActionListener, MouseListener{
 			//exclusions.clear();
 
 			// The capture button
-		} else if (source == captureButton){
+		} else if (actionCommand.equals("captureButton")){
 			JFileChooser chooser = new JFileChooser();
 			chooser.setCurrentDirectory(new File("."));
 			chooser.addChoosableFileFilter(new FileFilter() {
@@ -650,18 +669,28 @@ implements ActionListener, MouseListener{
 				System.out.println("User pressed cancel, or something went wrong");
 			}
 			// The animation button  used to stop the animation
-		}  else if (source == animationButton){
+		} else if (actionCommand.equals("animationCheckBox")){ 
+			if (animationCheckBox.isSelected()) {
+				animationCheckBox.setSelected(false);
+				showAnimation_ = false;
+			} else {
+				animationCheckBox.setSelected(true);
+				showAnimation_ = true;
+			}
+		} else if (actionCommand.equals("animationButton")){
 			showAnimation_ = false;
 			// The pause animation toggle button
-		}  else if (source == animationToggleButton){
-			if(!animationToggleButton.isSelected()){
+		} else if (actionCommand.equals("animationToggleButton")){
+			if (animationToggleButton.isSelected()) {
+				animationToggleButton.setSelected(false);
+			} else {
+				animationToggleButton.setSelected(true);
 				try{
 					animationThread_.interrupt();
 				} catch (Exception ex){
-				//Ignore
+					//Ignore
 				}
 			}
-
 		}
 		vv.repaint();
 	}
@@ -711,6 +740,10 @@ implements ActionListener, MouseListener{
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
+		Object source = e.getComponent();
+		if (source == animationSlider) {
+			animationSleepTime_ = animationSlider.getValue();
+		}
 	}
 
 	/**
@@ -736,22 +769,25 @@ implements ActionListener, MouseListener{
 		capturePanel = new JPanel();
 		captureButton = new JButton();
 		animationPanel = new JPanel();
-        animationSlider = new JSlider();
-        animationButton = new JButton();
-        animationCheckBox = new JCheckBox();
-        animationToggleButton = new JToggleButton();
+		animationSlider = new JSlider();
+		animationButton = new JButton();
+		animationCheckBox = new JCheckBox();
+		animationToggleButton = new JToggleButton();
 
 		labelsPanel.setBorder(BorderFactory.createTitledBorder("Labels"));
 
 		vertLabelCheckBox.setText("Show vertex labels");
 		vertLabelCheckBox.addActionListener(this);
+		vertLabelCheckBox.setActionCommand("vertLabelCheckBox");
 		vertLabelCheckBox.setSelected(true);
 
 		edgeLabelCheckBox.setText("Show edge labels");
 		edgeLabelCheckBox.addActionListener(this);
+		edgeLabelCheckBox.setActionCommand("edgeLabelCheckBox");
 
 		showExploredCheckBox.setText("Show unexplored states/actions");
 		showExploredCheckBox.addActionListener(this);
+		showExploredCheckBox.setActionCommand("showExploredCheckBox");
 		showExploredCheckBox.setSelected(true);
 
 		vertLabelPos.setText("Label position:");
@@ -780,34 +816,34 @@ implements ActionListener, MouseListener{
 		GroupLayout jPanel1Layout = new GroupLayout(labelsPanel);
 		labelsPanel.setLayout(jPanel1Layout);
 		jPanel1Layout.setHorizontalGroup(
-	            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-	            .addGroup(jPanel1Layout.createSequentialGroup()
-	                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-	                    .addComponent(vertLabelCheckBox)
-	                    .addGroup(jPanel1Layout.createSequentialGroup()
-	                        .addComponent(vertLabelPos)
-	                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-	                        .addComponent(vertLabelPosComboBox, 0, 127, Short.MAX_VALUE))
-	                    .addComponent(edgeLabelCheckBox)
-	                    .addComponent(showExploredCheckBox))
-	                .addContainerGap())
-	        );
-	        jPanel1Layout.setVerticalGroup(
-	            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-	            .addGroup(jPanel1Layout.createSequentialGroup()
-	                .addComponent(vertLabelCheckBox)
-	                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-	                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-	                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-	                        .addComponent(vertLabelPos)
-	                        .addComponent(vertLabelPosComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-	                    .addGroup(jPanel1Layout.createSequentialGroup()
-	                        .addGap(25, 25, 25)
-	                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-	                            .addComponent(edgeLabelCheckBox))))
-	                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 2, Short.MAX_VALUE)
-	                .addComponent(showExploredCheckBox))
-	        );
+				jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(jPanel1Layout.createSequentialGroup()
+						.addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+								.addComponent(vertLabelCheckBox)
+								.addGroup(jPanel1Layout.createSequentialGroup()
+										.addComponent(vertLabelPos)
+										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+										.addComponent(vertLabelPosComboBox, 0, 127, Short.MAX_VALUE))
+										.addComponent(edgeLabelCheckBox)
+										.addComponent(showExploredCheckBox))
+										.addContainerGap())
+		);
+		jPanel1Layout.setVerticalGroup(
+				jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(jPanel1Layout.createSequentialGroup()
+						.addComponent(vertLabelCheckBox)
+						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+						.addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+								.addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+										.addComponent(vertLabelPos)
+										.addComponent(vertLabelPosComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+										.addGroup(jPanel1Layout.createSequentialGroup()
+												.addGap(25, 25, 25)
+												.addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+														.addComponent(edgeLabelCheckBox))))
+														.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 2, Short.MAX_VALUE)
+														.addComponent(showExploredCheckBox))
+		);
 
 		layoutTypePanel.setBorder(BorderFactory.createTitledBorder("Layout Type"));
 
@@ -857,18 +893,23 @@ implements ActionListener, MouseListener{
 
 		mergeVerticesButton.setText("Merge states");
 		mergeVerticesButton.addActionListener(this);
+		mergeVerticesButton.setActionCommand("mergeVerticesButton");
 
 		expandVerticesButton.setText("Expand states");
 		expandVerticesButton.addActionListener(this);
+		expandVerticesButton.setActionCommand("expandVerticesButton");
 
 		mergeEdgesButton.setText("Merge transitions");
 		mergeEdgesButton.addActionListener(this);
+		mergeEdgesButton.setActionCommand("mergeEdgesButton");
 
 		expandEdgesButton.setText("Expand transitions");
 		expandEdgesButton.addActionListener(this);
+		expandEdgesButton.setActionCommand("expandEdgesButton");
 
 		resetButton.setText("Reset");
 		resetButton.addActionListener(this);
+		resetButton.setActionCommand("resetButton");
 
 		GroupLayout jPanel3Layout = new GroupLayout(mergePanel);
 		mergePanel.setLayout(jPanel3Layout);
@@ -906,55 +947,62 @@ implements ActionListener, MouseListener{
 		labelTable.put( new Integer( 3000 ), new JLabel("Slow") );
 		animationSlider.setLabelTable( labelTable );
 		animationSlider.setPaintLabels(true);
-        animationSlider.setMajorTickSpacing(500);
-        animationSlider.setMaximum(3000);
-        animationSlider.setMinimum(100);
-        animationSlider.setValue(1000);
-        animationSlider.setPaintTicks(true);
-        animationSlider.setToolTipText("Use this slider to control the speed of the animation");
+		animationSlider.setMajorTickSpacing(500);
+		animationSlider.setMaximum(3000);
+		animationSlider.setMinimum(100);
+		animationSlider.setValue(1000);
+		animationSlider.setPaintTicks(true);
+		animationSlider.setToolTipText("Use this slider to control the speed of the animation");
+		animationSlider.addMouseListener(this);
+		animationSleepTime_ = animationSlider.getValue();
+		
+		animationButton.setText("Stop");
+		animationButton.addActionListener(this);
+		animationButton.setActionCommand("animationButton");
 
-        animationButton.setText("Stop ");
-        animationButton.addActionListener(this);
+		animationCheckBox.setText("Show animation");
+		animationCheckBox.setSelected(true);
+		animationCheckBox.addActionListener(this);
+		animationCheckBox.setActionCommand("animationCheckBox");
 
-        animationCheckBox.setText("Show animation");
-        animationCheckBox.setSelected(true);
+		animationToggleButton.setText("Pause");
+		animationToggleButton.addActionListener(this);
+		animationToggleButton.setActionCommand("animationToggleButton");
 
-        animationToggleButton.setText("Pause");
-        animationToggleButton.addActionListener(this);
-
-        javax.swing.GroupLayout animationPanelLayout = new javax.swing.GroupLayout(animationPanel);
-        animationPanel.setLayout(animationPanelLayout);
-        animationPanelLayout.setHorizontalGroup(
-            animationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(animationPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(animationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(animationSlider, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)
-                    .addGroup(animationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addGroup(animationPanelLayout.createSequentialGroup()
-                            .addComponent(animationToggleButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(animationButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addComponent(animationCheckBox, javax.swing.GroupLayout.Alignment.LEADING)))
-                .addContainerGap())
-        );
-        animationPanelLayout.setVerticalGroup(
-            animationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(animationPanelLayout.createSequentialGroup()                
-                .addComponent(animationCheckBox)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(animationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(animationToggleButton)
-                    .addComponent(animationButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(animationSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(21, Short.MAX_VALUE))
-        );
+		javax.swing.GroupLayout animationPanelLayout = new javax.swing.GroupLayout(animationPanel);
+		animationPanel.setLayout(animationPanelLayout);
+		animationPanelLayout.setHorizontalGroup(
+				animationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(animationPanelLayout.createSequentialGroup()
+						.addContainerGap()
+						.addGroup(animationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+								.addComponent(animationSlider, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)
+								.addGroup(animationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+										.addGroup(animationPanelLayout.createSequentialGroup()
+												.addComponent(animationToggleButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+												.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+												.addComponent(animationButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+												.addComponent(animationCheckBox, javax.swing.GroupLayout.Alignment.LEADING)))
+												.addContainerGap())
+		);
+		animationPanelLayout.setVerticalGroup(
+				animationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(animationPanelLayout.createSequentialGroup()                
+						.addComponent(animationCheckBox)
+						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+						.addGroup(animationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+								.addComponent(animationToggleButton)
+								.addComponent(animationButton))
+								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+								.addComponent(animationSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+								.addContainerGap(21, Short.MAX_VALUE))
+		);
 
 		capturePanel.setBorder(BorderFactory.createTitledBorder("Capture"));
 
 		captureButton.setText("Save as image");
 		captureButton.addActionListener(this);
+		captureButton.setActionCommand("captureButton");
 
 		GroupLayout jPanel4Layout = new GroupLayout(capturePanel);
 		capturePanel.setLayout(jPanel4Layout);
@@ -990,8 +1038,8 @@ implements ActionListener, MouseListener{
 						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
 						.addComponent(capturePanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-		                .addComponent(animationPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-		                .addContainerGap(104, Short.MAX_VALUE))
+						.addComponent(animationPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+						.addContainerGap(104, Short.MAX_VALUE))
 		);
 		return panel;
 	}
@@ -1048,8 +1096,8 @@ implements ActionListener, MouseListener{
 			@SuppressWarnings("unchecked")
 			public void valueChanged(TreeSelectionEvent e) {
 				//if(!showAnimation_){
-					explScrollBar.setMaximum(tree.getRowCount());
-					explScrollBar.setValue(tree.getMinSelectionRow());
+				explScrollBar.setMaximum(tree.getRowCount());
+				explScrollBar.setValue(tree.getMinSelectionRow());
 				//}
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode)
 				tree.getLastSelectedPathComponent();
@@ -1332,7 +1380,7 @@ implements ActionListener, MouseListener{
 								//Ignore
 							}
 						} else {
-							Thread.sleep(animationSlider.getValue());
+							Thread.sleep(animationSleepTime_);
 						}
 					}
 				}
