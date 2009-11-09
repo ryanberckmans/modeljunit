@@ -3,7 +3,15 @@ package nz.ac.waikato.modeljunit.storytest;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import java.util.Arrays;
+import java.util.Random;
 import java.lang.IndexOutOfBoundsException;
+
+import nz.ac.waikato.modeljunit.GreedyTester;
+import nz.ac.waikato.modeljunit.StopOnFailureListener;
+import nz.ac.waikato.modeljunit.coverage.StateCoverage;
+import nz.ac.waikato.modeljunit.coverage.TransitionCoverage;
+import nz.ac.waikato.modeljunit.coverage.TransitionPairCoverage;
+import nz.ac.waikato.modeljunit.examples.FSM;
 
 /**
  * Tests the CalcTable
@@ -187,6 +195,41 @@ public class CalcTableTest extends TestCase {
         } catch (IndexOutOfBoundsException e) {
             assertTrue(false);
         }
+    }
+    
+    public void runModel(FSM model)
+    {
+      GreedyTester tester = new GreedyTester(model);
+      
+      tester.setRandom(new Random());
+      
+      tester.addCoverageMetric(new StateCoverage());
+      tester.addCoverageMetric(new TransitionCoverage());
+      tester.addCoverageMetric(new TransitionPairCoverage());
+      
+      tester.addListener(new StopOnFailureListener());
+      
+      tester.generate(10000);
+      
+      tester.printCoverage();
+    }
+    
+    public void testAddDelRowModel()
+    {
+      AddDelRowModel model = new AddDelRowModel();
+      runModel(model);
+    }
+    
+    public void testAddRowColumnModel()
+    {
+      AddDelColumnModel model = new AddDelColumnModel();
+      runModel(model);
+    }
+    
+    public void testSetValueModel()
+    {
+      SetValueModel model = new SetValueModel();
+      runModel(model);
     }
     
     /**

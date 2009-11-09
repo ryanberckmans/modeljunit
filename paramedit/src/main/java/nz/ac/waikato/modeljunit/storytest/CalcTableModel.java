@@ -33,7 +33,7 @@ public class CalcTableModel
    
    public int getRowCount()
    {
-      return mTable.rows() + 1;
+      return mTable.rows() + 2;
    }
    
    public int getColumnCount()
@@ -57,7 +57,8 @@ public class CalcTableModel
    public String getValueAt(int row, int column)
    {
       return row == 0 ? mTable.getColumnHeader(column) :
-                        mTable.getValue(row - 1, column);
+             row == 1 ? mTable.getTypeRange(column).toString() :
+                        mTable.getValue(row - 2, column);
    }
    
    public String getColumnName(int column)

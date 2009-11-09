@@ -10,11 +10,11 @@ import java.io.IOException;
  * @author root
  *
  */
-public class GuessSuggestionStrategyTest
+public class MCDCSuggestionStrategyTest
     extends AbstractSuggestionStrategyTest
 {
   public final static String PATH = System.getProperty("user.dir") + "/src/test/resources/";
-  public final static GuessSuggestionStrategyFactory FACTORY = GuessSuggestionStrategyFactory.INSTANCE;
+  public final static MCDCSuggestionStrategyFactory FACTORY = MCDCSuggestionStrategyFactory.INSTANCE;
   
   public void testEmpty()
     throws IOException, FileNotFoundException
@@ -25,12 +25,13 @@ public class GuessSuggestionStrategyTest
   public void testStandard()
     throws IOException, FileNotFoundException
   {
-    compareValues(PATH + "StandardTable.txt", PATH + "StandardGuess.txt", FACTORY);
+    compareValues(PATH + "StandardTable.txt", PATH + "Empty.txt", FACTORY);
   }
 
   public void testRand()
     throws IOException, FileNotFoundException
   {
-   compareValues(PATH + "randtable.txt", PATH + "RandGuess.txt", FACTORY);
+   compareValues(PATH + "MCDCRandTable.txt", PATH + "RandMCDC.txt", FACTORY);
   }
+
 }

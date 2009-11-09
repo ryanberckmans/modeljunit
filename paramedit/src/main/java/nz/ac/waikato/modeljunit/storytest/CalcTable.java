@@ -1,5 +1,6 @@
 package nz.ac.waikato.modeljunit.storytest;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -20,6 +21,7 @@ public class CalcTable
    * 
    */
   private static final long serialVersionUID = 1L;
+  
   /** The name of this table */
    private final String mName;
    /** The Column Names */
@@ -32,6 +34,10 @@ public class CalcTable
    private final Set<Integer> mContradiction;
    /** Whether or not there is an Contradiction in a row */
    private final Set<Integer> mHighlighted;
+   
+   private final List<TypeRange> mTypeRanges;
+   
+   //private final List<String> mType
 
    public CalcTable()
    {
@@ -47,10 +53,17 @@ public class CalcTable
      mName = name;
      mColumns = new ArrayList<String>(columns);
      mTypes = new ArrayList<Class<?>>();
+     mTypeRanges = new ArrayList<TypeRange>();
      mContradiction = new HashSet<Integer>();
      for (int i = 0; i < mColumns.size(); i++) {
         mColumns.set(i, mColumns.get(i).trim());
         mTypes.add(null);
+        try {
+          mTypeRanges.add(new TypeRange("", i, this));
+        } catch (Throwable t) {
+          t.printStackTrace();
+          System.exit(0);
+        }
      }
      mMatrix = new ArrayList<List<String>>();
      mHighlighted = new HashSet<Integer>();
@@ -79,6 +92,11 @@ public class CalcTable
    public boolean isHighlighted(int row)
    {
       return mHighlighted.contains(row);
+   }
+   
+   public void setTypeRange(int column, TypeRange typerange)
+   {
+     mTypeRanges.set(column, typerange);
    }
    
    public void setHighlighted(int[] rows)
@@ -131,6 +149,7 @@ public class CalcTable
       if (tester == null) {mTypes.set(column, null); return;}
       for (int r = 0; r < mMatrix.size(); r++) {
          if (getValue(r, column).equals("")) {continue;}
+         if (getValue(r, column).equals("...")) {continue;}
          if (!tester.satisfies(getValue(r, column))) {
             mTypes.set(column, null); return;
          }
@@ -143,9 +162,19 @@ public class CalcTable
 	   return mName;
    }
    
-   public Class<?> getType(int column)
+   public Class<?> guessType(int column)
    {
       return mTypes.get(column);
+   }
+   
+   public Class<?> getType(int column)
+   {
+     return mTypeRanges.get(column).getType();
+   }
+   
+   public TypeRange getTypeRange(int column)
+   {
+     return mTypeRanges.get(column);
    }
    
    /**
