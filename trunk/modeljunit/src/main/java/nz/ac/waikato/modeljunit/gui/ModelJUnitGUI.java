@@ -705,8 +705,6 @@ public class ModelJUnitGUI implements Runnable
 
 
    public static void main(String[] args) {
-      ModelJUnitGUI gui = new ModelJUnitGUI();
-
-      new Thread(gui).start();
+      SwingUtilities.invokeLater(new ModelJUnitGUI());
    }
 }
