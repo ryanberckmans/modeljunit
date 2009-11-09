@@ -1,44 +1,39 @@
 package nz.ac.waikato.modeljunit.command;
 
 import nz.ac.waikato.modeljunit.storytest.CalcTable;
+import nz.ac.waikato.modeljunit.storytest.TypeRange;
 
-public class SetColumnNameCommand
+public class SetTypeRangeCommand
    extends AbstractUndoableCommand
 {
    public static final long serialVersionUID = 1;
    
    private final CalcTable mTable;
    private final int mColumn;
-   private final String mValue;
-   private final String mOldValue;
+   private final TypeRange mValue;
+   private final TypeRange mOldValue;
 
 /**
 Basic constructor for SetValueCommand
 */
-   public SetColumnNameCommand(CalcTable Table, int Column, String Value,
-                               String OldValue)
+   public SetTypeRangeCommand(CalcTable Table, int Column, TypeRange newr)
    {
       mTable = Table;
       mColumn = Column;
-      mValue = Value;
-      mOldValue = OldValue;
-   }
-   
-   public SetColumnNameCommand(CalcTable Table, int Column, String Value)
-   {
-     this(Table, Column, Value, Table.getColumnHeader(Column));
+      mValue = newr;
+      mOldValue = mTable.getTypeRange(mColumn);
    }
    
    public void execute()
    {
       System.out.println("execute");
-      mTable.setColumnHeader(mColumn, mValue);
+      mTable.setTypeRange(mColumn, mValue);
    }
    
    public void undo()
    {
       super.undo();
-      mTable.setColumnHeader(mColumn, mOldValue);
+      mTable.setTypeRange(mColumn, mOldValue);
    }
    
    public String getName()

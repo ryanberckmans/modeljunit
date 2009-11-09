@@ -1,6 +1,8 @@
 package nz.ac.waikato.modeljunit.storytest;
 
+import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -12,7 +14,7 @@ public class GuessSuggestionStrategy
    implements Observer, Subject, SuggestionStrategy
 {   
    private final List<Suggestion> mSuggestions;
-   private static final String CONTRADICTION = "contradiction";
+   private static final Result CONTRADICTION = new Result("contradiction");
    
    public GuessSuggestionStrategy(CalcTable calc)
    {
@@ -21,7 +23,7 @@ public class GuessSuggestionStrategy
       guess();
    }
 
-   private void guess()
+   /*private void guess()
    {
       System.out.println("guess");
       mSuggestions.clear();
@@ -85,6 +87,12 @@ public class GuessSuggestionStrategy
             }
          }
       }
+   }
+   
+   private boolean rowIsEquation(List<String> row)
+   {
+     
+     return false;
    }
    
    private List<Tuple> merge(List<Tuple> guesses)
@@ -160,7 +168,145 @@ public class GuessSuggestionStrategy
          }
       }
       return guesses;
+   }*/
+   
+   private void guess()
+   {
+      System.out.println("guess");
+      mSuggestions.clear();
+      int result = -1;
+      CalcTable calc = getCalcTable();
+      if (calc.rows() == 0) {return;}
+      System.out.println(calc.toString());
+      for (int c = 0; c < calc.columns(); c++) {
+         if (calc.isResult(c)) {
+            result = c; break;
+         }
+      }
+      if (result == -1) {
+         return;
+      }
+      boolean[] columnsdone = new boolean[calc.columns()];
+      // TODO make this work for multiple results columns
+      int[] columnorder = new int[calc.columns() - 1];
+      boolean[] isBoolean = new boolean[calc.columns()];
+      int count = 0;
+      for (int c = 0; c < calc.columns(); c++) {
+         if (!calc.isResult(c) && !columnsdone[c] && calc.getType(c) != null) {
+            if (calc.getType(c).equals(Boolean.class)) {
+               columnsdone[c] = true; columnorder[count] = c;
+               isBoolean[c] = true;
+               count++;
+            }
+         }
+      }
+      for (int c = 0; c < calc.columns(); c++) {
+         if (!calc.isResult(c) && !columnsdone[c] && calc.getType(c) != null) {
+            if (calc.getType(c).equals(Double.class)) {
+               columnsdone[c] = true; columnorder[count] = c;
+               count++;
+            }
+         }
+      }
+      List<Integer> rows = new ArrayList<Integer>(calc.rows());
+      List<Guess> preguess = new ArrayList<Guess>();
+      for (int i = 0; i < calc.rows(); i++) {
+         if (calc.getRow(i).contains("")) {continue;}
+         Guess guess = Guess.getGuess(calc.getRow(i), result, isBoolean);
+         if (guess == null) {
+           rows.add(i);
+         } else {
+           preguess.add(guess);
+         }
+      }
+      System.out.println("preguess: " +preguess);
+      for (Guess guess: preguess) {
+        Iterator<Integer> it = rows.iterator();
+        while (it.hasNext()) {
+          int r = it.next();
+          if (guess.conforms(calc.getRow(r), result)) {
+            it.remove();
+          }
+        }
+      }
+      List<Tuple> guesses = new ArrayList<Tuple>(calc.rows());
+      Guess partialguess = new Guess(calc.columns());
+      sift(columnorder, result, rows, isBoolean, guesses, 0, partialguess);
+      System.out.println("guesses:" + guesses.size());
+      guesses = merge(guesses);
+      for (Tuple tup : guesses) {
+         if (tup != null) {
+            Guess guess = tup.mGuess;
+            int[] irows = new int[tup.mRows.size()];
+            for (int i = 0; i < tup.mRows.size(); i++) {
+               irows[i] = tup.mRows.get(i);
+            }
+            if (!guess.get(result).equals(CONTRADICTION)) {
+               mSuggestions.add(new RowsSuggestion(guess.toStrings(), irows, getCalcTable()));
+            } else {
+               mSuggestions.add(new RowsContradiction(guess.toStrings(), irows, getCalcTable()));
+            }
+         }
+      }
    }
+   
+   private boolean rowIsEquation(List<String> row)
+   {
+     
+     return false;
+   }
+   
+   private List<Tuple> merge(List<Tuple> guesses)
+   {
+      List<Integer> stack = new ArrayList<Integer>(guesses.size());
+      for (int i = 0; i < guesses.size(); i++) {stack.add(i);}
+      while(!stack.isEmpty()) {
+         int guess = stack.remove(stack.size() - 1);
+         Tuple tup1 = guesses.get(guess);
+         if (tup1 == null) {continue;}
+         Guess guess1 = tup1.mGuess;
+         guess:
+         for (int g = 0; g < guesses.size(); g++) {
+            if (g == guess) {continue;}
+            Tuple tup2 = guesses.get(g);
+            if (tup2 == null) {continue;}
+            Guess guess2 = tup2.mGuess;
+            int diff = -1;
+            System.out.println(guess1);
+            System.out.println(guess2);
+            for (int c = 0; c < guess1.size(); c++) {
+               if (!guess1.get(c).equals(guess2.get(c))) {
+                  if (diff == -1) {
+                     diff = c;
+                  } else {
+                     continue guess;
+                  }
+               }
+            }
+            System.out.println(diff);
+            if (diff == -1) {
+               guesses.set(g, null);
+               tup1.mRows.addAll(tup2.mRows);
+            } else {
+               Bound newparam = null;
+               /*String[] range1 = guess1.get(diff).split("\\.\\.\\.");
+               String[] range2 = guess2.get(diff).split("\\.\\.\\.");
+               System.out.println(Arrays.toString(range1));
+               System.out.println(Arrays.toString(range2));*/
+               System.out.println();
+               newparam = guess1.get(diff).merge(guess2.get(diff));
+               if (newparam != null) {
+                 stack.add(guess);
+                 guess1.set(diff, newparam);
+                 tup1.mRows.addAll(tup2.mRows);
+                 guesses.set(g, null);
+               }
+            }
+         }
+      }
+      return guesses;
+   }
+   
 
    public List<Suggestion> getSuggestions()
    {
@@ -173,8 +319,10 @@ public class GuessSuggestionStrategy
       inform();
    }
    
+   
+   
    private void siftdouble(int[] columnorder, int resultcolumn, List<Integer> rows, boolean[] isBoolean,
-                           List<Tuple> guesses, int depth, List<String> currentguess)
+                           List<Tuple> guesses, int depth, Guess currentguess)
    {
       SortedMap<Double, Triple> rowmap = new TreeMap<Double, Triple>();
       int index = columnorder[depth];
@@ -220,14 +368,14 @@ public class GuessSuggestionStrategy
          if (trip == null) {break;}
          if (last != -1 && trip.allsame) {continue;}
          if (trip.allsame) {last = i; continue;}*/
-         List<String> guess = new ArrayList<String>(currentguess);
-         String previous = getStringValue(i -1, values);
-         String to = getStringValue(i, values);
-         guess.set(index, previous + "..." + to);
+         Guess guess = new Guess(currentguess);
+         Double previous = getDoubleValue(i -1, values);
+         Double to = getDoubleValue(i, values);
+         guess.set(index, new BoundDouble(previous, to));
          if (!trip.allsame) {
             sift(columnorder, resultcolumn, trip.mList, isBoolean, guesses, depth + 1, guess);
          } else {
-            guess.set(resultcolumn, trip.mResult);
+            guess.set(resultcolumn, new Result(trip.mResult));
             guesses.add(new Tuple(guess, trip.mList));
          }
       }
@@ -245,6 +393,188 @@ public class GuessSuggestionStrategy
       guesses.get(guesses.size() - 1).set(index, prevprev + "...");*/
    }
    
+   private void siftboolean(int[] columnorder, int resultcolumn, List<Integer> rows, boolean[] isBoolean,
+                            List<Tuple> guesses, int depth, Guess currentguess)
+    {
+      List<Integer> trues = new ArrayList<Integer>();
+      List<Integer> falses = new ArrayList<Integer>();
+      int index = columnorder[depth];
+      String falseres = null;
+      String trueres = null;
+      boolean allfalse = true;
+      boolean alltrue = true;
+      for (int row : rows) {
+        String result = getCalcTable().getValue(row, resultcolumn);
+        if (getCalcTable().getValue(row, index).equals("T")) {
+          trueres = trueres == null ? result : trueres;
+          alltrue = alltrue && trueres.equals(result);
+          trues.add(row);
+        } else {
+          falseres = falseres== null ? result : falseres;
+          allfalse = allfalse && falseres.equals(result);
+          falses.add(row);
+        }
+      }
+      Guess trueguess = new Guess(currentguess);
+      Guess falseguess = new Guess(currentguess);
+      if (!falses.isEmpty()) {trueguess.set(index, new BoundBoolean(true));}
+      if (!trues.isEmpty()) {falseguess.set(index, new BoundBoolean(false));}
+      if (!trues.isEmpty()) {
+        if (alltrue) {
+          trueguess.set(resultcolumn, new Result(trueres));
+          guesses.add(new Tuple(trueguess, trues));
+          return;
+        } else {
+          sift(columnorder, resultcolumn, trues, isBoolean, guesses, depth + 1, trueguess);
+        }
+      }
+      if (!falses.isEmpty()) {
+        if (allfalse) {
+          falseguess.set(resultcolumn, new Result(falseres));
+          guesses.add(new Tuple(falseguess, falses));
+        return;
+        } else {
+          sift(columnorder, resultcolumn, falses, isBoolean, guesses, depth + 1, falseguess);
+        }
+      }
+    }
+    
+    private void sift(int[] columnorder, int resultcolumn, List<Integer> rows, boolean[] isBoolean,
+                      List<Tuple> guesses, int depth, Guess currentguess)
+    {
+      if (depth >= columnorder.length) {
+        Guess guess = new Guess(currentguess);
+        guess.set(resultcolumn, CONTRADICTION);
+        guesses.add(new Tuple(guess, rows));
+        return;
+      }
+        if(isBoolean[columnorder[depth]]) {
+        siftboolean(columnorder, resultcolumn, rows, isBoolean, guesses, depth, currentguess);
+      } else {
+        siftdouble(columnorder, resultcolumn, rows, isBoolean, guesses, depth, currentguess);
+      }
+    }
+/*   
+    private void siftdouble(int[] columnorder, int resultcolumn, List<Integer> rows, boolean[] isBoolean,
+        List<Tuple> guesses, int depth, List<String> currentguess)
+{
+SortedMap<Double, Triple> rowmap = new TreeMap<Double, Triple>();
+int index = columnorder[depth];
+for (Integer row : rows) {
+String result = getCalcTable().getValue(row, resultcolumn);
+System.out.println(row);
+try {
+Double value = new Double(getCalcTable().getValue(row, index));
+Triple trip = rowmap.get(value);
+if (trip == null) {
+List<Integer> list = new ArrayList<Integer>();
+trip = new Triple(list, result);
+rowmap.put(value, trip);
+}
+trip.mList.add(row);
+trip.allsame = trip.allsame && trip.mResult.equals(result);
+System.out.println("mResult:" + trip.mResult + "\tresult" + result);
+System.out.println("allsame:" + trip.allsame);
+} catch (NumberFormatException exception) {
+exception.printStackTrace();
+}
+}
+Double[] values = new Double[rowmap.size()];
+Triple[] triples = new Triple[rowmap.size()];
+int i = 0;
+for (Double value : rowmap.keySet()) {
+Triple trip = rowmap.get(value);
+values[i] = value;
+triples[i] = trip;
+i++;
+}
+for (i = 0; i < values.length; i++) {
+Triple trip = i >= triples.length ? null : triples[i];
+List<String> guess = new ArrayList<String>(currentguess);
+String previous = getStringValue(i -1, values);
+String to = getStringValue(i, values);
+guess.set(index, previous + "..." + to);
+if (!trip.allsame) {
+sift(columnorder, resultcolumn, trip.mList, isBoolean, guesses, depth + 1, guess);
+} else {
+guess.set(resultcolumn, trip.mResult);
+guesses.add(new Tuple(guess, trip.mList));
+}
+}
+}
+
+private void siftboolean(int[] columnorder, int resultcolumn, List<Integer> rows, boolean[] isBoolean,
+List<Tuple> guesses, int depth, List<String> currentguess)
+{
+List<Integer> trues = new ArrayList<Integer>();
+List<Integer> falses = new ArrayList<Integer>();
+int index = columnorder[depth];
+String falseres = null;
+String trueres = null;
+boolean allfalse = true;
+boolean alltrue = true;
+for (int row : rows) {
+String result = getCalcTable().getValue(row, resultcolumn);
+if (getCalcTable().getValue(row, index).equals("T")) {
+trueres = trueres == null ? result : trueres;
+alltrue = alltrue && trueres.equals(result);
+trues.add(row);
+} else {
+falseres = falseres== null ? result : falseres;
+allfalse = allfalse && falseres.equals(result);
+falses.add(row);
+}
+}
+List<String> trueguess = new ArrayList<String>(currentguess);
+List<String> falseguess = new ArrayList<String>(currentguess);
+if (!falses.isEmpty()) {trueguess.set(index, "T");}
+if (!trues.isEmpty()) {falseguess.set(index, "F");}
+if (!trues.isEmpty()) {
+if (alltrue) {
+trueguess.set(resultcolumn, trueres);
+guesses.add(new Tuple(trueguess, trues));
+return;
+} else {
+sift(columnorder, resultcolumn, trues, isBoolean, guesses, depth + 1, trueguess);
+}
+}
+if (!falses.isEmpty()) {
+if (allfalse) {
+falseguess.set(resultcolumn, falseres);
+guesses.add(new Tuple(falseguess, falses));
+return;
+} else {
+sift(columnorder, resultcolumn, falses, isBoolean, guesses, depth + 1, falseguess);
+}
+}
+}
+
+private void sift(int[] columnorder, int resultcolumn, List<Integer> rows, boolean[] isBoolean,
+   List<Tuple> guesses, int depth, List<String> currentguess)
+{
+if (depth >= columnorder.length) {
+List<String> guess = new ArrayList<String>(currentguess);
+guess.set(resultcolumn, CONTRADICTION);
+guesses.add(new Tuple(guess, rows));
+return;
+}
+if(isBoolean[columnorder[depth]]) {
+siftboolean(columnorder, resultcolumn, rows, isBoolean, guesses, depth, currentguess);
+} else {
+siftdouble(columnorder, resultcolumn, rows, isBoolean, guesses, depth, currentguess);
+}
+}*/
+    
+    private Double getDoubleValue(int index, Double[] values)
+    {
+       if (index < 0) {
+          return Double.NEGATIVE_INFINITY;
+       } else if (index + 1 >= values.length) {
+          return Double.POSITIVE_INFINITY;
+       }
+       return values[index];
+    }
+
    private String getStringValue(int index, Double[] values)
    {
       if (index < 0 || index + 1 >= values.length) {
@@ -268,75 +598,308 @@ public class GuessSuggestionStrategy
    
    private class Tuple
    {
-      final List<String> mGuess;
+      final Guess mGuess;
       final List<Integer> mRows;
       
-      Tuple(List<String> guess, List<Integer> rows)
+      Tuple(Guess guess, List<Integer> rows)
       {
          mGuess = guess;
          mRows = rows;
       }
    }
    
-   private void siftboolean(int[] columnorder, int resultcolumn, List<Integer> rows, boolean[] isBoolean,
-                            List<Tuple> guesses, int depth, List<String> currentguess)
+   private static class Guess
+     extends AbstractList<Bound>
    {
-      List<Integer> trues = new ArrayList<Integer>();
-      List<Integer> falses = new ArrayList<Integer>();
-      int index = columnorder[depth];
-      String falseres = null;
-      String trueres = null;
-      boolean allfalse = true;
-      boolean alltrue = true;
-      for (int row : rows) {
-         String result = getCalcTable().getValue(row, resultcolumn);
-         if (getCalcTable().getValue(row, index).equals("T")) {
-            trueres = trueres == null ? result : trueres;
-            alltrue = alltrue && trueres.equals(result);
-            trues.add(row);
-         } else {
-            falseres = falseres== null ? result : falseres;
-            allfalse = allfalse && falseres.equals(result);
-            falses.add(row);
+     private final Bound[] mBounds;
+     
+     Guess(int size)
+     {
+       mBounds = new Bound[size];
+       Arrays.fill(mBounds, DontCare.INSTANCE);
+     }
+     
+     Guess(Guess guess)
+     {
+       mBounds = Arrays.copyOf(guess.mBounds, guess.size());
+     }
+     
+     public int size()
+     {
+       return mBounds.length;
+     }
+     
+     public Bound set(int index, Bound element)
+     {
+       Bound t = mBounds[index];
+       mBounds[index] = element;
+       return t;
+     }
+     
+     public Bound get(int index)
+     {
+       return mBounds[index];
+     }
+     
+     public List<String> toStrings()
+     {
+       List<String> strings = new ArrayList<String>(size());
+       for (int i = 0; i < mBounds.length; i++) {
+         strings.add(mBounds[i].toString());
+       }
+       return strings;
+     }
+     
+     public boolean conforms(List<String> row, int result)
+     {
+       System.out.println(row);
+       System.out.println(this);
+       for (int i = 0; i < row.size(); i++) {
+         if (result == i) {continue;}
+         if (!mBounds[i].inBounds(row.get(i))) {
+           return false;
          }
-      }
-      List<String> trueguess = new ArrayList<String>(currentguess);
-      List<String> falseguess = new ArrayList<String>(currentguess);
-      if (!falses.isEmpty()) {trueguess.set(index, "T");}
-      if (!trues.isEmpty()) {falseguess.set(index, "F");}
-      if (!trues.isEmpty()) {
-         if (alltrue) {
-            trueguess.set(resultcolumn, trueres);
-            guesses.add(new Tuple(trueguess, trues));
-            return;
-         } else {
-            sift(columnorder, resultcolumn, trues, isBoolean, guesses, depth + 1, trueguess);
-         }
-      }
-      if (!falses.isEmpty()) {
-         if (allfalse) {
-            falseguess.set(resultcolumn, falseres);
-            guesses.add(new Tuple(falseguess, falses));
-            return;
-         } else {
-            sift(columnorder, resultcolumn, falses, isBoolean, guesses, depth + 1, falseguess);
-         }
-      }
+         System.out.println("inbounds");
+       }
+       System.out.println("conforms");
+       return true;
+     }
+     
+     public static Guess getGuess(List<String> row, int resultcol, boolean isBoolean[])
+     {
+       boolean contained = false;
+       Guess res = new Guess(row.size());
+       for (int i = 0; i < row.size(); i++) {
+         if (i == resultcol) {res.set(i, new Result(row.get(i))); continue;}
+         Bound b = isBoolean[i] ? BoundBoolean.parse(row.get(i)) : BoundDouble.parse(row.get(i));
+         if (b == null) {return null;}
+         if (b == DontCare.INSTANCE) {contained = true;}
+         res.set(i, b);
+       }
+       return contained ? res : null;
+     }
    }
    
-   private void sift(int[] columnorder, int resultcolumn, List<Integer> rows, boolean[] isBoolean,
-                     List<Tuple> guesses, int depth, List<String> currentguess)
+   private interface Bound
    {
-      if (depth >= columnorder.length) {
-         List<String> guess = new ArrayList<String>(currentguess);
-         guess.set(resultcolumn, CONTRADICTION);
-         guesses.add(new Tuple(guess, rows));
-         return;
-      }
-      if(isBoolean[columnorder[depth]]) {
-         siftboolean(columnorder, resultcolumn, rows, isBoolean, guesses, depth, currentguess);
-      } else {
-         siftdouble(columnorder, resultcolumn, rows, isBoolean, guesses, depth, currentguess);
-      }
+     public boolean inBounds(Object o);
+     
+     public Bound merge(Bound b);
+   }
+   
+   private static class Result
+     implements Bound
+   {
+     private final String mResult;
+     
+     Result(String result)
+     {
+       mResult = result;
+     }
+     
+     public boolean inBounds(Object o)
+     {
+       return o.equals(mResult);
+     }
+     
+     public Bound merge(Bound b)
+     {
+       return null;
+     }
+     
+     public int hashCode()
+     {
+       return mResult.toString().hashCode();
+     }
+     
+     public boolean equals(Object o)
+     {
+       if (! (o instanceof Result)) {return false;}
+       Result res = (Result) o;
+       return mResult.equals(res.mResult);
+     }
+     
+     public String toString()
+     {
+       return mResult;
+     }
+   }
+   
+   private static class DontCare
+     implements Bound
+   {
+     static final DontCare INSTANCE = new DontCare();
+     
+     private DontCare()
+     {
+     }
+     
+     public boolean inBounds(Object o)
+     {
+       return true;
+     }
+     
+     public Bound merge(Bound b)
+     {
+       return INSTANCE;
+     }
+     
+     public String toString()
+     {
+       return "...";
+     }
+   }
+   
+   private static class BoundBoolean
+     implements Bound
+   {
+     private final boolean mValue;
+     
+     private BoundBoolean(boolean value)
+     {
+       mValue = value;
+     }
+     
+     public static Bound parse(String string)
+     {
+       if (string.equals("...")) {return DontCare.INSTANCE;}
+       if (string.equals("T")) {
+         return new BoundBoolean(true);
+       } else if (string.equals("F")) {
+         return new BoundBoolean(false);
+       }
+       return null;
+     }
+     
+     public boolean inBounds(Object value)
+     {
+       if (value instanceof String) {
+         String st = (String) value;
+         value = st.equals("T") ? true : value;
+         value = st.equals("F") ? false : value;
+       }
+       if (value instanceof Boolean) {
+         boolean temp = (Boolean) value;
+         return mValue == temp;
+       }
+       return false;
+     }
+     
+     public Bound merge(Bound b)
+     {
+       if (b instanceof DontCare) {return b;}
+       if (!(b instanceof BoundBoolean)) {return null;}
+       BoundBoolean bb = (BoundBoolean) b;
+       if (bb.mValue != mValue) {
+         return DontCare.INSTANCE;
+       }
+       return null;
+     }
+     
+     public int hashCode()
+     {
+       //TODO do better hashCode
+       return toString().hashCode();
+     }
+     
+     public boolean equals(Object o)
+     {
+       if (!(o instanceof BoundBoolean)) {return false;}
+       BoundBoolean bb = (BoundBoolean)o;
+       return bb.toString().equals(toString());
+     }
+     
+     public String toString()
+     {
+       return mValue ? "T" : "F";
+     }
+   }
+   
+   private static class BoundDouble
+     implements Bound
+   {
+     private final double mLower;
+     private final double mUpper;
+     
+     private BoundDouble(double l, double u)
+     {
+       mLower = l;
+       mUpper = u;
+     }
+     
+     public static Bound parse(String string)
+     {
+       if (string.equals("...")) {return DontCare.INSTANCE;}
+       try {
+         double l = Double.parseDouble(string);
+         double u = l;
+         return new BoundDouble(l, u);
+       } catch (NumberFormatException nfe) {
+       }
+       return null;
+     }
+     
+     public boolean inBounds(Object value)
+     {
+       System.out.println("value: " +value);
+       if (value instanceof String) {
+         String st = (String) value;
+         try {
+           value = new Double(st);
+         } catch (NumberFormatException nfe) {
+           return false;
+         }
+       }
+       System.out.println("value2: " +value);
+       if (value instanceof Double) {
+         double temp = (Double) value;
+         if (mLower != mUpper) {
+           return mLower < temp && temp <= mUpper;
+         } else {
+           return mLower == temp;
+         }
+       }
+       return false;
+     }
+     
+     public Bound merge(Bound b)
+     {
+       System.out.println("merge");
+       if (b instanceof DontCare) {return b;}
+       System.out.println("merge2");
+       if (!(b instanceof BoundDouble)) {return null;}
+       BoundDouble bd = (BoundDouble) b;
+       System.out.println(this + " vs " + bd);
+       if (bd.mLower == mUpper) {
+         return new BoundDouble(mLower, bd.mUpper);
+       } else if (mLower == bd.mUpper) {
+         return new BoundDouble(bd.mLower, mUpper);
+       }
+       System.out.println(this + " vs " + bd);
+       return null;
+     }
+     
+     public int hashCode()
+     {
+       //TODO do better hashCode
+       return (int)(mLower * mUpper);
+     }
+     
+     public boolean equals(Object o)
+     {
+       if (!(o instanceof BoundDouble)) {return false;}
+       BoundDouble bd = (BoundDouble)o;
+       return mLower == bd.mLower && mUpper == bd.mUpper;
+     }
+     
+     public String toString()
+     {
+       if (mLower == mUpper) {return "" + mUpper;}
+       String res = "";
+       res = mLower == Double.NEGATIVE_INFINITY? res : res + mLower;
+       res += "...";
+       res = mUpper == Double.POSITIVE_INFINITY? res : res + mUpper;
+       return res;
+     }
    }
 }

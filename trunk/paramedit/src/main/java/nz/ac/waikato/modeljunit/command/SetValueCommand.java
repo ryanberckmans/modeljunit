@@ -26,6 +26,11 @@ Basic constructor for SetValueCommand
       mOldValue = OldValue;
    }
    
+   public SetValueCommand(CalcTable Table, int Row, int Column, String Value)
+   {
+     this(Table, Row, Column, Value, Table.getValue(Row, Column));
+   }
+   
    public void execute()
    {
       System.out.println("execute");
