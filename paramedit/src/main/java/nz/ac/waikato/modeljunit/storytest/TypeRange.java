@@ -5,6 +5,7 @@ package nz.ac.waikato.modeljunit.storytest;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -43,6 +44,7 @@ public class TypeRange
       double[][] ranges = new double[tup.mRange.size()][2];
       mRanges = tup.mRange.toArray(ranges);
     }
+    System.out.println(Arrays.toString(mRanges));
   }
   
   public boolean isGuess()
@@ -74,8 +76,10 @@ public class TypeRange
       for (int i = 0; i < getRanges().length; i++) {
         if (i != 0) {sb.append(",");}
         sb.append(getRanges()[i][0]);
-        sb.append("...");
-        sb.append(getRanges()[i][1]);
+        if (getRanges()[i][0] != getRanges()[i][1]) {
+          sb.append("...");
+          sb.append(getRanges()[i][1]);
+        }
       }
     }
     return sb.toString();
@@ -89,7 +93,7 @@ public class TypeRange
       System.out.println("D:" + depth);
       int tint = depth;
       boolean decimal = false;
-      if (string.length() <= depth || !(string.charAt(tint) > '0' && string.charAt(tint) < '9')) {
+      if (string.length() <= depth || !(string.charAt(tint) >= '0' && string.charAt(tint) <= '9')) {
         System.out.println(string);
         for (int i = 0; i < depth; i++) {
           System.out.print(" ");
@@ -97,7 +101,7 @@ public class TypeRange
         System.out.println("^");
         throw new ParseException("Expected Digit", depth);}
       while (tint < string.length()) {
-        if (string.charAt(tint) > '0' && string.charAt(tint) < '9') {
+        if (string.charAt(tint) >= '0' && string.charAt(tint) <= '9') {
           tint++; continue;
         } else if (!decimal && string.charAt(tint) == '.' &&
                    string.charAt(tint + 1) > '0' && string.charAt(tint + 1) < '9') {
@@ -123,19 +127,23 @@ public class TypeRange
       Tuple2 tup2 = D(string, depth);
       depth = tup2.mDepth;
       double first = tup2.mDouble;
-      System.out.println("R:" + depth);
-      if (!string.startsWith("...", depth)) {throw new ParseException("Expected ...", depth);}
-      depth += 3;
-      System.out.println("R:" + depth);
-      tup2 = D(string, depth);
-      depth = tup2.mDepth;
       double second = tup2.mDouble;
+      System.out.println("R:" + depth);
+      if (string.startsWith("...", depth)) {
+        depth += 3;
+        System.out.println("R:" + depth);
+        tup2 = D(string, depth);
+        depth = tup2.mDepth;
+        second = tup2.mDouble;
+      }
       tup.mRange.add(new double[]{first, second});
+      System.out.println(tup.mRange);
       System.out.println(string);
       for (int i = 0; i < depth; i++) {
         System.out.print(" ");
       }
       System.out.println("^");
+      System.out.println("R:" + depth);
       return depth;
     }
     
