@@ -280,7 +280,8 @@ public class CalcTablePanel
          int scol = mTable.getSelectedColumn();
          int row = srow == -1 ? mRow : srow;
          row = row == -1 ? mCalc.rows() : row;
-         
+         row--;
+         row = row < 0 ? 0 : row;
          Command command = new AddRowCommand(mCalc, row);
          getUndoInterface().execute(command);
          if (srow != -1 && scol != -1) {
@@ -340,6 +341,8 @@ public class CalcTablePanel
          int row = srow == -1 ? mRow : srow;
          row = row == -1 ? mCalc.columns() : row;
          row--;
+         row--;
+         row = row < 0 ? 0 : row;
          if (row == -1) {System.out.println("can't delete header"); return;}
          Command command = new DeleteRowCommand(mCalc, row);
          getUndoInterface().execute(command);

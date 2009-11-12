@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.lang.NumberFormatException;
 import java.util.Arrays;
 
@@ -14,6 +16,8 @@ public class GuessSuggestionStrategy
    implements Observer, Subject, SuggestionStrategy
 {   
    private final List<Suggestion> mSuggestions;
+   private List<SortedSet<Double>> mBottoms = null;
+   private List<SortedSet<Double>> mTops = null;
    private static final Result CONTRADICTION = new Result("contradiction");
    
    public GuessSuggestionStrategy(CalcTable calc)
@@ -205,8 +209,20 @@ public class GuessSuggestionStrategy
             if (calc.getType(c).equals(Double.class)) {
                columnsdone[c] = true; columnorder[count] = c;
                count++;
+               
             }
          }
+      }
+      mBottoms = new ArrayList<SortedSet<Double>>();
+      mTops = new ArrayList<SortedSet<Double>>();
+      for (int c = 0; c < calc.columns(); c++) {
+        mTops.add(new TreeSet<Double>());
+        mBottoms.add(new TreeSet<Double>());
+        double[][] arr = calc.getTypeRange(c).getRanges();
+        for (int i = 0; i < arr.length; i++) {
+          mBottoms.get(c).add(arr[i][0]);
+          mTops.get(c).add(arr[i][1]);
+        }
       }
       List<Integer> rows = new ArrayList<Integer>(calc.rows());
       List<Guess> preguess = new ArrayList<Guess>();
@@ -355,6 +371,11 @@ public class GuessSuggestionStrategy
          i++;
       }
       for (i = 0; i < values.length; i++) {
+        System.out.println("****");
+        System.out.println("****");
+        System.out.println("Sign");
+        System.out.println("****");
+        System.out.println("****");
          Triple trip = i >= triples.length ? null : triples[i];
          /*if (last != -1 && (trip == null || !trip.allsame || !trip.mResult.equals(triples[last].mResult))) {
             List<String> guess = new ArrayList<String>(currentguess);
@@ -371,6 +392,23 @@ public class GuessSuggestionStrategy
          Guess guess = new Guess(currentguess);
          Double previous = getDoubleValue(i -1, values);
          Double to = getDoubleValue(i, values);
+         //Double next = getDoubleValue(i + 1, values);
+         System.out.println("bots:" + mBottoms.get(index) + " head:" + mBottoms.get(index).headSet(to) + " to:" + to);
+         if (!mBottoms.get(index).headSet(to).isEmpty()) {
+           double prev2 = mBottoms.get(index).headSet(to).last();
+           System.out.println("prev:" + previous + " prev2:" + prev2);
+           if (previous < prev2) {
+             previous = prev2;
+           }
+         }
+         System.out.println("tops:" + mTops.get(index) + " head:" + mTops.get(index).tailSet(previous) + " prev:" + to);
+         if (!mTops.get(index).tailSet(previous).isEmpty()) {
+           double next2 = mTops.get(index).tailSet(previous).first();
+           System.out.println("next:" + to + " next2:" + next2);
+           if (next2 < to) {
+             to = next2;
+           }
+         }
          guess.set(index, new BoundDouble(previous, to));
          if (!trip.allsame) {
             sift(columnorder, resultcolumn, trip.mList, isBoolean, guesses, depth + 1, guess);
