@@ -43,6 +43,11 @@
    </build>
   <dependencies>
     <dependency>
+      <groupId>nz.ac.waikato.modeljunit</groupId>
+      <artifactId>modeljunit</artifactId>
+      <version>2.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
