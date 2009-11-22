@@ -478,7 +478,7 @@ implements ActionListener, MouseListener {
 	/**
 	 * The override required by implementing the ActionPerformed class.
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "deprecation" })
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String actionCommand = e.getActionCommand();
@@ -682,14 +682,13 @@ implements ActionListener, MouseListener {
 			// The pause animation toggle button
 		} else if (actionCommand.equals("animationToggleButton")){
 			if (animationToggleButton.isSelected()) {
+				animationToggleButton.setText("Pause");
 				animationToggleButton.setSelected(false);
+				animationThread_.resume();
 			} else {
+				animationToggleButton.setText("Play");
 				animationToggleButton.setSelected(true);
-				try{
-					animationThread_.interrupt();
-				} catch (Exception ex){
-					//Ignore
-				}
+				animationThread_.suspend();
 			}
 		}
 		vv.repaint();
@@ -1337,6 +1336,7 @@ implements ActionListener, MouseListener {
 			rootNode_ = (DefaultMutableTreeNode)tree_.getModel().getRoot();
 		}
 
+		@SuppressWarnings("deprecation")
 		public void run(){
 			// Expand out all the rows of the tree
 			for (int i = 0; i < tree.getRowCount(); i++){
@@ -1374,11 +1374,7 @@ implements ActionListener, MouseListener {
 							animateLayoutChanges();
 						}
 						if(animationToggleButton.isSelected()){
-							try{
-								Thread.sleep(Long.MAX_VALUE);
-							} catch (InterruptedException ie){
-								//Ignore
-							}
+							suspend();
 						} else {
 							Thread.sleep(animationSleepTime_);
 						}
