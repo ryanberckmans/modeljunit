@@ -681,6 +681,7 @@ implements ActionListener, MouseListener {
 			showAnimation_ = false;
 			// The pause animation toggle button
 		} else if (actionCommand.equals("animationToggleButton")){
+			System.out.println(animationSlider.getValue());
 			if (animationToggleButton.isSelected()) {
 				animationToggleButton.setText("Pause");
 				animationToggleButton.setSelected(false);
@@ -690,7 +691,7 @@ implements ActionListener, MouseListener {
 				animationToggleButton.setSelected(true);
 				animationThread_.suspend();
 			}
-		}
+		} 
 		vv.repaint();
 	}
 
@@ -739,10 +740,6 @@ implements ActionListener, MouseListener {
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		Object source = e.getComponent();
-		if (source == animationSlider) {
-			animationSleepTime_ = animationSlider.getValue();
-		}
 	}
 
 	/**
@@ -952,7 +949,14 @@ implements ActionListener, MouseListener {
 		animationSlider.setValue(1000);
 		animationSlider.setPaintTicks(true);
 		animationSlider.setToolTipText("Use this slider to control the speed of the animation");
-		animationSlider.addMouseListener(this);
+		animationSlider.addChangeListener(new ChangeListener() {
+		      public void stateChanged(ChangeEvent evt) {
+		        JSlider slider = (JSlider) evt.getSource();
+		        if (!slider.getValueIsAdjusting()) {
+		          animationSleepTime_ = slider.getValue();
+		        }
+		      }
+		    });
 		animationSleepTime_ = animationSlider.getValue();
 		
 		animationButton.setText("Stop");
