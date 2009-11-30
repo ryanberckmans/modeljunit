@@ -195,16 +195,17 @@ public class LookaheadTester extends Tester
   }
 
   /**
-   * Evaluate the desirability of reaching {@code state}.
+   * Evaluate the desirability of reaching {@code state}. 
+   * Zero means not desirable. Positive number means more desirable.
    * However, at the top level of recursion (when {@code depth} equals
    * getDepth()), it returns the number of the best action to take.
    * @param state
    * @param depth The depth of lookahead
-   * @return A desirability integer, or an action number.
+   * @return A desirability integer greater than or equal to 0, or an action number.
    */
   public int evalState(Object state, int depth)
   {
-    if (depth == 0 || depth < DEPTH && state == model_.getCurrentState())
+    if (depth == 0 || depth < DEPTH && state.equals(model_.getCurrentState()))
       return 0;
     int[] worth = new int[model_.getNumActions()];
     for (int i = 0; i < worth.length; i++) {
@@ -264,7 +265,7 @@ public class LookaheadTester extends Tester
     // Note: every enabled action must either be in TODO,
     // or have been taken previously, so its worth will be > MIN_VALUE.
     int bestAction = -1;
-    int bestWorth = Integer.MIN_VALUE;
+    int bestWorth = 0;
     for (int i = 0; i < model_.getNumActions(); i++) {
       if (worth[i] > bestWorth && (depth != DEPTH || model_.isEnabled(i))) {
         bestAction = i;

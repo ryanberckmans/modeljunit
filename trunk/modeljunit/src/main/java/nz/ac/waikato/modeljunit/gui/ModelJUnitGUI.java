@@ -81,20 +81,36 @@ public class ModelJUnitGUI implements Runnable
     *  When each panel is displayed, it is put into a transient frame.
     */
    public ModelJUnitGUI() {
-      mProject = new Project();
-      Project.setInstance(mProject);
-      mGraphCurrent = false;
-
-      mVisualisation = PanelJUNGVisualisation.getGraphVisualisationInstance();
-      mCoverage = PanelCoverage.getInstance();
-      mResultViewer = PanelResultViewer.getResultViewerInstance();
-      mTestDesign = PanelTestDesign.getTestDesignPanelInstance(this); 
-
-      buildGUI();
-      
-      displaySplashWindow();
+	   this(true);
    }
 
+   public ModelJUnitGUI(boolean isDisplaySplashWindow) {
+		initialize();
+		buildGUI();
+		
+		if (isDisplaySplashWindow) {
+			displaySplashWindow();
+		} else {
+			mAppWindow.setVisible(true);
+			mAppWindow.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		}
+   }
+   
+   public PanelJUNGVisualisation getVisualisation() {
+		return mVisualisation;
+	}
+
+	private void initialize() {
+		mProject = new Project();
+		Project.setInstance(mProject);
+		mGraphCurrent = false;
+
+		mVisualisation = PanelJUNGVisualisation.getGraphVisualisationInstance();
+		mCoverage = PanelCoverage.getInstance();
+		mResultViewer = PanelResultViewer.getResultViewerInstance();
+		mTestDesign = PanelTestDesign.getTestDesignPanelInstance(this); 
+	}
+	
    /** Construct an application window. **/
    public void buildGUI() {
       mAppWindow = new JFrame(mAppWindowTitle);
