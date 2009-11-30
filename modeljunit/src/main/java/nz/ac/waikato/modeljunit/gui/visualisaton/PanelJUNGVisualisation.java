@@ -320,6 +320,14 @@ implements ActionListener, MouseListener {
 	}
 
 	/**
+	 * Return the JUNGHelper instance
+	 * @return the JUNGHelper instance
+	 */
+	public JUNGHelper getJUNGHelper() {
+		return jView_;
+	}
+	
+	/**
 	 * This will show the fully explored graph
 	 * @param graph The GraphListener which contains the explored graph.
 	 */
@@ -683,11 +691,9 @@ implements ActionListener, MouseListener {
 		} else if (actionCommand.equals("animationToggleButton")){
 			System.out.println(animationSlider.getValue());
 			if (animationToggleButton.isSelected()) {
-				animationToggleButton.setText("Pause");
 				animationToggleButton.setSelected(false);
 				animationThread_.resume();
 			} else {
-				animationToggleButton.setText("Play");
 				animationToggleButton.setSelected(true);
 				animationThread_.suspend();
 			}
@@ -788,6 +794,7 @@ implements ActionListener, MouseListener {
 
 		vertLabelPos.setText("Label position:");
 
+		vertLabelPosComboBox.setName("vertLabelPosComboBox");
 		vertLabelPosComboBox.setModel(new DefaultComboBoxModel(
 				new Renderer.VertexLabel.Position[] {
 						Renderer.VertexLabel.Position.AUTO
@@ -843,6 +850,7 @@ implements ActionListener, MouseListener {
 
 		layoutTypePanel.setBorder(BorderFactory.createTitledBorder("Layout Type"));
 
+		layoutTypeComboBox.setName("layoutTypeComboBox");
 		layoutTypeComboBox.setModel(new DefaultComboBoxModel(
 				new JUNGHelper.LayoutType[] { JUNGHelper.LayoutType.FR
 						, JUNGHelper.LayoutType.CIRCLE

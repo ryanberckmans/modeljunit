@@ -463,6 +463,9 @@ public class PanelTestDesign extends PanelAbstract
     if (e.getSource() == m_checkFailureVerbosity) {
       Parameter.setFailureVerbosity(m_checkFailureVerbosity.isSelected());
     }
+    
+    // -------- Set the total test length ---------
+    TestExeModel.setWalkLength(Integer.valueOf(m_txtLength.getText()));
 
     // -------- Regenerate Code in View ---------
     try {
@@ -800,7 +803,15 @@ public class PanelTestDesign extends PanelAbstract
   {
     if (e.getSource() == m_txtLength) {
       TestExeModel.setWalkLength(Integer.valueOf(m_txtLength.getText()));
-    }
+      
+      // -------- Regenerate Code in View ---------
+      try {
+         mCodeView.setText(generateCode());
+      } catch (Exception x) {
+         mCodeView.setText("There was a problem generating code at this time:\n" + x.getMessage());
+      }
 
+      mCodeView.setPreferredSize(mScrollPane.getViewport().getExtentSize());
+    }
   }
 }
