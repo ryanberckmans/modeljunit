@@ -116,9 +116,9 @@ public class LookaheadTesterTest extends TestCase
     assertEquals("(FT, removeS2, FF)", path.get(12).toString());
     assertEquals("(FF, removeS1, FF)", path.get(13).toString());
     assertEquals("(FF, removeS2, FF)", path.get(14).toString());
-    assertEquals("(FF, addS1, TF)", path.get(15).toString());
-    assertEquals("(TF, removeS2, TF)", path.get(16).toString());
-    assertEquals(16, transitions.getCoverage());
+    assertEquals("(FF, reset, FF)", path.get(15).toString());
+    assertEquals("(FF, reset, FF)", path.get(16).toString());
+    assertEquals(15, transitions.getCoverage());
   }
 
   public void testGenerate2()
@@ -188,7 +188,7 @@ public class LookaheadTesterTest extends TestCase
     assertEquals("(FF, addS2, FT)", path.get(25).toString());
     assertEquals("(FT, addS1, TT)", path.get(26).toString());
     assertEquals("(TT, removeS2, TF)", path.get(27).toString());
-    assertEquals("(TF, addS1, TF)", path.get(28).toString());
+    assertEquals("(TF, reset, FF)", path.get(28).toString());
 
     assertEquals(16, transitions.getCoverage());
     assertEquals(4, tester.getMaxLength());
