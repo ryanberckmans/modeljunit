@@ -1,6 +1,7 @@
 package nz.ac.waikato.modeljunit.gui;
 
 import java.awt.Component;
+import java.util.Properties;
 
 import org.junit.Test;
 import org.uispec4j.Trigger;
@@ -22,7 +23,7 @@ import edu.uci.ics.jung.graph.Graph;
 public class ModelJUnitGUITest extends UISpecTestCase {
 	private ModelJUnitGUI modelJUnitGUI;
 	private Window window;
-
+	
 	protected void setUp() throws Exception {
 		window = WindowInterceptor.run(new Trigger() { 
 			public void run() { 
@@ -35,8 +36,6 @@ public class ModelJUnitGUITest extends UISpecTestCase {
 
 	@Test
 	public void testInitialControlPanel() {
-//		String labelPositions = "AUTO" + "CNTR" + "N" + "NE" + "E" + "SE" + "S" + "SW" + "W" + "NW";
-//		String layoutTypes = "FR" + "CIRCLE" + "ISOM" + "KK" + "SPRING";
 		String[] labelPositions = new String[]{"AUTO","CNTR","N","NE","E","SE","S","SW","W","NW"};
 		String[] layoutTypes = new String[]{"FR","CIRCLE","ISOM","KK","SPRING"};
 
