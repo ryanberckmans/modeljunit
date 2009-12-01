@@ -93,10 +93,11 @@
       <version>4.4</version>
     </dependency>
     <dependency>
-      <groupId>uispec4j</groupId>
+      <groupId>org.uispec4j</groupId>
       <artifactId>uispec4j</artifactId>
-      <version>1.5</version>
-	</dependency> 
+      <version>2.1</version>
+      <classifier>jdk16</classifier>
+    </dependency> 
   </dependencies>
   <build>
     <plugins>
