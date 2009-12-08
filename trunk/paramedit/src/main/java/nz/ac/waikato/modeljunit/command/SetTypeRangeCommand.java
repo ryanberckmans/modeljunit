@@ -1,7 +1,7 @@
 package nz.ac.waikato.modeljunit.command;
 
 import nz.ac.waikato.modeljunit.storytest.CalcTable;
-import nz.ac.waikato.modeljunit.storytest.TypeRange;
+import nz.ac.waikato.modeljunit.storytest.parse.TypeRange;
 
 public class SetTypeRangeCommand
    extends AbstractUndoableCommand
