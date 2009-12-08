@@ -1,14 +1,19 @@
 package nz.ac.waikato.modeljunit.storytest;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.lang.IndexOutOfBoundsException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 import java.util.HashSet;
+
+import nz.ac.waikato.modeljunit.storytest.parse.Function;
+import nz.ac.waikato.modeljunit.storytest.parse.Parser;
+import nz.ac.waikato.modeljunit.storytest.parse.TypeRange;
 
 /**
  *  Holds a table of Data Values for Testing
@@ -25,7 +30,7 @@ public class CalcTable
   /** The name of this table */
    private final String mName;
    /** The Column Names */
-   private final List<String> mColumns;
+   private final List<ColumnName> mColumns;
    /** The Matrix of test values */
    private final List<List<String>> mMatrix;
    /** The Assumed Types of each Column **/
@@ -51,15 +56,15 @@ public class CalcTable
    public CalcTable(String name, List<String> columns)
    {
      mName = name;
-     mColumns = new ArrayList<String>(columns);
+     mColumns = new ArrayList<ColumnName>(columns.size());
      mTypes = new ArrayList<Class<?>>();
      mTypeRanges = new ArrayList<TypeRange>();
      mContradiction = new HashSet<Integer>();
-     for (int i = 0; i < mColumns.size(); i++) {
-        mColumns.set(i, mColumns.get(i).trim());
+     for (int i = 0; i < columns.size(); i++) {
+        mColumns.add(new ColumnName(columns.get(i).trim()));
         mTypes.add(null);
         try {
-          mTypeRanges.add(new TypeRange("", i, this));
+          mTypeRanges.add(Parser.parseTypeRange("", i, this));
         } catch (Throwable t) {
           t.printStackTrace();
           System.exit(0);
@@ -67,7 +72,13 @@ public class CalcTable
      }
      mMatrix = new ArrayList<List<String>>();
      mHighlighted = new HashSet<Integer>();
+     System.out.println("addrow");
      addRow();
+   }
+   
+   public int getColumnNum(ColumnName name)
+   {
+     return mColumns.indexOf(name);
    }
    
    private Tester getTester(String string)
@@ -92,6 +103,11 @@ public class CalcTable
    public boolean isHighlighted(int row)
    {
       return mHighlighted.contains(row);
+   }
+   
+   public boolean isEditable(int column)
+   {
+     return getTypeRange(column).isEditable();
    }
    
    public void setTypeRange(int column, TypeRange typerange)
@@ -182,6 +198,7 @@ public class CalcTable
     */
    private List<String> createNewRow()
    {
+      System.out.println("columns(): = " + columns() + "\tmColumns.size() = " + mColumns.size());
       List<String> list = new ArrayList<String>(columns());
       for(int i = 0; i < mColumns.size(); i++) {
          list.add("");
@@ -261,10 +278,16 @@ public class CalcTable
    public void addColumn(String columnName, int index, String fillValue)
       throws IndexOutOfBoundsException
    {
-      mColumns.add(index, columnName);
+      mColumns.add(index, new ColumnName(columnName));
       mTypes.add(index, null);
       for (List<String> list: mMatrix) {
          list.add(index, fillValue);
+      }
+      try {
+        mTypeRanges.add(index, Parser.parseTypeRange("", index, this));
+      } catch (Throwable t) {
+        t.printStackTrace();
+        System.exit(0);
       }
       updateType(index);
       inform();
@@ -371,7 +394,11 @@ public class CalcTable
    public String getValue(int row, int column)
       throws IndexOutOfBoundsException
    {
-      return mMatrix.get(row).get(column);
+      if (isEditable(column)) {
+        return mMatrix.get(row).get(column);
+      } else {
+        return "" + getTypeRange(column).calculateRow(row);
+      }
    }
    
    /**
@@ -382,7 +409,22 @@ public class CalcTable
    public String getColumnHeader(int index)
       throws IndexOutOfBoundsException
    {
-      return mColumns.get(index);
+      return mColumns.get(index).mName;
+   }
+   
+   public ColumnName getColumnName(int index)
+   {
+     return mColumns.get(index);
+   }
+   
+   public ColumnName getColumnName(String name)
+   {
+     for (ColumnName cn : mColumns) {
+       if (cn.getName().equals(name)) {
+         return cn;
+       }
+     }
+     return null;
    }
       
    /**
@@ -393,7 +435,7 @@ public class CalcTable
    public void setColumnHeader(int column, String name)
       throws IndexOutOfBoundsException
    {
-      mColumns.set(column, name.trim());
+      mColumns.get(column).setName(name.trim());
       inform();
    }
    
@@ -405,7 +447,7 @@ public class CalcTable
    public boolean isResult(int column)
       throws IndexOutOfBoundsException
    {
-      return mColumns.get(column).endsWith("?");
+      return getColumnHeader(column).endsWith("?");
    }
    
    /**
@@ -414,8 +456,8 @@ public class CalcTable
    public String toString()
    {
       StringBuffer sb = new StringBuffer();
-      for (String name: mColumns) {
-         sb.append("|" + name);
+      for (ColumnName name: mColumns) {
+         sb.append("|" + name.getName());
       }
       sb.append("|\n");
       for (List<String> list: mMatrix) {
@@ -515,5 +557,5 @@ public class CalcTable
       {
          return mConstructor.getDeclaringClass();
       }
-   }
+   }  
 }

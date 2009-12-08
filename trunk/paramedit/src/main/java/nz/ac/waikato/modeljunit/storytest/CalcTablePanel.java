@@ -26,6 +26,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import javax.swing.JComponent;
 import nz.ac.waikato.modeljunit.command.Command;
+import nz.ac.waikato.modeljunit.storytest.parse.Parser;
+import nz.ac.waikato.modeljunit.storytest.parse.TypeRange;
+
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import java.awt.event.MouseAdapter;
@@ -228,8 +231,13 @@ public class CalcTablePanel
                                              mPrevious);
         } else if (mRow == 1) {
           try {
-            TypeRange tr = new TypeRange(mComponent.getText(), mColumn, mCalc);
-            command = new SetTypeRangeCommand(mCalc, mColumn, tr);
+            if (!mComponent.getText().startsWith("=")) {
+              TypeRange tr = Parser.parseTypeRange(mComponent.getText(), mColumn, mCalc);
+              command = new SetTypeRangeCommand(mCalc, mColumn, tr);
+            } else {
+              TypeRange tr = Parser.parseFunction(mComponent.getText().substring(1), mColumn, mCalc);
+              command = new SetTypeRangeCommand(mCalc, mColumn, tr);
+            }
           } catch (ParseException pe) {
             JOptionPane.showMessageDialog(CalcTablePanel.this, pe);
             return null;

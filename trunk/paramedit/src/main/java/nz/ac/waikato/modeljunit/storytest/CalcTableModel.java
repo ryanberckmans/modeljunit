@@ -43,7 +43,7 @@ public class CalcTableModel
    
    public boolean isCellEditable(int row, int column)
    {
-      return true;
+      return mTable.isEditable(column);
    }
    
    public void setValueAt(String aValue, int row, int column)
