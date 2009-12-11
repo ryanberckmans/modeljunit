@@ -46,13 +46,13 @@ public class EdgePaintTransformer<V, E> extends GradientEdgePaintTransformer<Obj
 			EdgeInfo e = (EdgeInfo)o;
 			PickedInfo<Object> pi = vv_.getPickedEdgeState();
 			if(pi.isPicked(o)){
-				return Color.blue;
+				return ColorUtil.PICKED;
 			} else if(e.getFailedEdge()){
-				return Color.red;
+				return ColorUtil.FAILED_EDGE;
 			} else if(e.getIsDisplayed() || e.getIsVisited()){            		
-				return Color.black;
+				return ColorUtil.EXPLORED;
 			}
 		}
-		return new Color(140,140,200);
+		return ColorUtil.DOTTED_LINE;
 	}    
 }

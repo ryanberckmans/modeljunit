@@ -33,6 +33,9 @@ import edu.uci.ics.jung.visualization.picking.PickedInfo;
  */
 public class VertexEdgePaintTransformer<V,E> implements Transformer<V, Paint> {	
 	
+  private Color DEFAULT_LINE_COLOR = ColorUtil.EXPLORED;
+  private Color PICKED = ColorUtil.PICKED;
+  
 	private PickedInfo<Object> pi;
 	private ArrayList<Object> vertecies_;
 	
@@ -49,28 +52,28 @@ public class VertexEdgePaintTransformer<V,E> implements Transformer<V, Paint> {
 		try{
 			if (v instanceof Graph){	
 				if(pi.isPicked(v)){
-					return Color.blue;
+					return PICKED;
 				}				
-				return Color.black;						
+				return DEFAULT_LINE_COLOR;						
 			}
 			if(v instanceof VertexInfo){
 				if (pi.isPicked(vertecies_.get(vertecies_.indexOf(v)))){					
-					return Color.blue;
+					return PICKED;
 				}
 				else
 				{				
 					if(vertecies_.contains(v)){
 						VertexInfo vert = (VertexInfo)vertecies_.get(vertecies_.indexOf(v));
 						if(vert.getIsDisplayed() || vert.getIsVisited()){							
-							return Color.black;
+							return DEFAULT_LINE_COLOR;
 						}
 					}
 				}
 			}							
-			return Color.BLACK;
+			return DEFAULT_LINE_COLOR;
 						
 		} catch (Exception e){						
-			return Color.BLACK;
+			return DEFAULT_LINE_COLOR;
 		}
 	}
 

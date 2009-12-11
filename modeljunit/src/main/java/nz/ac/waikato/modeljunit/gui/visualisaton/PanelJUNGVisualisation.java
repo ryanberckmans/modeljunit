@@ -20,7 +20,6 @@ package nz.ac.waikato.modeljunit.gui.visualisaton;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -50,7 +49,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
-import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
@@ -731,10 +729,11 @@ implements ActionListener, MouseListener {
 				pickedEdgeState.clear();
 				updateInfoPanel(vertex);
 			}else if(pickSupport.getEdge(layout, p.getX(), p.getY()) != null){
-				Object edge = pickSupport.getEdge(layout, p.getX(), p.getY());
+			  EdgeInfo edge = (EdgeInfo) pickSupport.getEdge(layout, p.getX(), p.getY());
 				pickedVertexState.clear();
+				pickedVertexState.pick(edge.getSrcVertex(), true);
+				pickedVertexState.pick(edge.getDestVertex(), true);
 				updateInfoPanel(edge);
-
 			} else {
 				updateInfoPanel("Nothing Selected");
 			}
@@ -1103,6 +1102,7 @@ implements ActionListener, MouseListener {
 		// setup the tree
 		tree = new JTree(jView_.getRootTreeNode());
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		tree.setCellRenderer(new CustomTreeCellRenderer());
 		tree.addTreeSelectionListener(new TreeSelectionListener(){
 			@SuppressWarnings("unchecked")
 			public void valueChanged(TreeSelectionEvent e) {
@@ -1110,8 +1110,7 @@ implements ActionListener, MouseListener {
 				explScrollBar.setMaximum(tree.getRowCount());
 				explScrollBar.setValue(tree.getMinSelectionRow());
 				//}
-				DefaultMutableTreeNode node = (DefaultMutableTreeNode)
-				tree.getLastSelectedPathComponent();
+				ColorTreeNode node = (ColorTreeNode)tree.getLastSelectedPathComponent();
 				PickedState<Object> pickedVertexState = vv.getPickedVertexState();
 				PickedState<Object> pickedEdgeState = vv.getPickedEdgeState();
 				if (node == null) return;
@@ -1124,25 +1123,36 @@ implements ActionListener, MouseListener {
 							ei.setIsDisplayed(false);
 							ei.getSrcVertex().setIsDisplayed(false);
 							ei.getDestVertex().setIsDisplayed(false);
+							ei.setIsCurrSeq(false);
+							ei.getSrcVertex().setIsCurrSeq(false);
+							ei.getDestVertex().setIsCurrSeq(false);
 						}
 					}
-					DefaultMutableTreeNode tempNode = null;
+					ColorTreeNode tempNode = null;
 					Enumeration enumt = node.getParent().children();
 
 					while(enumt.hasMoreElements()){
-						tempNode = (DefaultMutableTreeNode)enumt.nextElement();
+						tempNode = (ColorTreeNode)enumt.nextElement();
+						tempNode.setInCurrentSeq(true);
+
+						Transition nodeInfo = (Transition)tempNode.getUserObject();
+						EdgeInfo edgeInfo = jView_.getEdge(nodeInfo);
+						edgeInfo.setIsCurrSeq(true);
+						edgeInfo.getSrcVertex().setIsCurrSeq(true);
+						edgeInfo.getDestVertex().setIsCurrSeq(true);
+						
 						if(tempNode.getUserObject() instanceof Transition
 								&& node.getParent().getIndex(tempNode)<= node.getParent().getIndex(node)){
-							Transition nodeInfo = (Transition)tempNode.getUserObject();
 							jView_.setEdgeDisplayed(nodeInfo, true);
 							pickedEdgeState.clear();
 							pickedVertexState.clear();
-							pickedEdgeState.pick(jView_.getEdge(nodeInfo), true);
-							pickedVertexState.pick(jView_.getEdge(nodeInfo).getDestVertex(), true);
-							pickedVertexState.pick(jView_.getEdge(nodeInfo).getSrcVertex(), true);
-							updateInfoPanel(jView_.getEdge(nodeInfo));
+							pickedEdgeState.pick(edgeInfo, true);
+							pickedVertexState.pick(edgeInfo.getDestVertex(), true);
+							pickedVertexState.pick(edgeInfo.getSrcVertex(), true);
+							updateInfoPanel(edgeInfo);
 						}
 					}
+					tree.treeDidChange();
 					vv.repaint();
 				} else if(node.isRoot()){
 					Collection<Object> checkEdges = g.getEdges();
@@ -1153,12 +1163,16 @@ implements ActionListener, MouseListener {
 								ei.setIsDisplayed(true);
 								ei.getSrcVertex().setIsDisplayed(true);
 								ei.getDestVertex().setIsDisplayed(true);
+								ei.setIsCurrSeq(false);
+	              ei.getSrcVertex().setIsCurrSeq(false);
+	              ei.getDestVertex().setIsCurrSeq(false);
 							}
 						}
 					}
 					pickedEdgeState.clear();
 					pickedVertexState.clear();
 					updateInfoPanel("Nothing Selected");
+					tree.treeDidChange();
 					vv.repaint();
 				} else {
 					Collection<Object> checkEdges = g.getEdges();
@@ -1168,6 +1182,9 @@ implements ActionListener, MouseListener {
 							ei.setIsDisplayed(false);
 							ei.getSrcVertex().setIsDisplayed(false);
 							ei.getDestVertex().setIsDisplayed(false);
+							ei.setIsCurrSeq(false);
+              ei.getSrcVertex().setIsCurrSeq(false);
+              ei.getDestVertex().setIsCurrSeq(false);
 						}
 					}
 					DefaultMutableTreeNode tempNode = null;
@@ -1182,11 +1199,12 @@ implements ActionListener, MouseListener {
 					pickedEdgeState.clear();
 					pickedVertexState.clear();
 					updateInfoPanel("Nothing Selected");
+					tree.treeDidChange();
 					vv.repaint();
 				}
 			}
 		});
-
+		
 		tree.addTreeExpansionListener(new TreeExpansionListener(){
 
 			@Override
