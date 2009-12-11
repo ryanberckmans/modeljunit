@@ -1,16 +1,37 @@
 package nz.ac.waikato.modeljunit;
 
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Each Path object represents a particular point in a test sequence.
+ * That is, it comprises a pointer to a sequence of transitions (which may grow to
+ * contain more transitions, but existing entries must not be modified or cleared),
+ * plus an integer (<code>Depth</code>) that records a particular position along that sequence.
+ *
+ * Depth can range from 0 up to the length of the sequence.
+ */
 public class Path {
 
-    private Transition[] transitions_;
+    private List<Transition> transitions_;
     
     private int depth_;
 
-    public Transition[] getTransitions() {
+    /**
+     * Creates an object that remembers a point in the given test sequence.
+     * This takes a snapshot of the current length of <code>transitions_</code>.
+     * @param transitions the current test sequence.
+     */
+    public Path(List<Transition> transitions) {
+        this.transitions_ = transitions;
+        this.depth_ = transitions.size();
+    }
+
+    public List<Transition> getTransitions() {
       return transitions_;
     }
 
-    public void setTransitions(Transition[] transitions) {
+    public void setTransitions(List<Transition> transitions) {
       this.transitions_ = transitions;
     }
 
