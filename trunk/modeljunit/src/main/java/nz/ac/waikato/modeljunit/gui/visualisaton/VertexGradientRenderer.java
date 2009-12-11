@@ -46,27 +46,20 @@ import edu.uci.ics.jung.visualization.transform.shape.GraphicsDecorator;
 public class VertexGradientRenderer<V,E> implements Renderer.Vertex<V,E> {
 
 	private Color backFillColor;
-	private Color dispColor;	
-	private Color pickedColor;	
-	private Color visColor;	
-	private Color graphColor;	
-	private Color stanColor;
-	private Color firstStateColor;
+	private Color stanColor = ColorUtil.UNEXPLORED;
+	private Color dispColor = ColorUtil.EXPLORED;	
+	private Color pickedColor = ColorUtil.PICKED;	
+	private Color visColor = ColorUtil.EXPLORED_CURRENT_SEQ;	
+	private Color firstStateColor = ColorUtil.FIRST_STATE;
+	private Color graphColor = ColorUtil.GRAPH;	
 
 	private PickedState<V> pickedState;
 	private boolean cyclic;
 
 	public VertexGradientRenderer(Color backFillColor, PickedState<V> pickedState, boolean cyclic) {
 		this.backFillColor = backFillColor;
-		this.dispColor = Color.green;
-		this.pickedColor = new Color(204, 153, 0);		
-		this.graphColor = Color.magenta;
-		this.visColor = new Color(51, 102, 0);
-		this.stanColor = Color.gray;
-		this.firstStateColor = Color.cyan;
 		this.pickedState = pickedState;
 		this.cyclic = cyclic;
-		
 	}
 
 
@@ -133,12 +126,17 @@ public class VertexGradientRenderer<V,E> implements Renderer.Vertex<V,E> {
 			} else if(vert.isStartState()){				
 				fillPaint = new GradientPaint((float)r.getMinX(), (float)r.getMinY(), backFillColor,
 						(float)r.getMinX(), y2, firstStateColor, cyclic);
+			} else if(vert.getIsVisited()){
+			  if (vert.getIsCurrSeq()) {
+			    fillPaint = new GradientPaint((float)r.getMinX(), (float)r.getMinY(), backFillColor,
+			        (float)r.getMinX(), y2, visColor, cyclic);
+			  } else {
+			    fillPaint = new GradientPaint((float)r.getMinX(), (float)r.getMinY(), backFillColor,
+			        (float)r.getMinX(), y2, dispColor, cyclic);
+			  }
 			} else if(vert.getIsDisplayed()){				
 				fillPaint = new GradientPaint((float)r.getMinX(), (float)r.getMinY(), backFillColor,
 						(float)r.getMinX(), y2, dispColor, cyclic);
-			} else if(vert.getIsVisited()){
-				fillPaint = new GradientPaint((float)r.getMinX(), (float)r.getMinY(), backFillColor,
-						(float)r.getMinX(), y2, visColor, cyclic);
 			} else {
 				fillPaint = new GradientPaint((float)r.getMinX(), (float)r.getMinY(), backFillColor,
 						(float)r.getMinX(), y2, stanColor, cyclic);

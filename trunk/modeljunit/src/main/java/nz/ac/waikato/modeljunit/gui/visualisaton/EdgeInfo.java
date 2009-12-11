@@ -34,6 +34,7 @@ public class EdgeInfo {
 	private VertexInfo destVertex_;
 	private Boolean displayed_;
 	private Boolean visited_;
+	private Boolean isCurrSeq_;
 	private TreeMap<String, Integer> sequences_;
 	private Boolean failedEdge_;
 	private String failedMsg_;
@@ -99,6 +100,14 @@ public class EdgeInfo {
 	public Boolean getIsVisited(){
 		return visited_;
 	}
+	
+  public void setIsCurrSeq(Boolean isCurrSeq){
+    isCurrSeq_ = isCurrSeq;
+  }
+
+  public Boolean getIsCurrSeq(){
+    return isCurrSeq_;
+  }
 	
 	public TreeMap<String, Integer> getSequences_() {
 		return sequences_;

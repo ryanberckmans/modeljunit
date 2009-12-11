@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-import javax.swing.tree.DefaultMutableTreeNode;
-
 import nz.ac.waikato.jdsl.graph.api.Edge;
 import nz.ac.waikato.jdsl.graph.api.EdgeIterator;
 import nz.ac.waikato.modeljunit.GraphListener;
@@ -63,8 +61,8 @@ public class JUNGHelper {
 	private HashMap<Object, Object> vertices;
 	private HashMap<Transition, Object> edges;
 
-	private DefaultMutableTreeNode top_;
-	private DefaultMutableTreeNode stateChange_ = null;
+	private ColorTreeNode top_;
+	private ColorTreeNode stateChange_ = null;
 	
 	private boolean seenFirstState = false;
 
@@ -73,7 +71,7 @@ public class JUNGHelper {
 	 */
 	public JUNGHelper(){
 		g = new DirectedSparseMultigraph<Object, Object>();		
-		top_ = new DefaultMutableTreeNode("All test sequences");
+		top_ = new ColorTreeNode("All test sequences");
 		vertices = new HashMap<Object, Object>();
 		edges = new HashMap<Transition, Object>();		
 	}
@@ -205,7 +203,7 @@ public class JUNGHelper {
 			g.removeVertex(vx);
 		}
 		//clear the tree
-		top_ = new DefaultMutableTreeNode("All test sequences");		
+		top_ = new ColorTreeNode("All test sequences");		
 		stateChange_ = null;
 		//Clear the explored information
 		vertices.clear();
@@ -216,7 +214,7 @@ public class JUNGHelper {
 	 * This will return a root tree node.
 	 * @return The root node of a JTree
 	 */
-	public DefaultMutableTreeNode getRootTreeNode(){
+	public ColorTreeNode getRootTreeNode(){
 		return top_;
 	}
 
@@ -236,7 +234,7 @@ public class JUNGHelper {
 	 * @param str
 	 */
 	public void graphDoneReset(String str) {		
-		stateChange_ = new DefaultMutableTreeNode(str,true);
+		stateChange_ = new ColorTreeNode(str,true);
 		top_.add(stateChange_);		
 	}
 
@@ -299,14 +297,14 @@ public class JUNGHelper {
 		}
 		//Update the tree with the edge transition
 		if(null == stateChange_){
-			stateChange_ = new DefaultMutableTreeNode("Test sequence 1");
+			stateChange_ = new ColorTreeNode("Test sequence 1");
 			top_.add(stateChange_);
 		}
 		if(edges.get(trans) instanceof EdgeInfo){
 			EdgeInfo edg = (EdgeInfo)edges.get(trans);
 			edg.addTestSequence(stateChange_.toString());
 		}
-		DefaultMutableTreeNode transition = new DefaultMutableTreeNode(trans);		
+		ColorTreeNode transition = new ColorTreeNode(trans);		
 		stateChange_.add(transition);		
 	}	
 }
