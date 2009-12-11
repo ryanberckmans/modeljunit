@@ -71,10 +71,9 @@ public abstract class Tester
    */
   public Tester(FsmModel fsm)
   {
-	  if(fsm instanceof TimedFsmModel)
-		  model_ = new TimedModel((TimedFsmModel)fsm);
-	  else
-		  model_ = new Model(fsm);
+      this(fsm instanceof TimedFsmModel
+              ? new TimedModel((TimedFsmModel)fsm)
+              : new Model(fsm));
   }
   
 
