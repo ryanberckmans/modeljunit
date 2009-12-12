@@ -40,13 +40,12 @@ public class EdgeStrokeTransformer<V,E> implements Transformer<Object, Stroke> {
 	public Stroke transform(Object o) {	
 		if(o instanceof EdgeInfo){
 			EdgeInfo e = (EdgeInfo)o;
-			if(e.getIsDisplayed()){            		
-				return new BasicStroke(2.0f);
-			}else{
-				if(e.getIsVisited()){
-					return new BasicStroke(0.45f);
-				}
-			}
+			if(e.getIsVisited()){
+			  if (e.getIsCurrSeq()) {
+			    return new BasicStroke(2.0f);
+			  } 
+			  return new BasicStroke(0.45f);
+      }
 		}
 		return edgeStroke;
 	} 
