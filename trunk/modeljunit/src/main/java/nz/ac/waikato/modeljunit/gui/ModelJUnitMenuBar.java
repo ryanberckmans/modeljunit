@@ -197,7 +197,6 @@ public class ModelJUnitMenuBar extends JMenuBar
             }
          }
       );
-
 	  
  
       item = new JMenuItem("Generate Tests");
@@ -216,6 +215,22 @@ public class ModelJUnitMenuBar extends JMenuBar
          }
       );
 
+      
+      item = new JMenuItem("Efficiency Graphs");
+      item.setAccelerator(KeyStroke.getKeyStroke(
+        KeyEvent.VK_E, ActionEvent.CTRL_MASK));
+      mRun.add(item);
+
+      item.addActionListener(
+         new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+               mParent.displayEfficiencyGraphs();
+            }
+         }
+      );
+      
+      
       mRun.addSeparator();
 
       // ----------------- Example ------------------

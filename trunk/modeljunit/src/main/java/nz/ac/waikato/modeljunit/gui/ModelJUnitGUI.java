@@ -19,35 +19,45 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 package nz.ac.waikato.modeljunit.gui;
 
-import javax.swing.*;
-
-import java.awt.*;
-import java.awt.event.*;
-
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-
-import java.net.URL;
-import java.net.URI;
-
+import java.lang.reflect.Method;
 import java.util.regex.Matcher;
 
-import java.lang.reflect.Method;
-
-import nz.ac.waikato.modeljunit.gui.visualisaton.PanelJUNGVisualisation;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 
 import nz.ac.waikato.modeljunit.Action;
+import nz.ac.waikato.modeljunit.GraphListener;
 import nz.ac.waikato.modeljunit.Model;
 import nz.ac.waikato.modeljunit.Tester;
-import nz.ac.waikato.modeljunit.GreedyTester;
-
-import nz.ac.waikato.modeljunit.GraphListener;
 import nz.ac.waikato.modeljunit.coverage.ActionCoverage;
 import nz.ac.waikato.modeljunit.coverage.CoverageHistory;
 import nz.ac.waikato.modeljunit.coverage.StateCoverage;
 import nz.ac.waikato.modeljunit.coverage.TransitionCoverage;
 import nz.ac.waikato.modeljunit.coverage.TransitionPairCoverage;
+import nz.ac.waikato.modeljunit.gui.visualisaton.PanelJUNGVisualisation;
 
 import org.objectweb.asm.ClassReader;
 
@@ -69,6 +79,7 @@ public class ModelJUnitGUI implements Runnable
    private PanelCoverage mCoverage;
    private PanelResultViewer mResultViewer;
    private PanelTestDesign mTestDesign;
+   private PanelEfficiencyGraph mEfficiencyGraphs;
    private JDialog mSplash;
 
    private boolean mGraphCurrent;
@@ -109,6 +120,7 @@ public class ModelJUnitGUI implements Runnable
 		mCoverage = PanelCoverage.getInstance();
 		mResultViewer = PanelResultViewer.getResultViewerInstance();
 		mTestDesign = PanelTestDesign.getTestDesignPanelInstance(this); 
+		mEfficiencyGraphs = PanelEfficiencyGraph.getInstance();
 	}
 	
    /** Construct an application window. **/
@@ -584,6 +596,16 @@ public class ModelJUnitGUI implements Runnable
       results.setVisible(true);
    }
 
+   /** Display the efficiency graph window **/
+   public void displayEfficiencyGraphs() {
+     JFrame efficiencyGraphs = new JFrame("Efficiency Graphs - ModelJUnit");
+     efficiencyGraphs.setMinimumSize(new Dimension(760,500));
+     efficiencyGraphs.add(mEfficiencyGraphs, BorderLayout.CENTER);
+     efficiencyGraphs.add(mEfficiencyGraphs.getProgress(), BorderLayout.PAGE_END);
+     efficiencyGraphs.setVisible(true);
+     mEfficiencyGraphs.runClass();
+  }
+   
    public static void setModel(Model model) {
       mModel = model;
    }
@@ -601,6 +623,7 @@ public class ModelJUnitGUI implements Runnable
       mCoverage.newModel();
       mResultViewer.newModel();
       mTestDesign.newModel();
+      mEfficiencyGraphs.newModel();
    }
 
    public void displayAlgorithmPane() {
@@ -659,10 +682,11 @@ public class ModelJUnitGUI implements Runnable
       tester.addCoverageMetric(coverage[1]);
       tester.addCoverageMetric(coverage[2]);
       tester.addCoverageMetric(coverage[3]);
+      
       // Run test several times to draw line chart
       for (int i = 0; i < stages.length; i++) {
         tester.generate(stages[0]);
-	System.out.println("Progress: " + stages[i] + "/" + TestExeModel.getWalkLength());
+        System.out.println("Progress: " + stages[i] + "/" + TestExeModel.getWalkLength());
         mCoverage.setProgress(stages[i],TestExeModel.getWalkLength());
         // Update the line chart and repaint
         mCoverage.addStateCoverage((int) coverage[0].getPercentage());
@@ -718,8 +742,7 @@ public class ModelJUnitGUI implements Runnable
       System.out.println("Transition Coverage ="+hist.toString());
       System.out.println("History = "+hist.toCSV());*/
    }
-
-
+   
    public static void main(String[] args) {
       SwingUtilities.invokeLater(new ModelJUnitGUI());
    }
