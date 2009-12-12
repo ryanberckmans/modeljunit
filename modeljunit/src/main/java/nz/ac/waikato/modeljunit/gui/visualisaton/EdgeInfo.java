@@ -45,6 +45,7 @@ public class EdgeInfo {
 		destVertex_ = dest;
 		displayed_ = false;
 		visited_ = false;
+		isCurrSeq_ = false;
 		failedEdge_ = false;
 		failedMsg_ = new String();
 		sequences_ = new TreeMap<String, Integer>();
@@ -56,6 +57,7 @@ public class EdgeInfo {
 		destVertex_ = dest;
 		displayed_ = displayed;
 		visited_ = visited;
+		isCurrSeq_ = false;
 		failedEdge_ = false;
 		failedMsg_ = new String();
 		sequences_ = new TreeMap<String, Integer>();

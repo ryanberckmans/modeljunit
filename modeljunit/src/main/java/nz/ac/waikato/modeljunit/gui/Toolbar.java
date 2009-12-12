@@ -136,6 +136,20 @@ public class Toolbar extends JPanel
             }
          }
       );
+      
+      
+      b = new JButton("Efficiency Graphs");
+
+      this.add(b);
+
+      b.addActionListener(
+         new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+               mParent.displayEfficiencyGraphs();
+            }
+         }
+      );
 
    }
 
