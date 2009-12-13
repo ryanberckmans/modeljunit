@@ -158,7 +158,7 @@ public class StoryTestPanel
       tab.addRow();
       StoryTest story = new StoryTest();
       story.add(tab);
-      story.add(tab);
+      //story.add(tab);
       StoryTestSuggestionVisitor sugvisitor =
          new StoryTestSuggestionVisitor(DefaultStoryTestGUIFactory.INSTANCE);
       StoryTestGUIVisitor visitor =
