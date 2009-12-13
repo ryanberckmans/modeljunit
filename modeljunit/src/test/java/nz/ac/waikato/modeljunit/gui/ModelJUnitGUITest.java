@@ -98,7 +98,7 @@ public class ModelJUnitGUITest extends UISpecTestCase {
 			public Trigger process(Window configurationDialog) {
 				assertTrue(configurationDialog.titleEquals("Edit Configuration"));
 				/* Set the test length to 20 */
-				configurationDialog.getTextBox(displayedNameIdentity("10")).setText("20");
+				configurationDialog.getTextBox("totalTestLength").setText("20");
 				/* Choose Greedy Walk algorithm*/
 				configurationDialog.getComboBox().select("Greedy Walk");
 				return configurationDialog.getButton("OK").triggerClick();

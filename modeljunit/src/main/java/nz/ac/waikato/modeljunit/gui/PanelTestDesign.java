@@ -231,6 +231,7 @@ public class PanelTestDesign extends PanelAbstract
     JLabel labelTotalLength = new JLabel("Total Test length:");
     JLabel labelAverageLength = new JLabel("Average Test Length:");
     m_txtLength = new JTextField();
+    m_txtLength.setName("totalTestLength");
     m_txtLength.setColumns(7);
     m_txtLength.setText(String.valueOf(DEFAULT_WALK_LENGTH));
     m_txtLength.addFocusListener(this);
