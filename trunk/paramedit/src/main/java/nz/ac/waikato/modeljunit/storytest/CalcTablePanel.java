@@ -190,8 +190,8 @@ public class CalcTablePanel
                                                                   column);
          Color background = mCalc.isResult(column) ? RESULTCOLOR : NORMALCOLOR;
          if (row > 0) {
-            background = mCalc.isContradiction(row - 1) ? ERRORCOLOR : background;
-            background = mCalc.isHighlighted(row - 1) ? HIGHLIGHTEDCOLOR : background;
+            background = mCalc.isContradiction(row - 2) ? ERRORCOLOR : background;
+            background = mCalc.isHighlighted(row - 2) ? HIGHLIGHTEDCOLOR : background;
          }
          background = row % 2 == 0 ? background : subtleDifference(background);
          comp.setBackground(background);
