@@ -11,13 +11,15 @@ public class OptionPanelCreator
    * 0. Random walk panel
    * 1. Greedy panel
    * 2. Lookahead tester panel
+   * 3. Quick tester panel
   */
-  public static final int NUM_PANE = 3;
+  public static final int NUM_PANE = 4;
 
   public static final String[] ALGORITHM_NAME = {
     "Random Walk",
     "Greedy Walk",
-    "Lookahead Walk"
+    "Lookahead Walk",
+    "Quick Walk"
     };
 
   public static OptionPanelAdapter[] createPanels()
@@ -35,6 +37,9 @@ public class OptionPanelCreator
         "The Lookahead Walk algorithm looks ahead 'Depth' levels to find "
         + "unexplored transitions",
         "lookahead.gif");
+    panes[3] = new OptionPanelQuickWalk(ALGORITHM_NAME[3],
+        "The Quick Walk algorithm remembers unexplored paths for later exploration",
+        "quick.gif");
     return panes;
   }
 }

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 import nz.ac.waikato.modeljunit.FsmModel;
 import nz.ac.waikato.modeljunit.Model;
+import nz.ac.waikato.modeljunit.QuickTester;
 import nz.ac.waikato.modeljunit.RandomTester;
 import nz.ac.waikato.modeljunit.Tester;
 import nz.ac.waikato.modeljunit.VerboseListener;
@@ -265,6 +266,12 @@ public class TestExeModel
       if (bCoverage[i])
         coverage[i].clear();
     }
+    
+    if (m_tester[0] instanceof QuickTester) {
+      QuickTester tester = (QuickTester) m_tester[0];
+      tester.clear();
+    }
+    
     // Generate tests
     System.err.println("Generating "+m_nWalkLength+" tests with "+m_tester[0]);
     m_tester[0].generate(m_nWalkLength);
