@@ -256,11 +256,12 @@ public class QuickTester extends RandomTester {
         currentPath_ = null;
         todo_ = new HashMap<Unexplored, Path>();
         done_ = new HashMap<Object, BitSet>();
+        sequence_ = new ArrayList<Transition>();
     }
     
     public static void main(String[] args) {
         QuickTester qt = new QuickTester(new SimpleSet());
         qt.addListener(new VerboseListener());
-        qt.generate(40);
+        qt.generate(20);
     }
 }

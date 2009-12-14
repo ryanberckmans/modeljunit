@@ -67,7 +67,8 @@ public class QuickTesterTest {
   }
   
   @Test
-  public void testQuickWalk1() {
+  public void testResetWhenReachMaxDepth() {
+    tester.setMaxDepth(10);
     tester.generate(20);
     assertThat(path.size(), is(20));
     assertThat(path.get(0).toString(), is("(FF, removeS1, FF)"));
@@ -92,10 +93,37 @@ public class QuickTesterTest {
     assertThat(path.get(19).toString(), is("(TF, addS1, TF)"));
     assertThat(transitions.getCoverage(), is(12));
   }
+
+  @Test
+  public void testResetWhenNoMoreUnexploredFromCurrentState() {
+    tester.setMaxDepth(20);
+    tester.generate(20);
+    assertThat(path.size(), is(20));
+    assertThat(path.get(0).toString(), is("(FF, removeS1, FF)"));
+    assertThat(path.get(1).toString(), is("(FF, removeS2, FF)"));
+    assertThat(path.get(2).toString(), is("(FF, addS2, FT)"));
+    assertThat(path.get(3).toString(), is("(FT, addS2, FT)"));
+    assertThat(path.get(4).toString(), is("(FT, addS1, TT)"));
+    assertThat(path.get(5).toString(), is("(TT, removeS2, TF)"));
+    assertThat(path.get(6).toString(), is("(TF, addS2, TT)"));
+    assertThat(path.get(7).toString(), is("(TT, removeS1, FT)"));
+    assertThat(path.get(8).toString(), is("(FT, removeS1, FT)"));
+    assertThat(path.get(9).toString(), is("(FT, removeS2, FF)"));
+    assertThat(path.get(10).toString(), is("(FF, addS1, TF)"));
+    assertThat(path.get(11).toString(), is("(TF, removeS2, TF)"));
+    assertThat(path.get(12).toString(), is("(TF, addS1, TF)"));
+    assertThat(path.get(13).toString(), is("(TF, removeS1, FF)"));
+    assertThat(path.get(14).toString(), is("(FF, reset, FF)"));
+    assertThat(path.get(15).toString(), is("(FF, removeS1, FF)"));
+    assertThat(path.get(16).toString(), is("(FF, removeS2, FF)"));
+    assertThat(path.get(17).toString(), is("(FF, addS2, FT)"));
+    assertThat(path.get(18).toString(), is("(FT, addS2, FT)"));
+    assertThat(path.get(19).toString(), is("(FT, addS1, TT)"));
+    assertThat(transitions.getCoverage(), is(14));
+  }
   
   @Test
-  public void testQuickWalk2() {
-    
+  public void testQuickWalk() {
     tester.generate(40);
     assertThat(path.size(), is(40));
     assertThat(path.get(0).toString(), is("(FF, removeS1, FF)"));
