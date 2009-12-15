@@ -1,7 +1,6 @@
 package nz.ac.waikato.modeljunit.gui;
 
 import java.awt.Component;
-import java.util.Properties;
 
 import org.junit.Test;
 import org.uispec4j.Trigger;
@@ -63,7 +62,7 @@ public class ModelJUnitGUITest extends UISpecTestCase {
 	}
 
 	@Test
-	public void testSimpleSet() {
+	public void testSimpleSetRandomTester() {
 		/* Choose the SimpleSet model from menu */
 		window.getMenuBar().getMenu("Run").getSubMenu("SimpleSet").click();
 		assertTrue(window.titleEquals("ModelJUnit: nz.ac.waikato.modeljunit.examples.SimpleSet"));
@@ -91,20 +90,96 @@ public class ModelJUnitGUITest extends UISpecTestCase {
 		assertEquals(16, graph.getEdgeCount());
 	}
 
+	 @Test
+	  public void testViewTests() {
+	    WindowInterceptor.init(window.getMenuBar().getMenu("View").getSubMenu("View Tests Window").triggerClick())
+	      .process(new WindowHandler() {
+	        public Trigger process(Window configurationDialog) {
+	          assertTrue(configurationDialog.titleEquals("Results - ModelJUnit"));
+	          assertTrue(configurationDialog.getTextBox("resultsOutput").textEquals(
+	              "done (FF, addS2, FT)\n" + 
+	              "done (FT, addS1, TT)\n" +
+	              "done (TT, removeS1, FT)\n" +
+	              "done (FT, addS2, FT)\n" +
+	              "done (FT, addS2, FT)\n" +
+	              "done (FT, addS1, TT)\n" +
+	              "done (TT, addS2, TT)\n" +
+	              "done (TT, addS2, TT)\n" +
+	              "done (TT, addS2, TT)\n" +
+	              "done (TT, addS2, TT)\n"
+	          ));
+	          
+	          // no action can be performed after the results window is shown,
+	          // so return a new trigger with empty run() implementation.
+	          return new Trigger() {
+	            @Override
+	            public void run() throws Exception {}
+	          };
+	        }
+	      })
+	      .run();
+	}
+	 
+  @Test
+  public void testAnimateModel() {
+    WindowInterceptor.init(window.getMenuBar().getMenu("View").getSubMenu("Animate Window").triggerClick())
+      .process(new WindowHandler() {
+          public Trigger process(Window configurationDialog) {
+            assertTrue(configurationDialog.titleEquals("Animator - ModelJUnit"));
+            
+            assertTrue(configurationDialog.getButton(displayedNameIdentity("addS1")).isEnabled());
+            assertTrue(configurationDialog.getButton(displayedNameIdentity("addS2")).isEnabled());
+            assertTrue(configurationDialog.getButton(displayedNameIdentity("removeS1")).isEnabled());
+            assertTrue(configurationDialog.getButton(displayedNameIdentity("removeS2")).isEnabled());
+            
+            configurationDialog.getListBox().contentEquals("*** RESET *** (FF)");
+            configurationDialog.getButton(displayedNameIdentity("addS1")).click();
+            configurationDialog.getListBox().contentEquals(
+                "*** RESET *** (FF)\n" +
+            		"addS1(TF)"
+            );
+            configurationDialog.getButton(displayedNameIdentity("addS2")).click();
+            configurationDialog.getListBox().contentEquals(
+                "*** RESET *** (FF)\n" +
+                "addS1(TF)\n" +
+                "addS2(TT)"
+            );
+            configurationDialog.getButton(displayedNameIdentity("removeS1")).click();
+            configurationDialog.getListBox().contentEquals(
+                "*** RESET *** (FF)" +
+                "addS1(TF)\n" +
+                "addS2(TT)\n" +
+                "removeS1(FT)"
+            );
+            configurationDialog.getButton(displayedNameIdentity("removeS2")).click();
+            configurationDialog.getListBox().contentEquals(
+                "*** RESET *** (FF)" +
+                "addS1(TF)\n" +
+                "addS2(TT)\n" +
+                "removeS1(FT)\n" +
+                "removeS2(FF)"
+            );
+            
+            return configurationDialog.getButton(displayedNameIdentity("reset")).triggerClick();
+          }
+      })
+      .run();
+  }
+	 
 	@Test
-	public void testTestConfiguration() {
+	public void testTestConfigurationWithGreedyTester() {
 		WindowInterceptor.init(window.getMenuBar().getMenu("Run").getSubMenu("Test Configuration...").triggerClick())
-		.process(new WindowHandler() {
-			public Trigger process(Window configurationDialog) {
-				assertTrue(configurationDialog.titleEquals("Edit Configuration"));
-				/* Set the test length to 20 */
-				configurationDialog.getTextBox("totalTestLength").setText("20");
-				/* Choose Greedy Walk algorithm*/
-				configurationDialog.getComboBox().select("Greedy Walk");
-				return configurationDialog.getButton("OK").triggerClick();
-			}
-		})
-		.run();
+  		.process(new WindowHandler() {
+    			public Trigger process(Window configurationDialog) {
+    				assertTrue(configurationDialog.titleEquals("Edit Configuration"));
+    				/* Set the test length to 20 */
+    				configurationDialog.getTextBox("totalTestLength").setText("20");
+    				/* Choose Greedy Walk algorithm*/
+    				configurationDialog.getComboBox().select("Greedy Walk");
+    				return configurationDialog.getButton("OK").triggerClick();
+    			}
+    		})
+  		.run();
 		
 		/* Choose the Generate Tests menu item to run the Greedy Test */
 		window.getMenuBar().getMenu("Run").getSubMenu("Generate Tests").click();
@@ -133,7 +208,25 @@ public class ModelJUnitGUITest extends UISpecTestCase {
 				"    (FT, addS2, FT)"
 		));
 	}
-
+	
+	@Test
+  public void testRunEfficiencyGraphs() {
+	  WindowInterceptor.init(window.getMenuBar().getMenu("Run").getSubMenu("Efficiency Graphs").triggerClick())
+      .process(new WindowHandler() {
+          public Trigger process(Window configurationDialog) {
+            assertTrue(configurationDialog.titleEquals("Efficiency Graphs - ModelJUnit"));
+                        
+            // no action can be performed after the efficiency graphs window is shown,
+            // so return a new trigger with empty run() implementation.
+            return new Trigger() {
+              @Override
+              public void run() throws Exception {}
+            };
+          }
+      })
+      .run();
+  }
+	
 	/**
 	 * Matches components whose displayed name is exactly the same as the reference.
 	 */

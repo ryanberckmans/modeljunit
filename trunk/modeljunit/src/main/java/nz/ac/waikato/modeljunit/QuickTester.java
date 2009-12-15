@@ -54,8 +54,8 @@ public class QuickTester extends RandomTester {
     
     public QuickTester(Model model) {
       super(model);
-      model_.addListener(new RecordTestSequence());
-      graph_ = (GraphListener) model_.addListener("graph");
+      model.addListener(new RecordTestSequence());
+      graph_ = (GraphListener) model.addListener("graph");
     }
 
     public QuickTester(FsmModel fsm) {
@@ -74,7 +74,7 @@ public class QuickTester extends RandomTester {
 
         @Override
         public void doneTransition(int action, Transition tr) {
-            System.out.println("DEBUG: did " + tr);
+//            System.out.println("DEBUG: did " + tr);
             sequence_.add(tr);
         } 
     }
