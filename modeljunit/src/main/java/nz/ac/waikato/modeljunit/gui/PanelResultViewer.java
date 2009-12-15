@@ -40,6 +40,7 @@ public class PanelResultViewer extends PanelAbstract
     // Scroll pane for text area
     Dimension minimumSize = new Dimension(INITIAL_WIDTH, MIN_HEIGHT);
     m_txtOutput = new JTextArea();
+    m_txtOutput.setName("resultsOutput");
     m_txtOutput.setEditable(false);
 
     m_scrollTextArea = new JScrollPane(m_txtOutput);

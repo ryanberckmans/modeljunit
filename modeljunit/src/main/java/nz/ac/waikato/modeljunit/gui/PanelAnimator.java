@@ -55,6 +55,7 @@ public class PanelAnimator extends PanelAbstract implements ActionListener {
       mResetButton.addActionListener(this);
   
       mStateLabel = new JLabel("(uninitialised model)");
+      mStateLabel.setName("stateLabel");
    }
 
    public void newModel() {
