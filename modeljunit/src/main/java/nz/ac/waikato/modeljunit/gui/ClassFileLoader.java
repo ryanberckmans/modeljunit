@@ -30,8 +30,7 @@ public class ClassFileLoader extends ClassLoader
     // http://forum.java.sun.com/thread.jspa?threadID=568853&messageID=2815072
     // that thread explained why i have to add file://C in front of strPL
     // java doc does not explain :(
-    String strPL = Parameter.getPackageLocation();
-    strPL = "file://" + strPL;
+    String strPL = "file://" + Parameter.getPackageLocation();
     String strPN = Parameter.getPackageName();
     if (strPN != null && strPN.length() > 0 && strPN.charAt(strPN.length() - 1) != '.')
       strPN = strPN + ".";
@@ -39,40 +38,20 @@ public class ClassFileLoader extends ClassLoader
     System.out.println("**** Loading: PL: " + strPL);
     System.out.println("**** Loading: PN: " + strPN);
 
-    ClassLoader prevCL = Thread.currentThread().getContextClassLoader();
+    Class<?> modelclass = null;
     // Create the class loader by using the given URL
-    // Use prevCl as parent to maintain current visibility
     if (strPL != null && strPL.length() > 0) {
       try {
-        ClassLoader cl = URLClassLoader.newInstance(new URL[]{new URL(strPL)},
-            prevCL);
-
-        // Set class loader to current thread
-        Thread.currentThread().setContextClassLoader(cl);
-        // Expect that environment properties are in
-        // application resource file found at "url"
-
+        modelclass = URLClassLoader.newInstance(new URL[]{new URL(strPL)})
+	    .loadClass(strPN + classname);
       }
       catch (Exception e) {
         e.printStackTrace();
       }
-      finally {
-        // Restore
-        Thread.currentThread().setContextClassLoader(prevCL);
-      }
     }
-
-    try {
-      Class<?> modelclass = Class.forName(strPN + classname);
-      if (modelclass == null)
-        System.out.println("NULL model class was returned!!!");
-      return modelclass;
+    if (modelclass == null) {
+	System.out.println("NULL model class was returned!!!");
     }
-    catch (Exception e) {
-      e.printStackTrace();
-    }
-
-    System.out.println("NULL model class was returned!!!");
-    return null;
+    return modelclass;
   }
 }
