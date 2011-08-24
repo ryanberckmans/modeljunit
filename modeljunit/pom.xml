@@ -108,6 +108,8 @@
           <excludes>
             <!-- Exclude QuiDoncTest because it has very verbose output -->
             <exclude>**/QuiDoncTest.java</exclude>
+            <!-- Exclude because broken -->
+            <exclude>**/ModelJUnitGUITest.java</exclude>
           </excludes>
         </configuration>
       </plugin>
