@@ -207,7 +207,7 @@ public class PanelEfficiencyGraph extends PanelAbstract {
       g2.drawPolyline(arrayScaleXPos, arrayTPScaleYPos, mLookaheadTesterCoverage.size());
 
       // Quick tester coverage history
-      g2.setColor(Color.YELLOW);
+      g2.setColor(Color.MAGENTA);
       g2.drawPolyline(arrayScaleXPos, arrayAScaleYPos, mQuickTesterCoverage.size());
     }
   }
