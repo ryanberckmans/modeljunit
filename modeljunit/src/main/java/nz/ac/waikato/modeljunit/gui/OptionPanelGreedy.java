@@ -25,6 +25,7 @@ public class OptionPanelGreedy extends OptionPanelAdapter
   {
     super(name, explain, imgPath);
     m_checkRandomSeed = new JCheckBox("Use random seed");
+    m_checkRandomSeed.setOpaque(false);
     add(m_checkRandomSeed);
     add(Box.createHorizontalStrut(6));
     add(Box.createHorizontalGlue());

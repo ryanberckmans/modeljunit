@@ -40,7 +40,8 @@ public class OptionPanelAdapter extends JPanel implements IAlgorithmParameter
   {
     m_strNameOfAlgorithm = name;
     m_strExplanation = explain;
-    Border edge = BorderFactory.createLineBorder(Color.WHITE);
+    Border edge = BorderFactory.createLineBorder(Color.BLACK);
+    this.setBackground(new Color(156, 186, 216));
     this.setBorder(BorderFactory.createTitledBorder(edge, name+" Parameters"));
     //m_imgIcon = new ImageIcon(getClass().getResource("icon.gif"));
   }
