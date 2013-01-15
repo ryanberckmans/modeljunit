@@ -108,8 +108,29 @@ public class RandomTester extends Tester
 
   /** Take any randomly-chosen Action that is enabled.
    *  Returns the number of the Action taken, -1 if all are disabled.
+   *  Note: An alternate (and slightly faster) algorithm that searches forward through the actions is commented out below
    * @return      The Action taken, or -1 if none are enabled.
    */
+  
+//  public int doRandomAction()
+//  {
+//    int nTrans = model_.getNumActions();
+//    int index = rand_.nextInt(nTrans);
+//    int startIndex = index;
+//    //System.out.println("DEBUG: random choice is "+index+" out of "+nTrans
+//    do {
+//      if (model_.doAction(index)) {
+//        //System.out.println("DEBUG: done action "+index);
+//        return index;
+//      }
+//      index++;
+//      if (index >= nTrans) {
+//        index = 0;
+//      }
+//    } while (index != startIndex);
+//    return -1;
+//  }
+  
   public int doRandomAction()
   {
     int nTrans = model_.getNumActions();
