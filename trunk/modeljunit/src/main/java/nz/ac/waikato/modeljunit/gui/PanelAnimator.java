@@ -9,17 +9,16 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 import java.util.BitSet;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.Map;
-import java.util.LinkedList;
-
-import javax.swing.event.ListDataListener;
+import java.util.TreeMap;
 
 /** This gets the current Model object and builds a GUI based upon the actions
  *  it contains.
  * 
  * @author Gian Perrone <gdp3@cs.waikato.ac.nz>
 **/
+@SuppressWarnings("serial")
 public class PanelAnimator extends PanelAbstract implements ActionListener {
    private static PanelAnimator mInstance;
    private Model mModel;
@@ -42,7 +41,14 @@ public class PanelAnimator extends PanelAbstract implements ActionListener {
    {
       mModel = ModelJUnitGUI.getModel();
 
-      mButtons = new HashMap<JButton,Integer>();
+      Comparator<JButton> sort = new Comparator<JButton>() {
+        @Override
+        public int compare(JButton b1, JButton b2) {
+          return b1.getText().compareTo(b2.getText());
+        }
+      };
+      
+      mButtons = new TreeMap<JButton,Integer>(sort);
 
       mActionHistory = new DefaultListModel();
 
@@ -77,16 +83,17 @@ public class PanelAnimator extends PanelAbstract implements ActionListener {
     * Requires a non-null Model returned by ModelJUnitGUI.getModel()
     */
    public void buildGUI() {
-      GridLayout gl = new GridLayout(0,2);
+      GridLayout gl = new GridLayout(0,3);
 
       setLayout(gl);
 
       // Build a map from action numbers to buttons representing those actions, suitable for display.
 
       if(mModel == null) return;
-
+      mModel.doReset();
+      
       BitSet enabledActions = mModel.enabledGuards();
-      for(int i = 0; i<enabledActions.length(); i++) {
+      for(int i = 0; i < mModel.getNumActions(); i++) {
          System.out.println("GUI build action: " + i);
          JButton btn = new JButton(mModel.getActionName(i));
          btn.setEnabled(enabledActions.get(i));
