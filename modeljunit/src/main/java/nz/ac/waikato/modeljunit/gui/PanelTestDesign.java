@@ -157,6 +157,7 @@ public class PanelTestDesign extends PanelAbstract
 
     mCodeView = new JTextArea("");
     mCodeView.setPreferredSize(new Dimension(250,500));
+    mCodeView.setEditable(false);
 
     mScrollPane = new JScrollPane(mCodeView);
 
