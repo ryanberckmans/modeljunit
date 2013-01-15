@@ -228,7 +228,7 @@ implements ActionListener, MouseListener {
 		PluggableGraphMouse gm = new PluggableGraphMouse();
 		gm.add(new TranslatingGraphMousePlugin(MouseEvent.BUTTON3_MASK));
 		gm.add(new PickingGraphMousePlugin<Object, Object>());
-		gm.add(new ScalingGraphMousePlugin(new CrossoverScalingControl(), 0, 1.1f, 0.9f));
+		gm.add(new ScalingGraphMousePlugin(new CrossoverScalingControl(), 0, 0.9f, 1.1f));
 		vv.setGraphMouse(gm);
 		vv.addMouseListener(this);
 
@@ -1358,7 +1358,7 @@ implements ActionListener, MouseListener {
 	 *
 	 */
 	public class AnimateThread extends Thread{
-
+	  
 		DefaultMutableTreeNode rootNode_;
 
 		/** The thread constructor */
