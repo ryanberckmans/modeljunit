@@ -168,6 +168,7 @@ public class PanelCoverage extends PanelAbstract
             * m_covTP.get(i) / 100.0));
         arrayAScaleYPos[i] = (int) ((double) AXIS_HEIGHT - ((double) AXIS_Y_LENGTH
             * m_covA.get(i) / 100.0));
+//        System.out.println("DEBUG: "+arraySScaleYPos[i]+", "+arrayTScaleYPos[i]+", "+arrayTPScaleYPos[i]+", "+arrayAScaleYPos[i]);
       }
       // Draw scale text
       g2.drawString(Integer.toString(m_arrayStages[i]), nScaleposX,
@@ -197,7 +198,7 @@ public class PanelCoverage extends PanelAbstract
       }
       // Action coverage
       if (bShowCoverage[3]) {
-        g2.setColor(Color.YELLOW);
+        g2.setColor(Color.MAGENTA);
         g2.drawPolyline(arrayScaleXPos, arrayAScaleYPos, m_covA.size());
       }
     }
