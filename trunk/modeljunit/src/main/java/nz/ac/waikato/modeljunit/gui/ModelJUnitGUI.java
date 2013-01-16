@@ -23,6 +23,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -189,14 +190,18 @@ public class ModelJUnitGUI implements Runnable
       pane.setLayout(new GridBagLayout());
 
       mSplash.add(pane,BorderLayout.CENTER);
-      mSplash.add(new JLabel("<html><h1>Welcome to ModelJUnit</h1></html>"), BorderLayout.PAGE_START);
+      mSplash.add(new JLabel("<html><h1>&nbsp;Welcome to ModelJUnit</h1></html>"), BorderLayout.PAGE_START);
+      mSplash.setResizable(false);
+      mSplash.setMinimumSize(new Dimension(400, 545));
 
       GridBagConstraints c = new GridBagConstraints();
+      c.insets = new Insets(5,5,5,5);
+      c.anchor = GridBagConstraints.CENTER;
 
       c.gridx = 0;
       c.gridy = 0;
-      c.ipady = 50;
-      c.fill = GridBagConstraints.HORIZONTAL;
+      c.ipady = 0;
+      c.fill = GridBagConstraints.BOTH;
 
       JButton but = new JButton("New Project");
       but.addActionListener(new ActionListener() {
@@ -216,7 +221,7 @@ public class ModelJUnitGUI implements Runnable
 
       c.gridx = 0;
       c.gridy = 1;
-      c.ipady = 50;
+      c.ipady = 0;
 
       but = new JButton("Open Project");
       but.addActionListener(new ActionListener() {
@@ -233,28 +238,21 @@ public class ModelJUnitGUI implements Runnable
       c.ipady = 0;
 
       pane.add(new JLabel("<html><em>Open an existing ModelJUnit project</em><html>"), c);
-
+ 
       c.gridx = 0;
       c.gridy = 2;
-      c.ipady = 50;
-
-      but = new JButton("(Example icon)");
-
-      pane.add(but, c);
-    
-  
-      c.gridx = 1;
-      c.gridy = 2;
       c.ipady = 0;
+      c.ipadx = 50;
+      c.gridwidth = 2;
 
-      pane.add(new JLabel("<html><em>Double-click on any of the ModelJUnit examples below:</em><html>"), c);
+      pane.add(new JLabel("<html><em>Or double-click on any of the ModelJUnit examples below:</em><html>"), c);
 
  
       c.gridx = 0;
       c.gridy = 3;
-      c.ipady = 60;
+      c.ipady = 200;
       c.gridwidth = 2;
-
+      
       final DefaultListModel exampleModel = new DefaultListModel();
       final JList examples = new JList(exampleModel);
       
@@ -411,18 +409,18 @@ public class ModelJUnitGUI implements Runnable
         if (slash >= 0) {
           packageName = internalName.substring(0, slash).replaceAll("/", ".");
         }
-        //System.out.println("f.absolutePath="+f.getAbsolutePath());
-        //System.out.println("internalName="+internalName);
-        //System.out.println("className="+className);
-        //System.out.println("packageName="+packageName);
+//        System.out.println("f.absolutePath="+f.getAbsolutePath());
+//        System.out.println("internalName="+internalName);
+//        System.out.println("className="+className);
+//        System.out.println("packageName="+packageName);
 
         // now calculate the classpath for this .class file.
         String sep = Matcher.quoteReplacement(File.separator);
         String ignore = ("/"+internalName+".class").replaceAll("/", sep);
-        //System.out.println("ignore="+ignore);
+//        System.out.println("ignore="+ignore);
         if (wholePath.endsWith(ignore)) {
           classPath = wholePath.substring(0, wholePath.lastIndexOf(ignore));
-          //System.out.println("MU: classPath="+classPath);
+//          System.out.println("MU: classPath="+classPath);
         }
         else {
           errmsg = "Error calculating top of package from: "+wholePath;
@@ -491,7 +489,8 @@ public class ModelJUnitGUI implements Runnable
     }
 
    public void displayProjectFileChooser(boolean opening) {
-      FileChooserFilter javaFileFilter = new FileChooserFilter("mju",
+      String fileExt = "mju"; 
+      FileChooserFilter javaFileFilter = new FileChooserFilter(fileExt,
         "ModelJUnit Project Files");
       JFileChooser chooser = new JFileChooser();
       chooser.setCurrentDirectory(new File(Parameter.getModelChooserDirectory()));
@@ -521,6 +520,10 @@ public class ModelJUnitGUI implements Runnable
             loadModelFile(mProject.getModelFile());
             mTestDesign.updatePanelSettings();
          } else {
+            if (!wholePath.endsWith("."+fileExt)) {
+               wholePath += "."+fileExt;
+               f = new File(wholePath);
+            }
             mProject.setFileName(f);
          }
       }
