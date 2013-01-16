@@ -53,7 +53,6 @@ public class PanelAnimator extends PanelAbstract implements ActionListener {
       mActionHistory = new DefaultListModel();
 
       mActionHistoryList = new JList(mActionHistory);
-      mActionHistoryList.setEnabled(false);
 
       mResetButton = new JButton("Reset");
       // mButtons maps buttons to actions - reset is always "-1"
@@ -151,7 +150,7 @@ public class PanelAnimator extends PanelAbstract implements ActionListener {
 
       mModel.doAction(i);
       mActionHistory.addElement(mModel.getActionName(i) + "(" + mModel.getCurrentState() + ")");
-    
+      
       updateGUI();
    }
 
