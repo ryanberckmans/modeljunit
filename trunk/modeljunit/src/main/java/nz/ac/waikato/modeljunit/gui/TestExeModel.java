@@ -9,6 +9,7 @@ import java.io.Writer;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
+import nz.ac.waikato.modeljunit.Action;
 import nz.ac.waikato.modeljunit.FsmModel;
 import nz.ac.waikato.modeljunit.Model;
 import nz.ac.waikato.modeljunit.QuickTester;
@@ -54,6 +55,8 @@ public class TestExeModel
     return m_nWalkLength;
   }
 
+  private static ClassLoader m_modelClassLoader;
+  
   //-----------------------Run the test------------------------
   // private static Class<FsmModel> m_modelClass;
   private static Class<?> m_modelClass;
@@ -88,6 +91,7 @@ public class TestExeModel
   }
 
   /** Tries to load an instance of the current model class from a .class file.
+   * Before this is called, the class loader must be set.
    *
    * TODO: move this to a more appropriate class.
    *
@@ -95,20 +99,26 @@ public class TestExeModel
    */
   public static boolean loadModelClassFromFile()
   {
-    ClassFileLoader classLoader = ClassFileLoader.getInstance();
-    assert classLoader != null;
-
-    m_modelClass = classLoader.loadClass(Parameter.getClassName());
+    assert m_modelClassLoader != null;
     try {
-      m_modelObject = (nz.ac.waikato.modeljunit.FsmModel) m_modelClass
-          .newInstance();
+      m_modelClass = m_modelClassLoader.loadClass(Parameter.getClassName());
+      m_modelObject = (nz.ac.waikato.modeljunit.FsmModel) m_modelClass.newInstance();
+      int actionNumber = 0;
+      for (Method method : m_modelClass.getMethods()) {
+        if (method.isAnnotationPresent(Action.class)) {
+          actionNumber++;
+          TestExeModel.addMethod(method);
+        }
+      }
+//          System.out.println("Added "+actionNumber+" actions.");
       return true;
     }
-    catch (ClassCastException cce) {
+    catch (ClassCastException ex) {
       ErrorMessage.DisplayErrorMessage(
           "Wrong class (ClassCastException",
           "Please select FsmModel class."
-              + "\n Error in TestExeModel::loadModelClassFromFile");
+              + "\n Error in TestExeModel::loadModelClassFromFile: "
+              + ex.getLocalizedMessage());
     }
     catch (InstantiationException ie) {
       ErrorMessage.DisplayErrorMessage(
@@ -123,6 +133,12 @@ public class TestExeModel
           "Can not access model class."
               + "\n Error in TestExeModel::loadModelClassFromFile: "
               + iae.getLocalizedMessage());
+    } catch (ClassNotFoundException ex) {
+      ErrorMessage.DisplayErrorMessage(
+          "Cannot find model class (ClassNotFoundException)",
+          "Can not access model class."
+              + "\n Error in TestExeModel::loadModelClassFromFile: "
+              + ex.getLocalizedMessage());
     }
     return false;
   }
@@ -297,5 +313,13 @@ public class TestExeModel
     // Restore system.out to default value.
     System.setOut(ps);
     verbose.append(output);
+  }
+
+  public static ClassLoader getModelClassLoader() {
+    return m_modelClassLoader;
+  }
+
+  public static void setModelClassLoader(ClassLoader m_modelClassLoader) {
+    TestExeModel.m_modelClassLoader = m_modelClassLoader;
   }
 }

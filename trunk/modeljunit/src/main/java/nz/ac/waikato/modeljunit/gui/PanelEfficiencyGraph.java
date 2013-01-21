@@ -337,19 +337,9 @@ public class PanelEfficiencyGraph extends PanelAbstract {
   
   private Model loadModelClass() {
     TestExeModel.reset();
-    Parameter.setClassName(Parameter.getClassName());
-    Parameter.setPackageName(Parameter.getPackageName());
     
-    int actionNumber = 0;
     if (TestExeModel.loadModelClassFromFile()) {
-          Class<?> testcase = TestExeModel.getModelClass();
-          for (Method method : testcase.getMethods()) {
-            if (method.isAnnotationPresent(Action.class)) {
-              actionNumber++;
-              TestExeModel.addMethod(method);
-              System.out.println("Added method #"+actionNumber);
-            }
-          }
+      System.out.println("SUCCESS: loaded model " + Parameter.getClassName());
     } else {
        throw new RuntimeException("Error Loading Model - No @Action annotations!");
     }
@@ -373,7 +363,7 @@ public class PanelEfficiencyGraph extends PanelAbstract {
       File f = new File("EfficiencyOutput.csv");
       PrintWriter w = new PrintWriter(new FileOutputStream(f));
 
-      w.println(Parameter.getPackageName() + "." + Parameter.getClassName() + " Transition Coverage History");
+      w.println(Parameter.getClassName() + " Transition Coverage History");
       w.println();
       w.println("Random Tester: ");
       w.println(coverage[0].toCSV());

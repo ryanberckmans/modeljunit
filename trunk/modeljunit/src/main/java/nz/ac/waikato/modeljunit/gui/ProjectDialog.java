@@ -25,55 +25,45 @@ import java.awt.*;
 import java.awt.event.*;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /** A dialogue to create or edit a ModelJUnit project, including selection of a class file for the SUT.
  *
  * @author Gian Perrone <gian@waikato.ac.nz>
  **/
+@SuppressWarnings("serial")
 public class ProjectDialog extends JDialog
 {
    private ModelJUnitGUI mParent;
-   private JLabel mModelInfo1;
-   private JLabel mModelInfo2;
-   private JLabel mModelInfo3;
-   private JLabel mModelClassName;
+   private JLabel mModelJARName;
+   private JLabel mModelInfoLabel;
+   private JTextField mModelClassName;
+   private JButton createButton;
 
-   public ProjectDialog(ModelJUnitGUI parent) {
-         super(parent.getFrame(), "New ModelJUnit Project", true);
-         mParent = parent;
-         mModelInfo1 = new JLabel("Model: ");
-         mModelInfo2 = new JLabel("Path: ");
-         mModelInfo3 = new JLabel("Actions: ");
-         mModelClassName = new JLabel("(none selected)");
-         constructGUI();
-   }
-
-   public ProjectDialog(ModelJUnitGUI parent, Project project) {
+   public ProjectDialog(ModelJUnitGUI parent, Project... project) {
          super(parent.getFrame(), "Edit ModelJUnit Project", true);
          mParent = parent;
-         mModelInfo1 = new JLabel("Model: ");
-         mModelInfo2 = new JLabel("Path: ");
-         mModelInfo3 = new JLabel("Actions: ");
-         mModelClassName = new JLabel("(none selected)");
+         mModelJARName = new JLabel("(none selected)");
+         mModelInfoLabel = new JLabel(" Please enter the location of the class file (e.g: package.MyModel): ");
+         mModelClassName = new JTextField();
+         createButton = new JButton("Load");
          constructGUI();
    }
 
 
    public void constructGUI() {
-      setPreferredSize(new Dimension(400,250));
-   //   setMinimumSize(new Dimension(350,500));
+      setPreferredSize(new Dimension(800,250));
 
       GridLayout gridLayout = new GridLayout(0,1);
       setLayout(gridLayout);
 
-      add(new JLabel("<html><h1>New ModelJUnit Project</h1></html>"));
+      add(new JLabel("<html><h1>&nbsp;New ModelJUnit Project</h1></html>"));
 
       JPanel fileSelectPanel = new JPanel();
-
-      fileSelectPanel.add(new JLabel("Model Class File:"), BorderLayout.PAGE_START);
-      fileSelectPanel.add(mModelClassName, BorderLayout.CENTER);
+      
+      fileSelectPanel.add(new JLabel("Model JAR File:"), BorderLayout.PAGE_START);
+      fileSelectPanel.add(mModelJARName, BorderLayout.CENTER);
 
       JButton browseButton = new JButton("Browse...");
 
@@ -83,32 +73,39 @@ public class ProjectDialog extends JDialog
          new ActionListener(){
             public void actionPerformed(ActionEvent e)
             {
-               mParent.displayFileChooser();
+               String jarName = mParent.displayFileChooser();
 
-               String cName = Parameter.getPackageName()+"."+Parameter.getClassName();
-               int actionNumber = TestExeModel.getMethodList().size();
-               mModelInfo1.setText("Model:   "+cName);
-               mModelInfo3.setText("Actions: "+actionNumber + " actions were loaded.");
-               mModelClassName.setText("<html><em>"+Parameter.getPackageLocation()+"</em></html>");
+               mModelJARName.setText("<html><em>"+jarName+"&nbsp;</em></html>");
                pack();
-               //XXX: Read from the parent the details of the class and update
+               if (jarName != null) {
+                 Parameter.setPackageLocation(jarName);
+                 mModelInfoLabel.setEnabled(true);
+                 mModelClassName.setEnabled(true);
+                 createButton.setEnabled(true);
+               }
             }
          }
       );
 
       add(fileSelectPanel);
-
+      
       JPanel infoPanel = new JPanel();
       infoPanel.setBorder(BorderFactory.createLineBorder(Color.black));
- 
-      infoPanel.add(mModelInfo1, BorderLayout.PAGE_START);
-      infoPanel.add(mModelInfo3, BorderLayout.PAGE_END);
+      GridLayout panelGridLayout = new GridLayout(0,1);
+      panelGridLayout.setVgap(3);
+      infoPanel.setLayout(panelGridLayout);
+      
+      infoPanel.add(mModelInfoLabel, BorderLayout.NORTH);
+      infoPanel.add(mModelClassName, BorderLayout.SOUTH);
 
       add(infoPanel);
-
+      
+      mModelInfoLabel.setEnabled(false);
+      mModelClassName.setEnabled(false);
+      createButton.setEnabled(false);
+      
       JPanel buttonPanel = new JPanel();
       JButton cancelButton = new JButton("Cancel");
-      JButton createButton = new JButton("Create");
 
       cancelButton.addActionListener(
          new ActionListener(){
@@ -118,13 +115,28 @@ public class ProjectDialog extends JDialog
             }
          }
       );
-
+      
       createButton.addActionListener(
          new ActionListener(){
             public void actionPerformed(ActionEvent e)
             {
                setVisible(false);
                //XXX: Create project object and notify parent
+               
+               String packagePath = mModelClassName.getText();
+               packagePath = packagePath.replace(".class", "").replace("/", ".").replace("\\", ".").trim();
+               Parameter.setClassName(packagePath);
+               String classPath = Parameter.getPackageLocation()/*.replace(".jar", "") + "/" + Parameter.getClassName()*/;
+               System.out.println("DEBUG: Full model path: " + classPath);
+               File f = new File(classPath);
+               String errmsg = null;
+               try {
+                  errmsg = mParent.loadModel(f, Parameter.getClassName());
+               } catch (FileNotFoundException e1) {
+                  System.out.println("ERROR: " + errmsg);
+               } catch (IOException e1) {
+                  System.out.println("ERROR: " + errmsg);
+               }
             }
          }
       );
