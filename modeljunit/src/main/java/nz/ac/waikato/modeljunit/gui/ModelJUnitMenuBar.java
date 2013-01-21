@@ -233,117 +233,22 @@ public class ModelJUnitMenuBar extends JMenuBar
       
       mRun.addSeparator();
 
-      // ----------------- Example ------------------
-      item = new JMenuItem("FSM");
-      item.addActionListener(
-         new ActionListener(){
-            public void actionPerformed(ActionEvent e)
-            {
-              mParent.loadModelClass("FSM", "nz.ac.waikato.modeljunit.examples");
+      // ----------------- Examples ------------------
+      for (int i = 0; i < ExampleModels.EXAMPLE_MODELS.length; i++) {
+        final String modelName = ExampleModels.EXAMPLE_MODELS[i];
+        item = new JMenuItem(modelName.split(":")[0]);
+        item.setToolTipText(modelName.split(":")[1]);
+        item.addActionListener(
+            new ActionListener(){
+              public void actionPerformed(ActionEvent e)
+              {
+                mParent.loadExampleModel(modelName.split(":")[0]);
+              }
             }
-         }
-      );
-      mRun.add(item);
-      // ----------------- Example ------------------
-      item = new JMenuItem("SpecialFSMNoLoops");
-      item.addActionListener(
-         new ActionListener(){
-            public void actionPerformed(ActionEvent e)
-            {
-              mParent.loadModelClass("SpecialFSMNoLoops", "nz.ac.waikato.modeljunit.examples");
-            }
-         }
-      );
-      mRun.add(item);
-      // ----------------- Example ------------------
-      item = new JMenuItem("SimpleSet");
-      item.addActionListener(
-         new ActionListener(){
-            public void actionPerformed(ActionEvent e)
-            {
-              mParent.loadModelClass("SimpleSet", "nz.ac.waikato.modeljunit.examples");
-            }
-         }
-      );
-      mRun.add(item);
-      // ----------------- Example ------------------
-      item = new JMenuItem("StringSet");
-      item.addActionListener(
-         new ActionListener(){
-            public void actionPerformed(ActionEvent e)
-            {
-              mParent.loadModelClass("StringSet", "nz.ac.waikato.modeljunit.examples");
-            }
-         }
-      );
-      mRun.add(item);
-      // ----------------- Example ------------------
-      item = new JMenuItem("SimpleSetWithAdaptor");
-      item.addActionListener(
-         new ActionListener(){
-            public void actionPerformed(ActionEvent e)
-            {
-              mParent.loadModelClass("SimpleSetWithAdaptor", "nz.ac.waikato.modeljunit.examples");
-            }
-         }
-      );
-      mRun.add(item);
-       // ----------------- Example ------------------
-      item = new JMenuItem("LargeSet");
-      item.addActionListener(
-         new ActionListener(){
-            public void actionPerformed(ActionEvent e)
-            {
-              mParent.loadModelClass("LargeSet", "nz.ac.waikato.modeljunit.examples");
-            }
-         }
-      );
-      mRun.add(item);
-       // ----------------- Example ------------------
-      item = new JMenuItem("QuiDonc");
-      item.addActionListener(
-         new ActionListener(){
-            public void actionPerformed(ActionEvent e)
-            {
-              mParent.loadModelClass("QuiDonc", "nz.ac.waikato.modeljunit.examples");
-            }
-         }
-      );
-      mRun.add(item);
-       // ----------------- Example ------------------
-      item = new JMenuItem("SpecialFSM");
-      item.addActionListener(
-         new ActionListener(){
-            public void actionPerformed(ActionEvent e)
-            {
-              mParent.loadModelClass("SpecialFSM", "nz.ac.waikato.modeljunit.examples");
-            }
-         }
-      );
-      mRun.add(item);
-       // ----------------- Example ------------------
-      item = new JMenuItem("AlarmClock");
-      item.addActionListener(
-         new ActionListener(){
-            public void actionPerformed(ActionEvent e)
-            {
-              mParent.loadModelClass("AlarmClock", "nz.ac.waikato.modeljunit.examples");
-            }
-         }
-      );
-      mRun.add(item);
-       // ----------------- Example ------------------
-      item = new JMenuItem("TrafficLight");
-      item.addActionListener(
-         new ActionListener(){
-            public void actionPerformed(ActionEvent e)
-            {
-              mParent.loadModelClass("TrafficLight", "nz.ac.waikato.modeljunit.examples");
-            }
-         }
-      );
-      mRun.add(item);
- 
+            );
+        mRun.add(item);   
+      }
+      
       this.add(mRun);
 
       // Populate the "Help" menu:

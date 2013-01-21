@@ -28,29 +28,8 @@ public @XmlRootElement class Parameter
   // Number of coverage options
   public static final int NUM_COVERAGE = 5;
 
-  /** The absolute path to the directory containing the .class model files. */
-  private static String m_modelFolder;
-
   /** The path to the top-level package directory of the model. */
   private static String m_strPackageLocation;
-
-  /** The Java package name.  Eg. nz.ac.waikato.modeljunit */
-  private static String m_strPackageName;
-
-  /** The path to the directory containing the model files. */
-  public static String getModelFolder()
-  {
-    if (m_modelFolder == null) {
-      m_modelFolder = DEFAULT_DIRECTORY;
-    }
-    return m_modelFolder;
-  }
-
-  /** Set the path to the directory containing the model files. */
-  public static void setModelFolder(String folder)
-  {
-    m_modelFolder = folder;
-  }
 
   /** The path to the top-level package directory of the model. */
   public static String getPackageLocation()
@@ -58,24 +37,11 @@ public @XmlRootElement class Parameter
     return m_strPackageLocation;
   }
 
-  /** The name of the Java package that contains the model. */
-  public static String getPackageName()
-  {
-    return m_strPackageName;
-  }
-
   /** Set the path to the top-level package directory of the model. */
   public static void setPackageLocation(String location)
   {
+    System.out.println("SetPackageLocation to " + location);
     m_strPackageLocation = location;
-  }
-
-  /** The name of the Java package that contains the model.
-   *  This must be a dot-separated sequence of names.
-   */
-  public static void setPackageName(String name)
-  {
-    m_strPackageName = name;
   }
 
   /**
@@ -90,6 +56,7 @@ public @XmlRootElement class Parameter
 
   public static void setGenerateGraph(boolean print)
   {
+    System.out.println("SetGenerateGraph to " + print);
     m_bGenerateGraph = print;
   }
 
@@ -152,7 +119,7 @@ public @XmlRootElement class Parameter
   }
 
   /**
-   * Class name, just includes the name of the class and suffix
+   * Class name, includes the Package and the name of the class
    */
   private static String m_strClassName;
 
@@ -161,26 +128,14 @@ public @XmlRootElement class Parameter
     return m_strClassName;
   }
 
+  /**
+   * Class name, includes the Package and the name of the class
+   * @param classname
+   */
   public static void setClassName(String classname)
   {
+    System.out.println("SetClassName to " + classname);
     m_strClassName = classname;
-  }
-
-  /**
-   * The absolute path of model (class or java file) includes path and file name
-   */
-  private static String m_strModelPath;
-
-  /** The absolute path of the model (.class) file. */
-  public static String getModelPath()
-  {
-    return m_strModelPath;
-  }
-
-  /** Set the absolute path of the model (.class) file. */
-  public static void setModelPath(String location)
-  {
-    m_strModelPath = location;
   }
 
   /**
@@ -320,8 +275,8 @@ public @XmlRootElement class Parameter
   //----------------------Override toString----------------------
   public String toString()
   {
-    return "class name: " + m_strClassName + ", \nLocation: "
-        + m_strModelPath + ", \nAlgorithm: " + m_strAlgorithmName
+    return "class name: " + m_strClassName
+        + ", \nAlgorithm: " + m_strAlgorithmName
         + ", \nCoverage: " + m_bCoverageOption[0] + ", " + m_bCoverageOption[1]
         + ", " + m_bCoverageOption[2] + ".";
   }

@@ -578,7 +578,7 @@ public class PanelTestDesign extends PanelAbstract
 
   public void newModel()
   {
-      String cName = Parameter.getPackageName()+"."+Parameter.getClassName();
+      String cName = Parameter.getClassName();
       // TODO: get the number of actions from the Model.
       int actionNumber = TestExeModel.getMethodList().size();
       m_modelInfo1.setText("Model:   "+cName);

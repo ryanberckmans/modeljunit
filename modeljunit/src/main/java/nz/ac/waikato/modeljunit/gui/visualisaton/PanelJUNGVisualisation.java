@@ -1297,6 +1297,7 @@ implements ActionListener, MouseListener {
 		infoPanel.setMinimumSize(new Dimension(300,100));
 		infoScrollPane = new javax.swing.JScrollPane();
 		infoTextArea = new javax.swing.JTextArea();
+		infoTextArea.setEditable(false);
 		infoTextArea.setLineWrap(true);
 		infoTextArea.append("Nothing Selected");
 
