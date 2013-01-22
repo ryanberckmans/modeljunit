@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with CZT; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ */
 
 package nz.ac.waikato.modeljunit.coverage;
 
@@ -26,65 +26,57 @@ import nz.ac.waikato.jdsl.graph.api.Vertex;
 import nz.ac.waikato.jdsl.graph.api.VertexIterator;
 import nz.ac.waikato.modeljunit.Transition;
 
-/** Counts the number of times each state has been entered.
- *  Each reset will increment the count of the initial state.
- *  Each transition will increment the count of its target state.
- *  <p>
- *  The getCoverage method will return the total number of states
- *  visited since the last clear.  The getMaximum method will
- *  return the total number of states in the graph, if this is known.
- *  </p>
+/**
+ * Counts the number of times each state has been entered. Each reset will increment the count of the initial state.
+ * Each transition will increment the count of its target state.
+ * <p>
+ * The getCoverage method will return the total number of states visited since the last clear. The getMaximum method
+ * will return the total number of states in the graph, if this is known.
+ * </p>
  */
-public class StateCoverage extends AbstractCoverage
-{
-  protected boolean todoReset_ = false;
-  
-  public String getName()
-  {
-    return "state coverage";
-  }
+public class StateCoverage extends AbstractCoverage {
+    protected boolean todoReset_ = false;
 
-  public String getDescription()
-  {
-    return "The number of different FSM states visited.";
-  }
-
-  @Override
-  public void setGraph(InspectableGraph model, Map<Object, Vertex> state2vertex)
-  {
-    for (VertexIterator iter = model.vertices(); iter.hasNext();) {
-      Vertex v = iter.nextVertex();
-      addItem(v.element()); // get the FSM state object.
+    public String getName() {
+        return "state coverage";
     }
-    maxCoverage_ = coverage_.size();
-  }
 
-  @Override
-  public void clear()
-  {
-    super.clear();
-    todoReset_ = false;
-  }
-
-  /** Increments the count of the initial state.
-   *  However, this is done just once for each sequence of resets.
-   */
-  @Override
-  public void doneReset(String reason, boolean testing)
-  {
-    super.doneReset(reason, testing);
-    todoReset_ = true;
-  }
-
-  /** Increments the count of the target state of the transition. */
-  @Override
-  public void doneTransition(int action, Transition tr)
-  {
-    super.doneTransition(action, tr);
-    if (todoReset_) {
-      todoReset_ = false;
-      incrementItem(tr.getStartState());
+    public String getDescription() {
+        return "The number of different FSM states visited.";
     }
-    incrementItem(tr.getEndState());
-  }
+
+    @Override
+    public void setGraph(InspectableGraph model, Map<Object, Vertex> state2vertex) {
+        for (VertexIterator iter = model.vertices(); iter.hasNext();) {
+            Vertex v = iter.nextVertex();
+            addItem(v.element()); // get the FSM state object.
+        }
+        maxCoverage_ = coverage_.size();
+    }
+
+    @Override
+    public void clear() {
+        super.clear();
+        todoReset_ = false;
+    }
+
+    /**
+     * Increments the count of the initial state. However, this is done just once for each sequence of resets.
+     */
+    @Override
+    public void doneReset(String reason, boolean testing) {
+        super.doneReset(reason, testing);
+        todoReset_ = true;
+    }
+
+    /** Increments the count of the target state of the transition. */
+    @Override
+    public void doneTransition(int action, Transition tr) {
+        super.doneTransition(action, tr);
+        if (todoReset_) {
+            todoReset_ = false;
+            incrementItem(tr.getStartState());
+        }
+        incrementItem(tr.getEndState());
+    }
 }
