@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with CZT; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ */
 
 package nz.ac.waikato.modeljunit.coverage;
 
@@ -30,60 +30,51 @@ import nz.ac.waikato.jdsl.graph.api.VertexIterator;
 import nz.ac.waikato.modeljunit.Transition;
 import nz.ac.waikato.modeljunit.TransitionPair;
 
-/** Measures the number of distinct Actions that have been tested.
+/**
+ * Measures the number of distinct Actions that have been tested.
  */
-public class TransitionPairCoverage extends AbstractCoverage
-{
-  /** The current state of the FSM. */
-  Transition lastTransition_ = null;
+public class TransitionPairCoverage extends AbstractCoverage {
+    /** The current state of the FSM. */
+    Transition lastTransition_ = null;
 
-  public String getName()
-  {
-    return "transition-pair coverage";
-  }
+    public String getName() {
+        return "transition-pair coverage";
+    }
 
-  public String getDescription()
-  {
-    return "All the pairs of transitions (t1,t2), where t1 is a transition"
-      +" that leads into some state and t2 is a transition that leads"
-      +" out of that same state.";
-  }
+    public String getDescription() {
+        return "All the pairs of transitions (t1,t2), where t1 is a transition"
+                        + " that leads into some state and t2 is a transition that leads" + " out of that same state.";
+    }
 
-  @Override
-  public void setGraph(InspectableGraph model, Map<Object, Vertex> state2vertex)
-  {
-    for (VertexIterator iter=model.vertices(); iter.hasNext(); ) {
-      Vertex v = iter.nextVertex();
-      for (EdgeIterator incoming = model.incidentEdges(v,EdgeDirection.IN);
-           incoming.hasNext(); ) {
-        Edge in = incoming.nextEdge();
-        Transition inTrans = transition(in, model);
-        for (EdgeIterator outgoing = model.incidentEdges(v,EdgeDirection.OUT);
-             outgoing.hasNext(); ) {
-          Edge out = outgoing.nextEdge();
-          Transition outTrans = transition(out, model);
-          TransitionPair pair = new TransitionPair(inTrans,outTrans);
-          addItem(pair);
+    @Override
+    public void setGraph(InspectableGraph model, Map<Object, Vertex> state2vertex) {
+        for (VertexIterator iter = model.vertices(); iter.hasNext();) {
+            Vertex v = iter.nextVertex();
+            for (EdgeIterator incoming = model.incidentEdges(v, EdgeDirection.IN); incoming.hasNext();) {
+                Edge in = incoming.nextEdge();
+                Transition inTrans = transition(in, model);
+                for (EdgeIterator outgoing = model.incidentEdges(v, EdgeDirection.OUT); outgoing.hasNext();) {
+                    Edge out = outgoing.nextEdge();
+                    Transition outTrans = transition(out, model);
+                    TransitionPair pair = new TransitionPair(inTrans, outTrans);
+                    addItem(pair);
+                }
+            }
         }
-      }
+        maxCoverage_ = coverage_.size();
     }
-    maxCoverage_ = coverage_.size();
-  }
 
-  @Override
-  public void doneReset(String reason, boolean testing)
-  {
-    lastTransition_ = null;
-  }
-
-  @Override
-  public void doneTransition(int action, Transition tr)
-  {
-    if (lastTransition_ != null
-        && lastTransition_.getEndState().equals(tr.getStartState())) {
-      TransitionPair pair = new TransitionPair(lastTransition_, tr);
-      incrementItem(pair);
+    @Override
+    public void doneReset(String reason, boolean testing) {
+        lastTransition_ = null;
     }
-    lastTransition_ = tr;
-  }
+
+    @Override
+    public void doneTransition(int action, Transition tr) {
+        if (lastTransition_ != null && lastTransition_.getEndState().equals(tr.getStartState())) {
+            TransitionPair pair = new TransitionPair(lastTransition_, tr);
+            incrementItem(pair);
+        }
+        lastTransition_ = tr;
+    }
 }

@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with CZT; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ */
 
 package nz.ac.waikato.modeljunit.coverage;
 
@@ -27,37 +27,33 @@ import nz.ac.waikato.jdsl.graph.api.InspectableGraph;
 import nz.ac.waikato.jdsl.graph.api.Vertex;
 import nz.ac.waikato.modeljunit.Transition;
 
-/** Measures the number of Transitions that have been tested.
+/**
+ * Measures the number of Transitions that have been tested.
  */
-public class TransitionCoverage extends AbstractCoverage
-{
-  public String getName()
-  {
-    return "transition coverage";
-  }
-
-  public String getDescription()
-  {
-    return "The number of different transitions executed.";
-  }
-
-  @Override
-  public void setGraph(InspectableGraph model, Map<Object, Vertex> state2vertex)
-  {
-    for (EdgeIterator iter=model.edges(); iter.hasNext(); ) {
-      Edge e = iter.nextEdge();
-      Object origin = model.origin(e).element();
-      Object dest = model.destination(e).element();
-      String action = (String) e.element();
-      Transition tr = new Transition(origin, action, dest);
-      addItem(tr);
+public class TransitionCoverage extends AbstractCoverage {
+    public String getName() {
+        return "transition coverage";
     }
-    maxCoverage_ = coverage_.size();
-  }
 
-  @Override
-  public void doneTransition(int action, Transition tr)
-  {
-    incrementItem(tr);
-  }
+    public String getDescription() {
+        return "The number of different transitions executed.";
+    }
+
+    @Override
+    public void setGraph(InspectableGraph model, Map<Object, Vertex> state2vertex) {
+        for (EdgeIterator iter = model.edges(); iter.hasNext();) {
+            Edge e = iter.nextEdge();
+            Object origin = model.origin(e).element();
+            Object dest = model.destination(e).element();
+            String action = (String) e.element();
+            Transition tr = new Transition(origin, action, dest);
+            addItem(tr);
+        }
+        maxCoverage_ = coverage_.size();
+    }
+
+    @Override
+    public void doneTransition(int action, Transition tr) {
+        incrementItem(tr);
+    }
 }
