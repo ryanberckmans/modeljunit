@@ -26,7 +26,6 @@ import nz.ac.waikato.jdsl.graph.api.Edge;
 import nz.ac.waikato.jdsl.graph.api.InspectableGraph;
 import nz.ac.waikato.jdsl.graph.api.Vertex;
 import nz.ac.waikato.modeljunit.AbstractListener;
-import nz.ac.waikato.modeljunit.Model;
 import nz.ac.waikato.modeljunit.Transition;
 
 /**
@@ -88,7 +87,9 @@ public abstract class AbstractCoverage extends AbstractListener implements Cover
     }
 
     /**
-     * Add a coverage item to the {@code coverage_} map. If the item is already in the map, its value is left unchanged.
+     * Add a coverage item to the {@code coverage_} map, but do not mark it as covered.
+     *
+     * If the item is already in the map, its value is left unchanged.
      * If the item is new, its value is set to zero.
      * 
      * @param item
@@ -100,7 +101,9 @@ public abstract class AbstractCoverage extends AbstractListener implements Cover
     }
 
     /**
-     * Increments the count of {@code item} in the {@code coverage_} map. This should be called by
+     * Increments the count of {@code item} in the {@code coverage_} map.
+     * 
+     * This should be called by
      * {@link #doneTransition(int,Transition) doneTransition} (and perhaps doneReset) whenever a coverage item is
      * covered. If item was not already in the map, then it is added to the map and its value is set to one.
      * 
