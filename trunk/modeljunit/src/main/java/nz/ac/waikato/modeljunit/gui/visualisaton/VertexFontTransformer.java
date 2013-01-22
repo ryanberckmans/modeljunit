@@ -22,9 +22,9 @@ import java.awt.Font;
 
 import org.apache.commons.collections15.Transformer;
 
-public class VertexFontTransformer<V, E> implements Transformer<Object, Font>{	
+public class VertexFontTransformer<V, E> implements Transformer<Object, Font> {
 
-	public Font transform(Object o){					
-			return new Font("Arial", Font.BOLD, 14);				
-	}
+    public Font transform(Object o) {
+        return new Font("Arial", Font.BOLD, 14);
+    }
 }

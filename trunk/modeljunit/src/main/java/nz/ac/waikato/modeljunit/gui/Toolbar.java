@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with ModelJUnit; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ */
 
 package nz.ac.waikato.modeljunit.gui;
 
@@ -23,146 +23,116 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-/** The toolbar class for ModelJUnit.
- *
- * Holds a reference to the parent window so as to enable button actions. 
- *
+/**
+ * The toolbar class for ModelJUnit.
+ * 
+ * Holds a reference to the parent window so as to enable button actions.
+ * 
  * @author Gian Perrone <gian@waikato.ac.nz>
  **/
-public class Toolbar extends JPanel
-{
-   private ModelJUnitGUI mParent;
+public class Toolbar extends JPanel {
+    private ModelJUnitGUI mParent;
 
-   public Toolbar(ModelJUnitGUI parent) {
-      super();
-      mParent = parent;
-      this.setLayout(new FlowLayout(FlowLayout.LEFT));
-      buildGUI();
-   }
+    public Toolbar(ModelJUnitGUI parent) {
+        super();
+        mParent = parent;
+        this.setLayout(new FlowLayout(FlowLayout.LEFT));
+        buildGUI();
+    }
 
-   public void buildGUI() {
-      JButton b = new JButton("New",createImageIcon("/images/New16.gif", "New Project"));
-      this.add(b);
+    public void buildGUI() {
+        JButton b = new JButton("New", createImageIcon("/images/New16.gif", "New Project"));
+        this.add(b);
 
-      b.addActionListener(
-         new ActionListener(){
-            public void actionPerformed(ActionEvent e)
-            {
-               mParent.showProjectDialog(null);
+        b.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                mParent.showProjectDialog(null);
             }
-         }
-      );
-      
-      b = new JButton("Open", createImageIcon("/images/Open16.gif", "Open Project"));
-      this.add(b);
+        });
 
-      b.addActionListener(
-         new ActionListener(){
-            public void actionPerformed(ActionEvent e)
-            {
-               mParent.displayProjectFileChooser(true);
+        b = new JButton("Open", createImageIcon("/images/Open16.gif", "Open Project"));
+        this.add(b);
+
+        b.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                mParent.displayProjectFileChooser(true);
             }
-         }
-      );
+        });
 
-      b = new JButton("Save", createImageIcon("/images/Save16.gif", "Save Project"));
-      this.add(b);
+        b = new JButton("Save", createImageIcon("/images/Save16.gif", "Save Project"));
+        this.add(b);
 
-      b.addActionListener(
-         new ActionListener(){
-            public void actionPerformed(ActionEvent e)
-            {
-               mParent.saveProject();
+        b.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                mParent.saveProject();
             }
-         }
-      );
+        });
 
+        b = new JButton("Animate Model", createImageIcon("/images/Animate16.gif", "Animate Model"));
+        this.add(b);
 
-      b = new JButton("Animate Model", createImageIcon("/images/Animate16.gif", "Animate Model"));
-      this.add(b);
-
-      b.addActionListener(
-         new ActionListener(){
-            public void actionPerformed(ActionEvent e)
-            {
-               mParent.displayAnimateWindow();
+        b.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                mParent.displayAnimateWindow();
             }
-         }
-      );
-      
-      String[] configurations = {"Configuration 1", "Configuration 2", "Configuration 3"};
-      JComboBox combo = new JComboBox(configurations);
+        });
 
-      //this.add(combo);
+        String[] configurations = { "Configuration 1", "Configuration 2", "Configuration 3" };
+        JComboBox combo = new JComboBox(configurations);
 
-      b = new JButton("Test Configuration");
-      this.add(b);
-      
-      b.addActionListener(
-         new ActionListener(){
-            public void actionPerformed(ActionEvent e)
-            {
-               mParent.displayAlgorithmPane();
+        //this.add(combo);
+
+        b = new JButton("Test Configuration");
+        this.add(b);
+
+        b.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                mParent.displayAlgorithmPane();
             }
-         }
-      );
+        });
 
-      
+        b = new JButton("Generate Tests", createImageIcon("/images/Play16.gif", "Run Configuration"));
 
-      b = new JButton("Generate Tests", createImageIcon("/images/Play16.gif", "Run Configuration"));
+        this.add(b);
 
-      this.add(b);
-
-      b.addActionListener(
-         new ActionListener(){
-            public void actionPerformed(ActionEvent e)
-            {
-               mParent.runModel();
-	       //TestExeModel.runTestAuto();
+        b.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                mParent.runModel();
+                //TestExeModel.runTestAuto();
 
             }
-         }
-      );
+        });
 
+        b = new JButton("View Tests", createImageIcon("/images/Results16.gif", "View Results"));
+        this.add(b);
 
-      b = new JButton("View Tests",createImageIcon("/images/Results16.gif", "View Results") );
-      this.add(b);
-
-      b.addActionListener(
-         new ActionListener(){
-            public void actionPerformed(ActionEvent e)
-            {
-               mParent.displayResultsWindow();
+        b.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                mParent.displayResultsWindow();
             }
-         }
-      );
-      
-      
-      b = new JButton("Efficiency Graphs");
+        });
 
-      this.add(b);
+        b = new JButton("Efficiency Graphs");
 
-      b.addActionListener(
-         new ActionListener(){
-            public void actionPerformed(ActionEvent e)
-            {
-               mParent.displayEfficiencyGraphs();
+        this.add(b);
+
+        b.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                mParent.displayEfficiencyGraphs();
             }
-         }
-      );
+        });
 
-   }
+    }
 
-   /** Returns an ImageIcon, or null if the path was invalid. */
-   protected ImageIcon createImageIcon(String path,
-                                           String description) {
-      java.net.URL imgURL = getClass().getResource(path);
-      if (imgURL != null) {
-          return new ImageIcon(imgURL, description);
-      } else {
-          System.err.println("Couldn't find file: " + path);
-          return null;
-      }
-   }
+    /** Returns an ImageIcon, or null if the path was invalid. */
+    protected ImageIcon createImageIcon(String path, String description) {
+        java.net.URL imgURL = getClass().getResource(path);
+        if (imgURL != null) {
+            return new ImageIcon(imgURL, description);
+        } else {
+            System.err.println("Couldn't find file: " + path);
+            return null;
+        }
+    }
 
 }

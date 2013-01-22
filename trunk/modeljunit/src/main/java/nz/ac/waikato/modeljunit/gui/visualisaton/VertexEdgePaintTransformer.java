@@ -29,52 +29,50 @@ import edu.uci.ics.jung.visualization.picking.PickedInfo;
 
 /**
  * @author Jerramy Winchester
- *
+ * 
  */
-public class VertexEdgePaintTransformer<V,E> implements Transformer<V, Paint> {	
-	
-  private Color DEFAULT_LINE_COLOR = ColorUtil.EXPLORED;
-  private Color PICKED = ColorUtil.PICKED;
-  
-	private PickedInfo<Object> pi;
-	private ArrayList<Object> vertecies_;
-	
-	public VertexEdgePaintTransformer(PickedInfo<Object> pi, ArrayList<Object> v){
-		if (pi == null)
-			throw new IllegalArgumentException("PickedInfo instance must be non-null");
-		this.pi = pi;
-		this.vertecies_ = v;
-	}	
-	
-	@Override
-	public Paint transform(V v){
-		
-		try{
-			if (v instanceof Graph){	
-				if(pi.isPicked(v)){
-					return PICKED;
-				}				
-				return DEFAULT_LINE_COLOR;						
-			}
-			if(v instanceof VertexInfo){
-				if (pi.isPicked(vertecies_.get(vertecies_.indexOf(v)))){					
-					return PICKED;
-				}
-				else
-				{				
-					if(vertecies_.contains(v)){
-						VertexInfo vert = (VertexInfo)vertecies_.get(vertecies_.indexOf(v));
-						if(vert.getIsDisplayed() || vert.getIsVisited()){							
-							return DEFAULT_LINE_COLOR;
-						}
-					}
-				}
-			}							
-			return DEFAULT_LINE_COLOR;
-						
-		} catch (Exception e){						
-			return DEFAULT_LINE_COLOR;
-		}
-	}
+public class VertexEdgePaintTransformer<V, E> implements Transformer<V, Paint> {
+
+    private Color DEFAULT_LINE_COLOR = ColorUtil.EXPLORED;
+    private Color PICKED = ColorUtil.PICKED;
+
+    private PickedInfo<Object> pi;
+    private ArrayList<Object> vertecies_;
+
+    public VertexEdgePaintTransformer(PickedInfo<Object> pi, ArrayList<Object> v) {
+        if (pi == null)
+            throw new IllegalArgumentException("PickedInfo instance must be non-null");
+        this.pi = pi;
+        this.vertecies_ = v;
+    }
+
+    @Override
+    public Paint transform(V v) {
+
+        try {
+            if (v instanceof Graph) {
+                if (pi.isPicked(v)) {
+                    return PICKED;
+                }
+                return DEFAULT_LINE_COLOR;
+            }
+            if (v instanceof VertexInfo) {
+                if (pi.isPicked(vertecies_.get(vertecies_.indexOf(v)))) {
+                    return PICKED;
+                } else {
+                    if (vertecies_.contains(v)) {
+                        VertexInfo vert = (VertexInfo) vertecies_.get(vertecies_.indexOf(v));
+                        if (vert.getIsDisplayed() || vert.getIsVisited()) {
+                            return DEFAULT_LINE_COLOR;
+                        }
+                    }
+                }
+            }
+            return DEFAULT_LINE_COLOR;
+
+        } catch (Exception e) {
+            return DEFAULT_LINE_COLOR;
+        }
+    }
 
 }

@@ -24,128 +24,128 @@ import nz.ac.waikato.modeljunit.Transition;
 
 /**
  * @author Jerramy Winchester
- *
+ * 
  */
 public class EdgeInfo {
-	
-	//Class wide variables
-	private Transition transition_;
-	private VertexInfo srcVertex_;
-	private VertexInfo destVertex_;
-	private Boolean displayed_;
-	private Boolean visited_;
-	private Boolean isCurrSeq_;
-	private TreeMap<String, Integer> sequences_;
-	private Boolean failedEdge_;
-	private String failedMsg_;
 
-	public EdgeInfo(Transition trans, VertexInfo src, VertexInfo dest){
-		transition_ = trans;
-		srcVertex_ = src;
-		destVertex_ = dest;
-		displayed_ = false;
-		visited_ = false;
-		isCurrSeq_ = false;
-		failedEdge_ = false;
-		failedMsg_ = new String();
-		sequences_ = new TreeMap<String, Integer>();
-	}
-	
-	public EdgeInfo(Transition trans, VertexInfo src, VertexInfo dest, Boolean displayed, Boolean visited){
-		transition_ = trans;
-		srcVertex_ = src;
-		destVertex_ = dest;
-		displayed_ = displayed;
-		visited_ = visited;
-		isCurrSeq_ = false;
-		failedEdge_ = false;
-		failedMsg_ = new String();
-		sequences_ = new TreeMap<String, Integer>();
-	}
-	
-	public String getAction(){		
-		return transition_.getAction();
-	}
-	
-	public Transition getTransition(){
-		return transition_;
-	}
-	
-	public Object getSrcVertexName(){
-		return transition_.getStartState();
-	}
-	
-	public VertexInfo getSrcVertex(){
-		return srcVertex_;
-	}
-	
-	public Object getDestVertexName(){
-		return transition_.getEndState();
-	}
-	
-	public VertexInfo getDestVertex(){
-		return destVertex_;
-	}
-	
-	public void setIsDisplayed(boolean displayed){
-		displayed_ = displayed;
-	}
-	
-	public Boolean getIsDisplayed(){
-		return displayed_;
-	}
-	
-	public void setIsVisited(Boolean visited){
-		visited_ = visited;
-	}
-	
-	public Boolean getIsVisited(){
-		return visited_;
-	}
-	
-  public void setIsCurrSeq(Boolean isCurrSeq){
-    isCurrSeq_ = isCurrSeq;
-  }
+    //Class wide variables
+    private Transition transition_;
+    private VertexInfo srcVertex_;
+    private VertexInfo destVertex_;
+    private Boolean displayed_;
+    private Boolean visited_;
+    private Boolean isCurrSeq_;
+    private TreeMap<String, Integer> sequences_;
+    private Boolean failedEdge_;
+    private String failedMsg_;
 
-  public Boolean getIsCurrSeq(){
-    return isCurrSeq_;
-  }
-	
-	public TreeMap<String, Integer> getSequences_() {
-		return sequences_;
-	}
+    public EdgeInfo(Transition trans, VertexInfo src, VertexInfo dest) {
+        transition_ = trans;
+        srcVertex_ = src;
+        destVertex_ = dest;
+        displayed_ = false;
+        visited_ = false;
+        isCurrSeq_ = false;
+        failedEdge_ = false;
+        failedMsg_ = new String();
+        sequences_ = new TreeMap<String, Integer>();
+    }
 
-	public void addTestSequence(String sequence) {
-		this.sequences_ .put(sequence,
-				this.sequences_.containsKey(sequence) 
-				? ((sequences_.get(sequence)) + 1) : 1);
-	}	
+    public EdgeInfo(Transition trans, VertexInfo src, VertexInfo dest, Boolean displayed, Boolean visited) {
+        transition_ = trans;
+        srcVertex_ = src;
+        destVertex_ = dest;
+        displayed_ = displayed;
+        visited_ = visited;
+        isCurrSeq_ = false;
+        failedEdge_ = false;
+        failedMsg_ = new String();
+        sequences_ = new TreeMap<String, Integer>();
+    }
 
-	/**
-	 * @param failedEdge_ the failedEdge_ to set
-	 */
-	public void setFailedEdge(Boolean failedEdge) {
-		this.failedEdge_ = failedEdge;
-	}
+    public String getAction() {
+        return transition_.getAction();
+    }
 
-	/**
-	 * @return the failedEdge_
-	 */
-	public Boolean getFailedEdge() {
-		return failedEdge_;
-	}
+    public Transition getTransition() {
+        return transition_;
+    }
 
-	/**
-	 * @param failedMsg_ the failedMsg_ to set
-	 */
-	public void setFailedMsg(String failedMsg) {
-		this.failedMsg_ = failedMsg;
-	}
+    public Object getSrcVertexName() {
+        return transition_.getStartState();
+    }
 
-	/**
-	 * @return the failedMsg_
-	 */
-	public String getFailedMsg() {
-		return failedMsg_;
-	}
+    public VertexInfo getSrcVertex() {
+        return srcVertex_;
+    }
+
+    public Object getDestVertexName() {
+        return transition_.getEndState();
+    }
+
+    public VertexInfo getDestVertex() {
+        return destVertex_;
+    }
+
+    public void setIsDisplayed(boolean displayed) {
+        displayed_ = displayed;
+    }
+
+    public Boolean getIsDisplayed() {
+        return displayed_;
+    }
+
+    public void setIsVisited(Boolean visited) {
+        visited_ = visited;
+    }
+
+    public Boolean getIsVisited() {
+        return visited_;
+    }
+
+    public void setIsCurrSeq(Boolean isCurrSeq) {
+        isCurrSeq_ = isCurrSeq;
+    }
+
+    public Boolean getIsCurrSeq() {
+        return isCurrSeq_;
+    }
+
+    public TreeMap<String, Integer> getSequences_() {
+        return sequences_;
+    }
+
+    public void addTestSequence(String sequence) {
+        this.sequences_.put(sequence, this.sequences_.containsKey(sequence) ? ((sequences_.get(sequence)) + 1) : 1);
+    }
+
+    /**
+     * @param failedEdge_
+     *            the failedEdge_ to set
+     */
+    public void setFailedEdge(Boolean failedEdge) {
+        this.failedEdge_ = failedEdge;
+    }
+
+    /**
+     * @return the failedEdge_
+     */
+    public Boolean getFailedEdge() {
+        return failedEdge_;
+    }
+
+    /**
+     * @param failedMsg_
+     *            the failedMsg_ to set
+     */
+    public void setFailedMsg(String failedMsg) {
+        this.failedMsg_ = failedMsg;
+    }
+
+    /**
+     * @return the failedMsg_
+     */
+    public String getFailedMsg() {
+        return failedMsg_;
+    }
 }

@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with ModelJUnit; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ */
 
 package nz.ac.waikato.modeljunit.gui;
 
@@ -32,235 +32,239 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
 
-/** A container class for projects.
- *
- * Designed to contain preferences and configuration information,
- * as well as logic for saving/opening projects from files.
- *
- * The static setInstance/getInstance methods give access
- * to the singleton instance, which is the current project.
+/**
+ * A container class for projects.
+ * 
+ * Designed to contain preferences and configuration information, as well as logic for saving/opening projects from
+ * files.
+ * 
+ * The static setInstance/getInstance methods give access to the singleton instance, which is the current project.
  * 
  * @author Gian Perrone <gian@waikato.ac.nz>
  **/
-public @XmlRootElement class Project
-{
-   private String mProjectName;
-   /** Not used yet.
-    * TODO: make this a map from configuration name to a 
-    * Configuration object (or Parameter object), to allow
-    * multiple configurations with different test generation options. 
-    */
-   private Map<String,String> mConfiguration;
-   private File mFile;
-   private boolean mSaved;
-   /** Time when this project was last modified. */
-   private Date mLastModified;
-   private Parameter mParameter;
-   private File mModelFile;
-   /** This should be part of the configuration. */
-   private int mAlgorithm;
-   /** The singleton object for the current project. */
-   private static Project mProject;
+public @XmlRootElement
+class Project {
+    private String mProjectName;
+    /**
+     * Not used yet. TODO: make this a map from configuration name to a Configuration object (or Parameter object), to
+     * allow multiple configurations with different test generation options.
+     */
+    private Map<String, String> mConfiguration;
+    private File mFile;
+    private boolean mSaved;
+    /** Time when this project was last modified. */
+    private Date mLastModified;
+    private Parameter mParameter;
+    private File mModelFile;
+    /** This should be part of the configuration. */
+    private int mAlgorithm;
+    /** The singleton object for the current project. */
+    private static Project mProject;
 
-   /** Create a new (empty) project, untitled and unsaved **/
-   public Project() {
-      mFile = null;
-      mSaved = false;
-      mProjectName = "untitled";
-      mConfiguration = new HashMap<String,String>();
-      mParameter = new Parameter();
-      mModelFile = null;
-   }
+    /** Create a new (empty) project, untitled and unsaved **/
+    public Project() {
+        mFile = null;
+        mSaved = false;
+        mProjectName = "untitled";
+        mConfiguration = new HashMap<String, String>();
+        mParameter = new Parameter();
+        mModelFile = null;
+    }
 
-   /** Update the project name **/
-   public void setName(String name) {
-      mProjectName = name;
-      modify();
-   }
+    /** Update the project name **/
+    public void setName(String name) {
+        mProjectName = name;
+        modify();
+    }
 
-   /** Get the project name **/
-   public String getName() {
-      return mProjectName;
-   }
+    /** Get the project name **/
+    public String getName() {
+        return mProjectName;
+    }
 
-   public File getModelFile() {
-      return mModelFile;
-   }
+    public File getModelFile() {
+        return mModelFile;
+    }
 
-   public void setModelFile(File m) {
-      mModelFile = m;
-      modify();
-   }
+    public void setModelFile(File m) {
+        mModelFile = m;
+        modify();
+    }
 
-   /** Set the "modified" flag to indicate that the project is unsaved. **/
-   public void modify() {
-      mSaved = false;
-      mLastModified = new Date();
-   }
+    /** Set the "modified" flag to indicate that the project is unsaved. **/
+    public void modify() {
+        mSaved = false;
+        mLastModified = new Date();
+    }
 
-   public Map<String,String> getConfiguration() {
-      return mConfiguration;
-   }
+    public Map<String, String> getConfiguration() {
+        return mConfiguration;
+    }
 
-   public void setConfiguration(Map<String,String> strings) {
-      mConfiguration = strings;
-   }
+    public void setConfiguration(Map<String, String> strings) {
+        mConfiguration = strings;
+    }
 
-   /** Read the modified flag. **/
-   public boolean isModified() {
-      return !mSaved;
-   }
+    /** Read the modified flag. **/
+    public boolean isModified() {
+        return !mSaved;
+    }
 
-   public Date getLastModified() {
-      return mLastModified;
-   }
+    public Date getLastModified() {
+        return mLastModified;
+    }
 
-   public void setLastModified(Date lastModified) {
-      mLastModified = lastModified;
-   }
+    public void setLastModified(Date lastModified) {
+        mLastModified = lastModified;
+    }
 
-   /** Set a configuration value. **/
-   public void setProperty(String key,String value) {
-      mConfiguration.put(key,value);
-   }
+    /** Set a configuration value. **/
+    public void setProperty(String key, String value) {
+        mConfiguration.put(key, value);
+    }
 
-   /** Get a configuration value **/
-   public String getProperty(String key) {
-      return mConfiguration.get(key);
-   }
+    /** Get a configuration value **/
+    public String getProperty(String key) {
+        return mConfiguration.get(key);
+    }
 
-   /** Set a filename for the project to save to. **/
-   public void setFileName(File file) {
-      mFile = file;
-   }
+    /** Set a filename for the project to save to. **/
+    public void setFileName(File file) {
+        mFile = file;
+    }
 
-   /** Get the current filename for the project. **/
-   public File getFileName() {
-      return mFile;
-   }
+    /** Get the current filename for the project. **/
+    public File getFileName() {
+        return mFile;
+    }
 
-   public Parameter getParameter() {
-      return mParameter;
-   }
+    public Parameter getParameter() {
+        return mParameter;
+    }
 
-   public void setParameter(Parameter p) {
-      mParameter = p;
-   }
+    public void setParameter(Parameter p) {
+        mParameter = p;
+    }
 
-   public String getVersion() {
-      return ModelJUnitGUI.MODELJUNIT_VERSION;
-   }
+    public String getVersion() {
+        return ModelJUnitGUI.MODELJUNIT_VERSION;
+    }
 
-   public void setVersion(String version) {
-      if(!version.equals(ModelJUnitGUI.MODELJUNIT_VERSION)) {
-         System.err.println("WARNING:  This project file was made using a different version of ModelJUnit, and may not load correctly.");
-      }
-   }
+    public void setVersion(String version) {
+        if (!version.equals(ModelJUnitGUI.MODELJUNIT_VERSION)) {
+            System.err.println("WARNING:  This project file was made using a different version of ModelJUnit, and may not load correctly.");
+        }
+    }
 
-   public boolean[] getCoverageOptions() {
-      return Parameter.getCoverageOption();
-   }
+    public boolean[] getCoverageOptions() {
+        return Parameter.getCoverageOption();
+    }
 
-   public void setCoverageOptions(boolean[] options) {
-      Parameter.setCoverageOption(options);
-   }
+    public void setCoverageOptions(boolean[] options) {
+        Parameter.setCoverageOption(options);
+    }
 
-   public boolean getFailureVerbosity() {
-      return Parameter.getFailureVerbosity();
-   }
+    public boolean getFailureVerbosity() {
+        return Parameter.getFailureVerbosity();
+    }
 
-   public void setFailureVerbosity(boolean verbosity) {
-      Parameter.setFailureVerbosity(verbosity);
-   }
+    public void setFailureVerbosity(boolean verbosity) {
+        Parameter.setFailureVerbosity(verbosity);
+    }
 
-   public int getAlgorithm() {
-      return mAlgorithm;
-   }
+    public int getAlgorithm() {
+        return mAlgorithm;
+    }
 
-   public void setAlgorithm(int algorithm) {
-      mAlgorithm = algorithm;
-   }
+    public void setAlgorithm(int algorithm) {
+        mAlgorithm = algorithm;
+    }
 
-   public double getResetProbability() {
-      return Parameter.getResetProbability();
-   }
+    public double getResetProbability() {
+        return Parameter.getResetProbability();
+    }
 
-   public void setResetProbability(double prob) {
-      Parameter.setResetProbability(prob);
-   }
+    public void setResetProbability(double prob) {
+        Parameter.setResetProbability(prob);
+    }
 
-   public int getWalkLength() {
-      return TestExeModel.getWalkLength();
-   }
+    public int getWalkLength() {
+        return TestExeModel.getWalkLength();
+    }
 
-   public void setWalkLength(int len) {
-      TestExeModel.setWalkLength(len);
-   }
+    public void setWalkLength(int len) {
+        TestExeModel.setWalkLength(len);
+    }
 
-   public boolean getGenerateGraph() {
-      return Parameter.getGenerateGraph();
-   }
+    public boolean getGenerateGraph() {
+        return Parameter.getGenerateGraph();
+    }
 
-   public void setGenerateGraph(boolean generate) {
-      Parameter.setGenerateGraph(generate);
-   }
+    public void setGenerateGraph(boolean generate) {
+        Parameter.setGenerateGraph(generate);
+    }
 
-   /** Save the project state to the currently set filename. 
-    *  
-    *  A null filename will result in an exception.  Checking that the file is
-    *  writable must be done prior to calling this method.
-    *
-    *  @return true if writing the file succeeded, false otherwise
-    **/
-   public static boolean save(Project project) {
-      if(project == null) throw new RuntimeException("Cannot save a null project");
-      if(project.getFileName() == null) throw new RuntimeException("Filename for current project is null");
-     
-      try {
-         FileOutputStream fo = new FileOutputStream(project.getFileName());
-         JAXBContext context = JAXBContext.newInstance(Project.class);
+    /**
+     * Save the project state to the currently set filename.
+     * 
+     * A null filename will result in an exception. Checking that the file is writable must be done prior to calling
+     * this method.
+     * 
+     * @return true if writing the file succeeded, false otherwise
+     **/
+    public static boolean save(Project project) {
+        if (project == null)
+            throw new RuntimeException("Cannot save a null project");
+        if (project.getFileName() == null)
+            throw new RuntimeException("Filename for current project is null");
 
-         Marshaller m = context.createMarshaller();
-         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true); 
+        try {
+            FileOutputStream fo = new FileOutputStream(project.getFileName());
+            JAXBContext context = JAXBContext.newInstance(Project.class);
 
-         m.marshal(project, fo);
+            Marshaller m = context.createMarshaller();
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
-         fo.close();
-      } catch(Exception e) {
-         System.err.println("Project Save Failed: " + e.getMessage());
-         return false;
-      }
+            m.marshal(project, fo);
 
-      return true;
-   }
+            fo.close();
+        } catch (Exception e) {
+            System.err.println("Project Save Failed: " + e.getMessage());
+            return false;
+        }
 
-   public static Project load(File file) {
-      if(file == null) throw new RuntimeException("Invalid or missing project filename");
+        return true;
+    }
 
-      Project result = null;
+    public static Project load(File file) {
+        if (file == null)
+            throw new RuntimeException("Invalid or missing project filename");
 
-      try {
-         JAXBContext context = JAXBContext.newInstance(Project.class);
+        Project result = null;
 
-         Unmarshaller m = context.createUnmarshaller();
-      
-         result = (Project)m.unmarshal(file);
+        try {
+            JAXBContext context = JAXBContext.newInstance(Project.class);
 
-         if(result == null) throw new RuntimeException("Error:  Could not load project from file");
-      } catch (Exception e) {
-         System.err.println("Project Load Failed: " + e.getMessage());
-         return null;
-      }
+            Unmarshaller m = context.createUnmarshaller();
 
-      return result;
-   }
+            result = (Project) m.unmarshal(file);
 
-   public static void setInstance(Project pr) {
-      mProject = pr;
-   }
+            if (result == null)
+                throw new RuntimeException("Error:  Could not load project from file");
+        } catch (Exception e) {
+            System.err.println("Project Load Failed: " + e.getMessage());
+            return null;
+        }
 
-   public static Project getInstance() {
-      return mProject;
-   }
- 
+        return result;
+    }
+
+    public static void setInstance(Project pr) {
+        mProject = pr;
+    }
+
+    public static Project getInstance() {
+        return mProject;
+    }
+
 }
