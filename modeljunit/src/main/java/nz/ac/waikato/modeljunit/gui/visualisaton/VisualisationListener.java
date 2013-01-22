@@ -22,68 +22,54 @@ import nz.ac.waikato.modeljunit.AbstractListener;
 import nz.ac.waikato.modeljunit.TestFailureException;
 import nz.ac.waikato.modeljunit.Transition;
 
-/** 
- * An implementation of ModelListener that passes information about the model
- * to the JUNGHelper class.
+/**
+ * An implementation of ModelListener that passes information about the model to the JUNGHelper class.
  */
-public class VisualisationListener extends AbstractListener
-{
-	private JUNGHelper jView_ = JUNGHelper.getJUNGViewInstance();
-	private int resets = 1;
-	private Boolean failureOccured = false;
-	private Object lastVisitedState_;
-	private Transition lastVisitedTrans_;
-	private String lastVisitedFailedMsg_;
+public class VisualisationListener extends AbstractListener {
+    private JUNGHelper jView_ = JUNGHelper.getJUNGViewInstance();
+    private int resets = 1;
+    private Boolean failureOccured = false;
+    private Object lastVisitedState_;
+    private Transition lastVisitedTrans_;
+    private String lastVisitedFailedMsg_;
 
+    public VisualisationListener() {
+    }
 
-	public VisualisationListener(){
-	}
+    public String getName() {
+        return "visualGraph";
+    }
 
-	public String getName()
-	{
-		return "visualGraph";
-	}
+    public void doneReset(String reason, boolean testing) {
+        jView_.graphDoneReset("Test sequence " + (++resets) + " (" + reason + " reset)");
+    }
 
-	public void doneReset(String reason, boolean testing)
-	{ 		
-		jView_.graphDoneReset("Test sequence " + (++resets) + " (" + reason + " reset)");		
-	}
+    public void doneGuard(Object state, int action, boolean enabled, int value) {
+    }
 
-	public void doneGuard(Object state, int action, boolean enabled, int value)
-	{
-	}
+    public void startAction(Object state, int action, String name) {
+    }
 
-	public void startAction(Object state, int action, String name)
-	{
-	}
+    public void doneTransition(int action, Transition tr) {
+        //Tidy up any errored states.
+        if (!tr.getStartState().equals(lastVisitedState_) && null != lastVisitedState_ && failureOccured) {
+            jView_.visitedEdge(lastVisitedTrans_, true, lastVisitedFailedMsg_);
+        } else {
+            jView_.visitedVertex(tr.getStartState(), false);
+            jView_.visitedVertex(tr.getEndState(), false);
+            jView_.visitedEdge(tr, failureOccured, lastVisitedFailedMsg_);
+        }
+        failureOccured = false;
+        lastVisitedFailedMsg_ = null;
+    }
 
-	public void doneTransition(int action, Transition tr)
-	{ 		
-		//Tidy up any errored states.
-		if(!tr.getStartState().equals(lastVisitedState_) 
-				&& null != lastVisitedState_
-				&& failureOccured){			
-			jView_.visitedEdge(lastVisitedTrans_, true, lastVisitedFailedMsg_);			
-		} else {
-			jView_.visitedVertex(tr.getStartState(), false);
-			jView_.visitedVertex(tr.getEndState(), false);
-			jView_.visitedEdge(tr, failureOccured, lastVisitedFailedMsg_);			
-		}
-		failureOccured = false;
-		lastVisitedFailedMsg_ = null;
-	}
-
-	@Override
-	public void failure(TestFailureException ex)
-	{		
-		TestFailureException exp = (TestFailureException)ex;		
-		Transition tran = new Transition(exp.getState()
-				, exp.getActionName()
-				, exp.getState() + "_Fail");		
-		lastVisitedState_ = exp.getState();
-		lastVisitedTrans_ = tran;
-		lastVisitedFailedMsg_ = exp.getLocalizedMessage();
-		failureOccured = true;		
-	}
+    @Override
+    public void failure(TestFailureException ex) {
+        TestFailureException exp = (TestFailureException) ex;
+        Transition tran = new Transition(exp.getState(), exp.getActionName(), exp.getState() + "_Fail");
+        lastVisitedState_ = exp.getState();
+        lastVisitedTrans_ = tran;
+        lastVisitedFailedMsg_ = exp.getLocalizedMessage();
+        failureOccured = true;
+    }
 }
-

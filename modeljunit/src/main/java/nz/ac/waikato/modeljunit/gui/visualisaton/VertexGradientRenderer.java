@@ -41,123 +41,120 @@ import edu.uci.ics.jung.visualization.transform.shape.GraphicsDecorator;
 
 /**
  * @author Jerramy Winchester
- *
+ * 
  */
-public class VertexGradientRenderer<V,E> implements Renderer.Vertex<V,E> {
+public class VertexGradientRenderer<V, E> implements Renderer.Vertex<V, E> {
 
-	private Color backFillColor;
-	private Color stanColor = ColorUtil.UNEXPLORED;
-	private Color dispColor = ColorUtil.EXPLORED;	
-	private Color pickedColor = ColorUtil.PICKED;	
-	private Color visColor = ColorUtil.EXPLORED_CURRENT_SEQ;	
-	private Color firstStateColor = ColorUtil.FIRST_STATE;
-	private Color graphColor = ColorUtil.GRAPH;	
+    private Color backFillColor;
+    private Color stanColor = ColorUtil.UNEXPLORED;
+    private Color dispColor = ColorUtil.EXPLORED;
+    private Color pickedColor = ColorUtil.PICKED;
+    private Color visColor = ColorUtil.EXPLORED_CURRENT_SEQ;
+    private Color firstStateColor = ColorUtil.FIRST_STATE;
+    private Color graphColor = ColorUtil.GRAPH;
 
-	private PickedState<V> pickedState;
-	private boolean cyclic;
+    private PickedState<V> pickedState;
+    private boolean cyclic;
 
-	public VertexGradientRenderer(Color backFillColor, PickedState<V> pickedState, boolean cyclic) {
-		this.backFillColor = backFillColor;
-		this.pickedState = pickedState;
-		this.cyclic = cyclic;
-	}
+    public VertexGradientRenderer(Color backFillColor, PickedState<V> pickedState, boolean cyclic) {
+        this.backFillColor = backFillColor;
+        this.pickedState = pickedState;
+        this.cyclic = cyclic;
+    }
 
+    public void paintVertex(RenderContext<V, E> rc, Layout<V, E> layout, V v) {
+        Graph<V, E> graph = layout.getGraph();
+        if (rc.getVertexIncludePredicate().evaluate(Context.<Graph<V, E>, V> getInstance(graph, v))) {
+            boolean vertexHit = true;
+            // get the shape to be rendered
+            Shape shape = rc.getVertexShapeTransformer().transform(v);
 
-	public void paintVertex(RenderContext<V,E> rc, Layout<V,E> layout, V v) {
-		Graph<V,E> graph = layout.getGraph();
-		if (rc.getVertexIncludePredicate().evaluate(Context.<Graph<V,E>,V>getInstance(graph,v))) {
-			boolean vertexHit = true;
-			// get the shape to be rendered
-			Shape shape = rc.getVertexShapeTransformer().transform(v);
+            Point2D p = layout.transform(v);
+            p = rc.getMultiLayerTransformer().transform(Layer.LAYOUT, p);
 
-			Point2D p = layout.transform(v);
-			p = rc.getMultiLayerTransformer().transform(Layer.LAYOUT, p);
+            float x = (float) p.getX();
+            float y = (float) p.getY();
 
-			float x = (float)p.getX();
-			float y = (float)p.getY();
+            // create a transform that translates to the location of
+            // the vertex to be rendered
+            AffineTransform xform = AffineTransform.getTranslateInstance(x, y);
+            // transform the vertex shape with xtransform
+            shape = xform.createTransformedShape(shape);
 
-			// create a transform that translates to the location of
-			// the vertex to be rendered
-			AffineTransform xform = AffineTransform.getTranslateInstance(x,y);
-			// transform the vertex shape with xtransform
-			shape = xform.createTransformedShape(shape);
+            vertexHit = vertexHit(rc, shape);
 
-			vertexHit = vertexHit(rc, shape);			
+            if (vertexHit) {
+                paintShapeForVertex(rc, v, shape);
+            }
+        }
+    }
 
-			if (vertexHit) {
-				paintShapeForVertex(rc, v, shape);
-			}
-		}
-	}
+    protected boolean vertexHit(RenderContext<V, E> rc, Shape s) {
+        JComponent vv = rc.getScreenDevice();
+        Rectangle deviceRectangle = null;
+        if (vv != null) {
+            Dimension d = vv.getSize();
+            deviceRectangle = new Rectangle(0, 0, d.width, d.height);
+        }
+        return rc.getMultiLayerTransformer().getTransformer(Layer.VIEW).transform(s).intersects(deviceRectangle);
+    }
 
-	protected boolean vertexHit(RenderContext<V,E> rc, Shape s) {
-		JComponent vv = rc.getScreenDevice();
-		Rectangle deviceRectangle = null;
-		if(vv != null) {
-			Dimension d = vv.getSize();
-			deviceRectangle = new Rectangle(
-					0,0,
-					d.width,d.height);
-		}
-		return rc.getMultiLayerTransformer().getTransformer(Layer.VIEW).transform(s).intersects(deviceRectangle);
-	}
+    protected void paintShapeForVertex(RenderContext<V, E> rc, V v, Shape shape) {
+        GraphicsDecorator g = rc.getGraphicsContext();
+        Paint oldPaint = g.getPaint();
+        Rectangle r = shape.getBounds();
+        float y2 = (float) r.getMaxY();
+        if (cyclic) {
+            y2 = (float) (r.getMinY() + r.getHeight() / 2);
+        }
 
-	protected void paintShapeForVertex(RenderContext<V,E> rc, V v, Shape shape) {
-		GraphicsDecorator g = rc.getGraphicsContext();
-		Paint oldPaint = g.getPaint();
-		Rectangle r = shape.getBounds();
-		float y2 = (float)r.getMaxY();
-		if(cyclic) {
-			y2 = (float)(r.getMinY()+r.getHeight()/2);
-		}
-
-		Paint fillPaint = null;
-		if(pickedState != null && pickedState.isPicked(v)) {
-			fillPaint = new GradientPaint((float)r.getMinX(), (float)r.getMinY(), backFillColor,
-					(float)r.getMinX(), y2, pickedColor, cyclic);
-		} else if(v instanceof Graph){
-			fillPaint = new GradientPaint((float)r.getMinX(), (float)r.getMinY(), backFillColor,
-					(float)r.getMinX(), y2, graphColor, cyclic);
-		} else if(v instanceof VertexInfo){
-			VertexInfo vert = (VertexInfo)v;
-			if(vert.getIsFailedVertex()){
-				fillPaint = new GradientPaint((float)r.getMinX(), (float)r.getMinY(), backFillColor,
-						(float)r.getMinX(), y2, Color.red, cyclic);
-			} else if(vert.isStartState()){				
-				fillPaint = new GradientPaint((float)r.getMinX(), (float)r.getMinY(), backFillColor,
-						(float)r.getMinX(), y2, firstStateColor, cyclic);
-			} else if(vert.getIsVisited()){
-			  if (vert.getIsCurrSeq()) {
-			    fillPaint = new GradientPaint((float)r.getMinX(), (float)r.getMinY(), backFillColor,
-			        (float)r.getMinX(), y2, visColor, cyclic);
-			  } else {
-			    fillPaint = new GradientPaint((float)r.getMinX(), (float)r.getMinY(), backFillColor,
-			        (float)r.getMinX(), y2, dispColor, cyclic);
-			  }
-			} else if(vert.getIsDisplayed()){				
-				fillPaint = new GradientPaint((float)r.getMinX(), (float)r.getMinY(), backFillColor,
-						(float)r.getMinX(), y2, dispColor, cyclic);
-			} else {
-				fillPaint = new GradientPaint((float)r.getMinX(), (float)r.getMinY(), backFillColor,
-						(float)r.getMinX(), y2, stanColor, cyclic);
-			}
-		}
-		if(fillPaint != null) {
-			g.setPaint(fillPaint);
-			g.fill(shape);
-			g.setPaint(oldPaint);
-		}
-		Paint drawPaint = rc.getVertexDrawPaintTransformer().transform(v);
-		if(drawPaint != null) {
-			g.setPaint(drawPaint);
-		}
-		Stroke oldStroke = g.getStroke();
-		Stroke stroke = rc.getVertexStrokeTransformer().transform(v);
-		if(stroke != null) {
-			g.setStroke(stroke);
-		}
-		g.draw(shape);
-		g.setPaint(oldPaint);
-		g.setStroke(oldStroke);
-	}
+        Paint fillPaint = null;
+        if (pickedState != null && pickedState.isPicked(v)) {
+            fillPaint = new GradientPaint((float) r.getMinX(), (float) r.getMinY(), backFillColor, (float) r.getMinX(),
+                            y2, pickedColor, cyclic);
+        } else if (v instanceof Graph) {
+            fillPaint = new GradientPaint((float) r.getMinX(), (float) r.getMinY(), backFillColor, (float) r.getMinX(),
+                            y2, graphColor, cyclic);
+        } else if (v instanceof VertexInfo) {
+            VertexInfo vert = (VertexInfo) v;
+            if (vert.getIsFailedVertex()) {
+                fillPaint = new GradientPaint((float) r.getMinX(), (float) r.getMinY(), backFillColor, (float) r
+                                .getMinX(), y2, Color.red, cyclic);
+            } else if (vert.isStartState()) {
+                fillPaint = new GradientPaint((float) r.getMinX(), (float) r.getMinY(), backFillColor, (float) r
+                                .getMinX(), y2, firstStateColor, cyclic);
+            } else if (vert.getIsVisited()) {
+                if (vert.getIsCurrSeq()) {
+                    fillPaint = new GradientPaint((float) r.getMinX(), (float) r.getMinY(), backFillColor, (float) r
+                                    .getMinX(), y2, visColor, cyclic);
+                } else {
+                    fillPaint = new GradientPaint((float) r.getMinX(), (float) r.getMinY(), backFillColor, (float) r
+                                    .getMinX(), y2, dispColor, cyclic);
+                }
+            } else if (vert.getIsDisplayed()) {
+                fillPaint = new GradientPaint((float) r.getMinX(), (float) r.getMinY(), backFillColor, (float) r
+                                .getMinX(), y2, dispColor, cyclic);
+            } else {
+                fillPaint = new GradientPaint((float) r.getMinX(), (float) r.getMinY(), backFillColor, (float) r
+                                .getMinX(), y2, stanColor, cyclic);
+            }
+        }
+        if (fillPaint != null) {
+            g.setPaint(fillPaint);
+            g.fill(shape);
+            g.setPaint(oldPaint);
+        }
+        Paint drawPaint = rc.getVertexDrawPaintTransformer().transform(v);
+        if (drawPaint != null) {
+            g.setPaint(drawPaint);
+        }
+        Stroke oldStroke = g.getStroke();
+        Stroke stroke = rc.getVertexStrokeTransformer().transform(v);
+        if (stroke != null) {
+            g.setStroke(stroke);
+        }
+        g.draw(shape);
+        g.setPaint(oldPaint);
+        g.setStroke(oldStroke);
+    }
 }
