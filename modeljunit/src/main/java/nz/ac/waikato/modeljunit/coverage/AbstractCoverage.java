@@ -129,14 +129,19 @@ public abstract class AbstractCoverage extends AbstractListener implements Cover
      * graph is completely built.
      */
     public int getMaximum() {
-        if (maxCoverage_ > 0 && maxCoverage_ < coverage_.size()) {
+        if (0 < maxCoverage_ && maxCoverage_ < coverage_.size()) {
             maxCoverage_ = coverage_.size();
         }
         return maxCoverage_;
     }
 
     public float getPercentage() {
-        return (100.0F * getCoverage()) / (float) getMaximum();
+        int max = getMaximum();
+        if (max == -1) {
+            return (100.0F * getCoverage()) / (getCoverage() + 100.0F);
+        } else {
+            return (100.0F * getCoverage()) / (float) max;
+        }
     }
 
     public Map<Object, Integer> getDetails() {
