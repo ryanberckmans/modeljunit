@@ -27,11 +27,11 @@ public class OptionPanelGreedy extends OptionPanelAdapter implements IAlgorithmP
     }
 
     @Override
-    public String generateCode() {
+    public String generateCode(Project project) {
         m_bufCode = new StringBuffer();
 
         // Initialize test model
-        m_bufCode.append(Indentation.indent(Parameter.getClassName() + " model = new " + Parameter.getClassName()
+        m_bufCode.append(Indentation.indent(project.getClassName() + " model = new " + project.getClassName()
                         + "();"));
         m_bufCode.append(Indentation.indent("GreedyTester tester = new GreedyTester(model);"));
         // To use random seed or not
@@ -52,14 +52,14 @@ public class OptionPanelGreedy extends OptionPanelAdapter implements IAlgorithmP
      * Initialize tester and model
      * */
     @Override
-    public void initialize(int idx) {
+    public void initialize(Project project, int idx) {
         try {
             // Initialize model test case by using the loaded model
             // Tester tester = new GreedyTester(new SimpleSet());
             Class<?> testerClass = Class.forName("nz.ac.waikato.modeljunit.GreedyTester");
             Constructor<?> con = testerClass.getConstructor(new Class[] { Class
                             .forName("nz.ac.waikato.modeljunit.FsmModel") });
-            m_tester[idx] = (GreedyTester) con.newInstance(new Object[] { TestExeModel.getModelObject() });
+            m_tester[idx] = (GreedyTester) con.newInstance(new Object[] { project.getModelObject() });
         } catch (Exception exp) {
             exp.printStackTrace();
         }

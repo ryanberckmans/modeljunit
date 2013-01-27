@@ -43,13 +43,13 @@ public class AlgorithmPanel extends JPanel implements IAlgorithmParameter {
     }
 
     /** This delegates to the generateCode method of the parameters pane. */
-    public String generateCode() {
-        return m_panelOption.generateCode();
+    public String generateCode(Project mProject) {
+        return m_panelOption.generateCode(mProject);
     }
 
     /** This delegates to the initialize method of the parameters pane. */
-    public void initialize(int idx) {
-        m_panelOption.initialize(idx);
+    public void initialize(Project project, int idx) {
+        m_panelOption.initialize(project, idx);
     }
 
     /** This delegates to the getTester method of the parameters pane. */

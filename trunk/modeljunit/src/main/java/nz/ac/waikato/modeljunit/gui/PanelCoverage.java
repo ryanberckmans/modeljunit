@@ -60,14 +60,17 @@ public class PanelCoverage extends PanelAbstract {
     private static PanelCoverage m_panel;
 
     private JProgressBar mProgress;
+    
+    private ModelJUnitGUI mGUI;
 
-    public static PanelCoverage getInstance() {
+    public static PanelCoverage getInstance(ModelJUnitGUI gui) {
         if (m_panel == null)
-            m_panel = new PanelCoverage();
+            m_panel = new PanelCoverage(gui);
         return m_panel;
     }
 
-    private PanelCoverage() {
+    private PanelCoverage(ModelJUnitGUI gui) {
+        mGUI = gui;
         this.setBackground(Color.WHITE);
         this.setDoubleBuffered(true);
         mProgress = new JProgressBar(0, 100);
@@ -120,7 +123,7 @@ public class PanelCoverage extends PanelAbstract {
                 g2.draw(new Line2D.Float(LEFT_SPACE, nScalePos, LEFT_SPACE + SCALE_SHORT_LENGTH, nScalePos));
         }
         // Scale X
-        final int nWalkLength = TestExeModel.getWalkLength();
+        final int nWalkLength = mGUI.getProject().getWalkLength();
 
         if (this.m_arrayStages == null)
             computeStages(nWalkLength);
@@ -145,12 +148,10 @@ public class PanelCoverage extends PanelAbstract {
                 arrayTScaleYPos[i] = (int) ((double) AXIS_HEIGHT - ((double) AXIS_Y_LENGTH * m_covT.get(i) / 100.0));
                 arrayTPScaleYPos[i] = (int) ((double) AXIS_HEIGHT - ((double) AXIS_Y_LENGTH * m_covTP.get(i) / 100.0));
                 arrayAScaleYPos[i] = (int) ((double) AXIS_HEIGHT - ((double) AXIS_Y_LENGTH * m_covA.get(i) / 100.0));
-                //        System.out.println("DEBUG: "+arraySScaleYPos[i]+", "+arrayTScaleYPos[i]+", "+arrayTPScaleYPos[i]+", "+arrayAScaleYPos[i]);
             }
             // Draw scale text
             g2.drawString(Integer.toString(m_arrayStages[i]), nScaleposX, nScaleposY + 16);
         }
-        //System.out.println(isCoverageDrawable(i));
         if (isCoverageDrawable(1)) {
             arraySScaleYPos[0] = arrayTScaleYPos[0] = arrayTPScaleYPos[0] = arrayAScaleYPos[0] = AXIS_HEIGHT;
             arrayScaleXPos[0] = LEFT_SPACE;

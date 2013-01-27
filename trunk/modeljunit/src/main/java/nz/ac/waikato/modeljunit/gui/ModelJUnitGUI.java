@@ -71,6 +71,8 @@ import org.objectweb.asm.ClassReader;
  * @author Gian Perrone <gian@waikato.ac.nz>
  **/
 public class ModelJUnitGUI implements Runnable {
+    public static final String BUILTIN = "Builtin Examples";
+
     public static final String MODELJUNIT_VERSION = "2.0";
 
     private JFrame mAppWindow;
@@ -114,12 +116,11 @@ public class ModelJUnitGUI implements Runnable {
     }
 
     private void initialize() {
-        mProject = new Project();
-        Project.setInstance(mProject);
+        mProject = new Project(BUILTIN, "nz.ac.waikato.modeljunit.examples.FSM");
         mGraphCurrent = false;
 
         mVisualisation = PanelJUNGVisualisation.getGraphVisualisationInstance();
-        mCoverage = PanelCoverage.getInstance();
+        mCoverage = PanelCoverage.getInstance(this);
         mResultViewer = PanelResultViewer.getResultViewerInstance();
         mTestDesign = PanelTestDesign.getTestDesignPanelInstance(this);
         mEfficiencyGraphs = PanelEfficiencyGraph.getInstance();
@@ -260,7 +261,8 @@ public class ModelJUnitGUI implements Runnable {
         final JList examples = new JList(exampleModel);
 
         for (int i = 0; i < ExampleModels.EXAMPLE_MODELS.length; i++) {
-            exampleModel.addElement(ExampleModels.EXAMPLE_MODELS[i]);
+            String[] example = ExampleModels.EXAMPLE_MODELS[i].split(":");
+            exampleModel.addElement(example[1] + " - " +  example[2]);
         }
 
         pane.add(new JScrollPane(examples), c);
@@ -269,10 +271,10 @@ public class ModelJUnitGUI implements Runnable {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     int index = examples.locationToIndex(e.getPoint());
-                    String example = "" + exampleModel.get(index);
+                    String example = ExampleModels.EXAMPLE_MODELS[index];
                     example = example.split(":")[0];
                     mSplash.setVisible(false);
-                    loadExampleModel(example);
+                    loadModel(BUILTIN, example);
                     boolean[] coverage = { true, true, false, false, false };
                     Parameter.setCoverageOption(coverage);
                     mTestDesign.updatePanelSettings();
@@ -306,12 +308,13 @@ public class ModelJUnitGUI implements Runnable {
         mAppWindow.setVisible(true);
         mAppWindow.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-        Project pr = new Project();
+        System.out.println("@@@@@@@@@@@@@@@@@ RUN @@@@@@@@@@@@@@@@@@@");
+        Project pr = new Project(BUILTIN, "nz.ac.waikato.modeljunit.examples.FSM");
         pr.setName("Test Project");
         pr.setFileName(new File("test.mju"));
         //pr.setProperty("foobar",new Integer(123));
         //pr.setProperty("test","hello, world");
-        Project.save(pr);
+        pr.save();
     }
 
     /**
@@ -334,9 +337,9 @@ public class ModelJUnitGUI implements Runnable {
 
             Parameter.setModelChooserDirectory(f.getParent());
             // Reset the existing model
-            TestExeModel.reset(); //TODO: Do this later when the load button is pressed
-
-            mProject.setModelFile(f);
+//            mProject.reset(); //TODO: Do this later when the load button is pressed
+//
+//            mProject.setModelFile(f);
             return f.getAbsolutePath();
         } else {
             return null;
@@ -344,7 +347,7 @@ public class ModelJUnitGUI implements Runnable {
     }
 
     /**
-     * Load one of the example models.
+     * Loads a model. If the model is successfully loaded, then a new project is created and becomes the current project.
      * 
      * We assume these are inside the current .jar file or package, so the example model can be loaded using the current
      * class loader.
@@ -352,65 +355,15 @@ public class ModelJUnitGUI implements Runnable {
      * @param className
      *            the short name (without "nz.ac.waikato.modeljunit.examples") of the model to load.
      */
-    public void loadExampleModel(String className) {
-        TestExeModel.reset();
-        String packageName = "nz.ac.waikato.modeljunit.examples";
-        Parameter.setClassName(packageName + "." + className);
-        Parameter.setPackageLocation("Builtin Examples");
-        System.out.println("Parameter.getClassName: " + Parameter.getClassName());
-        System.out.println("Parameter.getPackageLocation: " + Parameter.getPackageLocation());
-        TestExeModel.setModelClassLoader(this.getClass().getClassLoader());
-        if (TestExeModel.loadModelClassFromFile()) {
-            System.out.println("SUCCESS: loaded example model " + className);
-        } else {
-            throw new RuntimeException("Error Loading Model - No @Action annotations!");
+    public void loadModel(String jarURL, String className) {
+        try {
+            mProject = new Project(jarURL, className);
+        } catch (Exception e) {
+            ErrorMessage.DisplayErrorMessage("Error loading model", e.getLocalizedMessage());
         }
-
-        String cName = Parameter.getClassName();
+        System.out.println("SUCCESS: loaded model " + className);
+        String cName = mProject.getClassName();
         displayNewModel(cName);
-    }
-
-    /**
-     * Loads a model from a jar file.
-     * 
-     * @param f
-     *            Path of the jar file
-     * @return errmsg or null if no error
-     * @throws IOException
-     * @throws FileNotFoundException
-     */
-    public String loadModel(File f, String cName) throws IOException, FileNotFoundException {
-        String errmsg = null;
-        Parameter.setPackageLocation(f.getAbsolutePath());
-        // Load model from file and initialize the model object
-        String strPL = "file:/" + Parameter.getPackageLocation();
-
-        System.out.println("**** Loading model: PL: " + strPL);
-
-        ClassLoader jarClassLoader = null;
-        // Create the class loader by using the given URL
-        if (strPL != null && strPL.length() > 0) {
-            try {
-                jarClassLoader = URLClassLoader.newInstance(new URL[] { new URL(strPL) });
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        TestExeModel.setModelClassLoader(jarClassLoader);
-        if (TestExeModel.loadModelClassFromFile()) {
-            System.out.println("SUCCESS: loaded model");
-        } else {
-            errmsg = "Invalid model class: no @Action methods.";
-        }
-
-        if (errmsg == null) {
-            // We have successfully loaded a new model
-            //initializeTester(0);
-            //initializeTester(1);
-            //m_butExternalExecute.setEnabled(true);
-            displayNewModel(cName);
-        }
-        return errmsg;
     }
 
     public void displayNewModel(String cName) {
@@ -419,7 +372,7 @@ public class ModelJUnitGUI implements Runnable {
         mProject.setName(cName);
 
         //Tester tester = new Tester(TestExeModel.getModelObject());
-        Model mod = new Model(TestExeModel.getModelObject());
+        Model mod = new Model(mProject.getModelObject());
 
         ModelJUnitGUI.setModel(mod);
 
@@ -454,15 +407,15 @@ public class ModelJUnitGUI implements Runnable {
 
             if (opening) {
                 mProject = Project.load(f);
-                Project.setInstance(mProject);
 
                 Parameter.setModelChooserDirectory(mProject.getModelFile().getParent());
                 // Reset the existing model
-                TestExeModel.reset(); //TODO: Do this later when the load button is pressed
+//                mProject.reset(); //TODO: Do this later when the load button is pressed
 
                 mTestDesign.updatePanelSettings();
                 //TODO: Fix this so it loads the model properly
             } else {
+                // Saving the project
                 if (!wholePath.endsWith("." + fileExt)) {
                     wholePath += "." + fileExt;
                     f = new File(wholePath);
@@ -491,7 +444,7 @@ public class ModelJUnitGUI implements Runnable {
             displayProjectFileChooser(false);
         }
 
-        Project.save(mProject);
+        mProject.save();
     }
 
     /** Display the window that permits animation of models. **/
@@ -551,7 +504,7 @@ public class ModelJUnitGUI implements Runnable {
         efficiencyGraphs.add(mEfficiencyGraphs, BorderLayout.CENTER);
         efficiencyGraphs.add(mEfficiencyGraphs.getProgress(), BorderLayout.PAGE_END);
         efficiencyGraphs.setVisible(true);
-        mEfficiencyGraphs.runClass();
+        mEfficiencyGraphs.runClass(mProject);
     }
 
     public static void setModel(Model model) {
@@ -612,9 +565,9 @@ public class ModelJUnitGUI implements Runnable {
         // Draw line chart in coverage panel
         if (mTestDesign.isLineChartDrawable()) {
             mCoverage.clearCoverages();
-            int[] stages = mCoverage.computeStages(TestExeModel.getWalkLength());
+            int[] stages = mCoverage.computeStages(mProject.getWalkLength());
 
-            mTestDesign.initializeTester(0);
+            mTestDesign.initializeTester(mProject, 0);
             Tester tester = TestExeModel.getTester(0);
             /* tester.buildGraph();*/
             displayCoverageWindow();
@@ -633,8 +586,8 @@ public class ModelJUnitGUI implements Runnable {
             // Run test several times to draw line chart
             for (int i = 0; i < stages.length; i++) {
                 tester.generate(stages[0]);
-                System.out.println("Progress: " + stages[i] + "/" + TestExeModel.getWalkLength());
-                mCoverage.setProgress(stages[i], TestExeModel.getWalkLength());
+                System.out.println("Progress: " + stages[i] + "/" + mProject.getWalkLength());
+                mCoverage.setProgress(stages[i], mProject.getWalkLength());
                 // Update the line chart and repaint
                 mCoverage.addStateCoverage((int) coverage[0].getPercentage());
                 mCoverage.addTransitionCoverage((int) coverage[1].getPercentage());
@@ -649,7 +602,7 @@ public class ModelJUnitGUI implements Runnable {
             }
         }
         // To reset tester, it solve the problem that coverage matrix incorrect.
-        mTestDesign.initializeTester(0);
+        mTestDesign.initializeTester(mProject, 0);
         //reset the visualisation panel
         mVisualisation.resetRunTimeInformation();
         //Try to fully explore the complete graph before running the test explorations
@@ -661,7 +614,7 @@ public class ModelJUnitGUI implements Runnable {
         mResultViewer.resetRunTimeInformation();
 
         // Run test and display test output
-        TestExeModel.runTestAuto();
+        TestExeModel.runTestAuto(mProject);
         // Finish the visualisation panel. This effectively starts the animation.    
         mVisualisation.updateGUI(true);
     }
@@ -676,9 +629,9 @@ public class ModelJUnitGUI implements Runnable {
                 return "";
             }
         };
-
+        
         worker.execute();
-
+        
         //runClass();
 
         /*CoverageHistory hist = new CoverageHistory(new TransitionCoverage(), 1);

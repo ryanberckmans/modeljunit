@@ -7,8 +7,9 @@ package nz.ac.waikato.modeljunit.gui;
 
 import java.awt.Color;
 
-import nz.ac.waikato.modeljunit.RandomTester;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import nz.ac.waikato.modeljunit.RandomTester;
 
 /*
  * Parameter.java
@@ -21,27 +22,12 @@ import javax.xml.bind.annotation.XmlRootElement;
  * configurations within a project.
  */
 
-public @XmlRootElement
-class Parameter {
+@XmlRootElement
+public class Parameter {
     public static final String DEFAULT_DIRECTORY = System.getProperty("user.dir");
 
     // Number of coverage options
     public static final int NUM_COVERAGE = 5;
-
-    /** The path to the top-level package directory of the model. */
-    private static String m_strPackageLocation;
-
-    /** The path to the top-level package directory of the model. */
-    public static String getPackageLocation() {
-        return m_strPackageLocation;
-    }
-
-    /** Set the path to the top-level package directory of the model. */
-    public static void setPackageLocation(String location) {
-        System.out.println("SetPackageLocation to " + location);
-        m_strPackageLocation = location;
-    }
-
     /**
      * Testing parameters, dot graph
      * */
@@ -101,25 +87,6 @@ class Parameter {
 
     public static void setFailureVerbosity(boolean verb) {
         m_bFailureVerbosity = verb;
-    }
-
-    /**
-     * Class name, includes the Package and the name of the class
-     */
-    private static String m_strClassName;
-
-    public static String getClassName() {
-        return m_strClassName;
-    }
-
-    /**
-     * Class name, includes the Package and the name of the class
-     * 
-     * @param classname
-     */
-    public static void setClassName(String classname) {
-        System.out.println("SetClassName to " + classname);
-        m_strClassName = classname;
     }
 
     /**
@@ -210,8 +177,8 @@ class Parameter {
      * 
      * @return if user can use the model to test return true otherwise return false
      */
-    public static boolean isTestRunnable(boolean bShowErrMsg) {
-        if (m_strClassName == null || !TestExeModel.isModelLoaded() || m_strClassName.length() == 0) {
+    public static boolean isTestRunnable(Project mProject, boolean bShowErrMsg) {
+        if (mProject.getClassName() == null || !mProject.isModelLoaded() || mProject.getClassName().length() == 0) {
             if (bShowErrMsg)
                 ErrorMessage.DisplayErrorMessage("NO MODEL", "No model loaded!");
             return false;
@@ -243,7 +210,7 @@ class Parameter {
 
     //----------------------Override toString----------------------
     public String toString() {
-        return "class name: " + m_strClassName + ", \nAlgorithm: " + m_strAlgorithmName + ", \nCoverage: "
+        return "Algorithm: " + m_strAlgorithmName + ", \nCoverage: "
                         + m_bCoverageOption[0] + ", " + m_bCoverageOption[1] + ", " + m_bCoverageOption[2] + ".";
     }
 }

@@ -68,11 +68,11 @@ public class OptionPanelLookahead extends OptionPanelAdapter implements IAlgorit
     }
 
     @Override
-    public String generateCode() {
+    public String generateCode(Project project) {
         StringBuffer result = new StringBuffer();
 
         // Initialize test model
-        result.append(Indentation.indent(Parameter.getClassName() + " model = new " + Parameter.getClassName() + "();"));
+        result.append(Indentation.indent(project.getClassName() + " model = new " + project.getClassName() + "();"));
         result.append(Indentation.indent("LookaheadTester tester = new LookaheadTester(model);"));
 
         // Calculate the Lookahead depth
@@ -91,14 +91,14 @@ public class OptionPanelLookahead extends OptionPanelAdapter implements IAlgorit
     }
 
     @Override
-    public void initialize(int idx) {
+    public void initialize(Project project, int idx) {
         try {
             // Initialize model test case by using the loaded model
             // Tester tester = new GreedyTester(new SimpleSet());
             Class<?> testerClass = Class.forName("nz.ac.waikato.modeljunit.LookaheadTester");
             Constructor<?> con = testerClass.getConstructor(new Class[] { Class
                             .forName("nz.ac.waikato.modeljunit.FsmModel") });
-            m_tester[idx] = (LookaheadTester) con.newInstance(new Object[] { TestExeModel.getModelObject() });
+            m_tester[idx] = (LookaheadTester) con.newInstance(new Object[] { project.getModelObject() });
         } catch (Exception exp) {
             exp.printStackTrace();
         }

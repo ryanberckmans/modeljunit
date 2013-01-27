@@ -41,12 +41,12 @@ public class OptionPanelAdapter extends JPanel implements IAlgorithmParameter {
     }
 
     @Override
-    public String generateCode() {
+    public String generateCode(Project project) {
         return null;
     }
 
     @Override
-    public void initialize(int idx) {
+    public void initialize(Project project, int idx) {
     }
 
     public String generateImportLab() {

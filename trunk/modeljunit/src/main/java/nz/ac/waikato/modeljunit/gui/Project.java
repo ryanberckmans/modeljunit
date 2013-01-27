@@ -19,18 +19,25 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 package nz.ac.waikato.modeljunit.gui;
 
-import java.util.Map;
-import java.util.HashMap;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.LinkedList;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+
+import nz.ac.waikato.modeljunit.Action;
+import nz.ac.waikato.modeljunit.FsmModel;
 
 /**
  * A container class for projects.
@@ -42,33 +49,172 @@ import javax.xml.bind.annotation.XmlRootElement;
  * 
  * @author Gian Perrone <gian@waikato.ac.nz>
  **/
-public @XmlRootElement
-class Project {
-    private String mProjectName;
-    /**
-     * Not used yet. TODO: make this a map from configuration name to a Configuration object (or Parameter object), to
-     * allow multiple configurations with different test generation options.
-     */
-    private Map<String, String> mConfiguration;
+
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Project {
+    private String mProjectName; 
+    private String mPackageLocation;
+    /** Class name, includes the Package and the name of the class. */
+    private String mClassName;
+    /** The name of the file the project was loaded from. */
     private File mFile;
-    private boolean mSaved;
     /** Time when this project was last modified. */
     private Date mLastModified;
-    private Parameter mParameter;
     private File mModelFile;
     /** This should be part of the configuration. */
     private int mAlgorithm;
-    /** The singleton object for the current project. */
-    private static Project mProject;
+    private int mWalkLength;
 
-    /** Create a new (empty) project, untitled and unsaved **/
+    @XmlTransient
+    private boolean mSaved;
+    @XmlTransient 
+    private ClassLoader mModelClassLoader;
+    @XmlTransient
+    private ArrayList<Method> mArrayMethod = new ArrayList<Method>();
+    @XmlTransient
+    private IAlgorithmParameter mAlgo;
+    @XmlTransient
+    private Class<?> mModelClass;
+    @XmlTransient
+    private FsmModel mModelObject;
+    /** The path to the jar file that contains the model, or {@link nz.ac.waikato.modeljunit.gui.ModelJUnitGUI#BUILTIN} for an example model. */
+    
+    /**
+     * Should only be used by JAXB, when loading a project.
+     */
     public Project() {
         mFile = null;
         mSaved = false;
         mProjectName = "untitled";
-        mConfiguration = new HashMap<String, String>();
-        mParameter = new Parameter();
         mModelFile = null;
+    }
+    
+    /** Create a new (empty) project, untitled and unsaved.  
+     * @param jarName The jar file containing the model or {@link nz.ac.waikato.modeljunit.gui.ModelJUnitGUI#BUILTIN}
+     * @param className Full class name of the model
+     **/
+    public Project(String jarName, String className) {
+        this();
+        setPackageLocation(jarName);
+        setClassName(className);
+    }
+
+    public void setModelClassLoader(ClassLoader cl) {
+        if (mModelClassLoader != null) {
+            throw new IllegalStateException("Cannot set mModelClassLoader twice.");
+        } else {
+            mModelClassLoader = cl;
+        }
+    }
+
+    public ClassLoader getModelClassLoader() {
+        return mModelClassLoader;
+    }
+
+    /**
+     * Sets the class name and loads that class and an instance of it.
+     * @param cName
+     */
+    public void setClassName(String cName) {
+        if (mClassName != null) {
+            throw new IllegalStateException("Cannot set mClassName twice.");
+        } else {
+            mClassName = cName;
+            if (getModelClassLoader() == null) {
+                throw new IllegalStateException("No class loader or jar file specified.");
+            }
+            try {
+                Class<?> clazz = getModelClassLoader().loadClass(cName);
+                if (clazz == null) {
+                    throw new RuntimeException("Error loading model " + cName);
+                }
+                setModelClass(clazz);
+                nz.ac.waikato.modeljunit.FsmModel model = (nz.ac.waikato.modeljunit.FsmModel) getModelClass().newInstance();
+                if (model == null) {
+                    throw new RuntimeException("Error instantiating model " + cName); 
+                }
+                setModelObject(model);
+                int actionNumber = 0;
+                for (Method method : getModelClass().getMethods()) {
+                    if (method.isAnnotationPresent(Action.class)) {
+                        actionNumber++;
+                        addMethod(method);
+                    }
+                }
+                System.out.println("Added "+actionNumber+" actions.");
+            } catch (ClassCastException ex) {
+                ErrorMessage.DisplayErrorMessage("Wrong class (ClassCastException", "Please select FsmModel class."
+                                + "\n Error in TestExeModel::loadModelClassFromFile: " + ex.getLocalizedMessage());
+            } catch (InstantiationException ie) {
+                ErrorMessage.DisplayErrorMessage("Model not initialized (InstantiationException)",
+                                "Can not initialize model." + "\n Error in TestExeModel::loadModelClassFromFile: "
+                                                + ie.getLocalizedMessage());
+            } catch (IllegalAccessException iae) {
+                ErrorMessage.DisplayErrorMessage("Cannot access model (IllegalAccessException)",
+                                "Can not access model class." + "\n Error in TestExeModel::loadModelClassFromFile: "
+                                                + iae.getLocalizedMessage());
+            } catch (ClassNotFoundException ex) {
+                ErrorMessage.DisplayErrorMessage("Cannot find model class (ClassNotFoundException)",
+                                "Can not access model class." + "\n Error in TestExeModel::loadModelClassFromFile: "
+                                                + ex.getLocalizedMessage());
+            }
+        }
+    }
+    
+    public String getClassName() {
+        return mClassName;
+    }
+
+    public void setAlgorithm(IAlgorithmParameter algo) {
+        mAlgo = algo;
+    }
+    
+    public IAlgorithmParameter getAlgo() {
+        return mAlgo;
+    }
+
+
+    /** The path to the top-level package directory of the model. */
+    public String getPackageLocation() {
+        return mPackageLocation;
+    }
+
+    /** Set the path to the top-level package directory of the model. */
+    public void setPackageLocation(String location) {
+        System.out.println("SetPackageLocation to " + location);
+        mPackageLocation = location;
+        if (location.equals(ModelJUnitGUI.BUILTIN)) {
+            mModelClassLoader = this.getClass().getClassLoader();
+        } else {
+            try {
+                mModelClassLoader = URLClassLoader.newInstance(new URL[] { new URL(location) });
+            } catch (MalformedURLException e) {
+                throw new RuntimeException("Cannot create class loader for jar file: " + location, e);
+            }
+        }
+    }
+
+    public void setModelClass(Class<?> mModelClass) {
+        this.mModelClass = mModelClass;
+    }
+
+    public void setModelObject(FsmModel mModelObject) {
+        this.mModelObject = mModelObject;
+    }
+
+    public Class<?> getModelClass() {
+        return mModelClass;
+    }
+
+    public FsmModel getModelObject() {
+        return mModelObject;
+    }
+
+    public boolean isModelLoaded() {
+        if (mModelClass == null || mModelObject == null)
+            return false;
+        return true;
     }
 
     /** Update the project name **/
@@ -82,6 +228,20 @@ class Project {
         return mProjectName;
     }
 
+    // Add an action method into list
+    public void addMethod(Method m) {
+        mArrayMethod.add(m);
+    }
+
+    public int getMethodCount() {
+        return mArrayMethod.size();
+    }
+
+    public void reset() {
+        mArrayMethod.clear();
+        //resetModelToNull();
+    }
+    
     public File getModelFile() {
         return mModelFile;
     }
@@ -97,14 +257,6 @@ class Project {
         mLastModified = new Date();
     }
 
-    public Map<String, String> getConfiguration() {
-        return mConfiguration;
-    }
-
-    public void setConfiguration(Map<String, String> strings) {
-        mConfiguration = strings;
-    }
-
     /** Read the modified flag. **/
     public boolean isModified() {
         return !mSaved;
@@ -118,16 +270,6 @@ class Project {
         mLastModified = lastModified;
     }
 
-    /** Set a configuration value. **/
-    public void setProperty(String key, String value) {
-        mConfiguration.put(key, value);
-    }
-
-    /** Get a configuration value **/
-    public String getProperty(String key) {
-        return mConfiguration.get(key);
-    }
-
     /** Set a filename for the project to save to. **/
     public void setFileName(File file) {
         mFile = file;
@@ -136,14 +278,6 @@ class Project {
     /** Get the current filename for the project. **/
     public File getFileName() {
         return mFile;
-    }
-
-    public Parameter getParameter() {
-        return mParameter;
-    }
-
-    public void setParameter(Parameter p) {
-        mParameter = p;
     }
 
     public String getVersion() {
@@ -189,11 +323,11 @@ class Project {
     }
 
     public int getWalkLength() {
-        return TestExeModel.getWalkLength();
+        return mWalkLength;
     }
 
     public void setWalkLength(int len) {
-        TestExeModel.setWalkLength(len);
+        mWalkLength = len;
     }
 
     public boolean getGenerateGraph() {
@@ -212,20 +346,18 @@ class Project {
      * 
      * @return true if writing the file succeeded, false otherwise
      **/
-    public static boolean save(Project project) {
-        if (project == null)
-            throw new RuntimeException("Cannot save a null project");
-        if (project.getFileName() == null)
+    public boolean save() {
+        if (getFileName() == null)
             throw new RuntimeException("Filename for current project is null");
 
         try {
-            FileOutputStream fo = new FileOutputStream(project.getFileName());
+            FileOutputStream fo = new FileOutputStream(getFileName());
             JAXBContext context = JAXBContext.newInstance(Project.class);
 
             Marshaller m = context.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
-            m.marshal(project, fo);
+            m.marshal(this, fo);
 
             fo.close();
         } catch (Exception e) {
@@ -248,7 +380,7 @@ class Project {
             Unmarshaller m = context.createUnmarshaller();
 
             result = (Project) m.unmarshal(file);
-
+            
             if (result == null)
                 throw new RuntimeException("Error:  Could not load project from file");
         } catch (Exception e) {
@@ -259,12 +391,20 @@ class Project {
         return result;
     }
 
-    public static void setInstance(Project pr) {
-        mProject = pr;
+    @Override
+    public String toString() {
+        return "*** PROJECT NAME: " + getName() + "\n" +
+                        "*** FILENAME: " + getFileName() + "\n" + 
+                        "*** MODEL FILE: " + getModelFile() + "\n" + 
+                        "*** VERSION: " + getVersion() + "\n" + 
+                        "*** RESET PROBABILITY: " + getResetProbability() + "\n" + 
+                        "*** WALK LENGTH: " + getWalkLength() + "\n" + 
+                        "*** FAILURE VERBOSITY: " + getFailureVerbosity() + "\n" + 
+                        "*** GENERATE GRAPH: " + getGenerateGraph() + "\n" +  
+                        "*** HASHCODE: " + this.hashCode() + "\n" + 
+                        "*** MODEL OBJECT: " + getModelObject() + "\n" +
+                        "*** CLASS NAME: " + getClassName() + "\n" +
+                        "*** CLASS LOADER: " + getModelClassLoader() + "\n" + 
+                        "*** METHODS: " + mArrayMethod.size() + "\n"; 
     }
-
-    public static Project getInstance() {
-        return mProject;
-    }
-
 }
