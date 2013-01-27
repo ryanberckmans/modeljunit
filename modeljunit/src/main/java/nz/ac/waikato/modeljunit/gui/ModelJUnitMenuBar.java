@@ -172,8 +172,6 @@ public class ModelJUnitMenuBar extends JMenuBar {
         item.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 mParent.runModel();
-                //TestExeModel.runTestAuto();
-
             }
         });
 
@@ -192,11 +190,12 @@ public class ModelJUnitMenuBar extends JMenuBar {
         // ----------------- Examples ------------------
         for (int i = 0; i < ExampleModels.EXAMPLE_MODELS.length; i++) {
             final String modelName = ExampleModels.EXAMPLE_MODELS[i];
-            item = new JMenuItem(modelName.split(":")[0]);
-            item.setToolTipText(modelName.split(":")[1]);
+            item = new JMenuItem(modelName.split(":")[1]);
+            item.setToolTipText(modelName.split(":")[2]);
+            item.setName(modelName.split(":")[1]);
             item.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    mParent.loadExampleModel(modelName.split(":")[0]);
+                    mParent.loadModel(ModelJUnitGUI.BUILTIN, modelName.split(":")[0]);
                 }
             });
             mRun.add(item);

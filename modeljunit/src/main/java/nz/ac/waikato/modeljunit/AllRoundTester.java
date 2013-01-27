@@ -36,10 +36,10 @@ public class AllRoundTester extends Tester
   /**
    * Allows you to add a tester
    */
-  public AllRoundTester(Tester testr)
+  public AllRoundTester(Tester tester)
   {
-    super(testr.getModel());
-    test = testr;
+    super(tester.getModel());
+    test = tester;
     state = test.addCoverageMetric(new StateCoverage());
     loopTolerance = 1;
   }

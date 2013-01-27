@@ -252,19 +252,19 @@ public class PanelEfficiencyGraph extends PanelAbstract {
         redrawGraph();
     }
 
-    public void runClass() {
+    public void runClass(Project project) {
         CoverageHistory[] coverage = new CoverageHistory[4];
         coverage[0] = new CoverageHistory(new TransitionCoverage(), 1);
         coverage[1] = new CoverageHistory(new TransitionCoverage(), 1);
         coverage[2] = new CoverageHistory(new TransitionCoverage(), 1);
         coverage[3] = new CoverageHistory(new TransitionCoverage(), 1);
 
-        Tester randomTester = constructRandomTester(coverage[0]);
-        Tester greedyTester = constructGreedyTester(coverage[1]);
-        Tester lookaheadTester = constructLookaheadTester(coverage[2]);
-        Tester quickTester = constructQuickTester(coverage[3]);
+        Tester randomTester = constructRandomTester(project, coverage[0]);
+        Tester greedyTester = constructGreedyTester(project, coverage[1]);
+        Tester lookaheadTester = constructLookaheadTester(project, coverage[2]);
+        Tester quickTester = constructQuickTester(project, coverage[3]);
 
-        setMaximumCoverage();
+        setMaximumCoverage(project);
 
         // Run test several times to draw line chart
         int[] stages = computeStages(WALK_LENGTH);
@@ -289,48 +289,46 @@ public class PanelEfficiencyGraph extends PanelAbstract {
             }
         }
 
-        writeHistoryToFile(coverage);
+        writeHistoryToFile(project, coverage);
     }
 
-    public Tester constructRandomTester(CoverageMetric metric) {
-        RandomTester tester = new RandomTester(loadModelClass());
+    public Tester constructRandomTester(Project project, CoverageMetric metric) {
+        RandomTester tester = new RandomTester(loadModelClass(project));
         tester.addCoverageMetric(metric);
         return tester;
     }
 
-    public Tester constructGreedyTester(CoverageMetric metric) {
-        GreedyTester tester = new GreedyTester(loadModelClass());
+    public Tester constructGreedyTester(Project project, CoverageMetric metric) {
+        GreedyTester tester = new GreedyTester(loadModelClass(project));
         tester.addCoverageMetric(metric);
         return tester;
     }
 
-    public Tester constructLookaheadTester(CoverageMetric metric) {
-        LookaheadTester tester = new LookaheadTester(loadModelClass());
+    public Tester constructLookaheadTester(Project project, CoverageMetric metric) {
+        LookaheadTester tester = new LookaheadTester(loadModelClass(project));
         tester.addCoverageMetric(metric);
         //    tester.setDepth(100);
         tester.setMaxLength(WALK_LENGTH);
         return tester;
     }
 
-    public Tester constructQuickTester(CoverageMetric metric) {
-        QuickTester tester = new QuickTester(loadModelClass());
+    public Tester constructQuickTester(Project project, CoverageMetric metric) {
+        QuickTester tester = new QuickTester(loadModelClass(project));
         tester.addCoverageMetric(metric);
         return tester;
     }
 
-    private Model loadModelClass() {
-        TestExeModel.reset();
-
-        if (TestExeModel.loadModelClassFromFile()) {
-            System.out.println("SUCCESS: loaded model " + Parameter.getClassName());
-        } else {
-            throw new RuntimeException("Error Loading Model - No @Action annotations!");
-        }
-        return new Model(TestExeModel.getModelObject());
+    /**
+     * Create a new instance of the model from an existing project
+     * @param project
+     * @return a non-null model
+     */
+    private Model loadModelClass(Project project) {
+        return new Model(TestExeModel.createNewModelInstance(project));
     }
 
-    private void setMaximumCoverage() {
-        GreedyTester tester = new GreedyTester(loadModelClass());
+    private void setMaximumCoverage(Project project) {
+        GreedyTester tester = new GreedyTester(loadModelClass(project));
         CoverageMetric metric = new TransitionCoverage();
         tester.addCoverageMetric(metric);
         int i = 1;
@@ -341,12 +339,12 @@ public class PanelEfficiencyGraph extends PanelAbstract {
         mMaximum = metric.getMaximum();
     }
 
-    public void writeHistoryToFile(CoverageHistory[] coverage) {
+    public void writeHistoryToFile(Project project, CoverageHistory[] coverage) {
         try {
             File f = new File("EfficiencyOutput.csv");
             PrintWriter w = new PrintWriter(new FileOutputStream(f));
 
-            w.println(Parameter.getClassName() + " Transition Coverage History");
+            w.println(project.getClassName() + " Transition Coverage History");
             w.println();
             w.println("Random Tester: ");
             w.println(coverage[0].toCSV());

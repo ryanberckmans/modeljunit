@@ -40,6 +40,7 @@ public class ProjectDialog extends JDialog {
     private JLabel mModelInfoLabel;
     private JTextField mModelClassName;
     private JButton createButton;
+    private String mJarName = null;
 
     public ProjectDialog(ModelJUnitGUI parent, Project... project) {
         super(parent.getFrame(), "Edit ModelJUnit Project", true);
@@ -70,12 +71,10 @@ public class ProjectDialog extends JDialog {
 
         browseButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String jarName = mParent.displayFileChooser();
-
-                mModelJARName.setText("<html><em>" + jarName + "&nbsp;</em></html>");
+                mJarName = mParent.displayFileChooser();
+                mModelJARName.setText("<html><em>" + mJarName + "&nbsp;</em></html>");
                 pack();
-                if (jarName != null) {
-                    Parameter.setPackageLocation(jarName);
+                if (mJarName != null) {
                     mModelInfoLabel.setEnabled(true);
                     mModelClassName.setEnabled(true);
                     createButton.setEnabled(true);
@@ -112,22 +111,9 @@ public class ProjectDialog extends JDialog {
         createButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
-                //XXX: Create project object and notify parent
-
-                String packagePath = mModelClassName.getText();
-                packagePath = packagePath.replace(".class", "").replace("/", ".").replace("\\", ".").trim();
-                Parameter.setClassName(packagePath);
-                String classPath = Parameter.getPackageLocation()/*.replace(".jar", "") + "/" + Parameter.getClassName()*/;
-                System.out.println("DEBUG: Full model path: " + classPath);
-                File f = new File(classPath);
-                String errmsg = null;
-                try {
-                    errmsg = mParent.loadModel(f, Parameter.getClassName());
-                } catch (FileNotFoundException e1) {
-                    System.out.println("ERROR: " + errmsg);
-                } catch (IOException e1) {
-                    System.out.println("ERROR: " + errmsg);
-                }
+                String cName = mModelClassName.getText();
+                cName = cName.replace(".class", "").replace("/", ".").replace("\\", ".").trim();
+                mParent.loadModel("file:/" + mJarName, cName);
             }
         });
 

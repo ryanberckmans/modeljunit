@@ -80,11 +80,11 @@ public class OptionPanelQuickWalk extends OptionPanelAdapter implements IAlgorit
     }
 
     @Override
-    public String generateCode() {
+    public String generateCode(Project project) {
         StringBuffer result = new StringBuffer();
 
         // Initialize test model
-        result.append(Indentation.indent(Parameter.getClassName() + " model = new " + Parameter.getClassName() + "();"));
+        result.append(Indentation.indent(project.getClassName() + " model = new " + project.getClassName() + "();"));
         result.append(Indentation.indent("QuickTester tester = new QuickTester(model);"));
 
         // Calculate the Quick Walk max depth
@@ -103,13 +103,13 @@ public class OptionPanelQuickWalk extends OptionPanelAdapter implements IAlgorit
     }
 
     @Override
-    public void initialize(int idx) {
+    public void initialize(Project project, int idx) {
         try {
             // Initialize model test case by using the loaded model
             Class<?> testerClass = Class.forName("nz.ac.waikato.modeljunit.QuickTester");
             Constructor<?> con = testerClass.getConstructor(new Class[] { Class
                             .forName("nz.ac.waikato.modeljunit.FsmModel") });
-            m_tester[idx] = (QuickTester) con.newInstance(new Object[] { TestExeModel.getModelObject() });
+            m_tester[idx] = (QuickTester) con.newInstance(new Object[] { project.getModelObject() });
         } catch (Exception exp) {
             exp.printStackTrace();
         }

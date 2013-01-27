@@ -223,7 +223,7 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
         m_txtLength.addFocusListener(this);
         m_txtLength.setMaximumSize(maxControlSize);
         // Set walk length to default value
-        TestExeModel.setWalkLength(DEFAULT_WALK_LENGTH);
+        m_gui.getProject().setWalkLength(DEFAULT_WALK_LENGTH);
 
         // Now do the layout of the above labels and controls.
         GroupLayout layout = new GroupLayout(m_algorithmLeft);
@@ -339,13 +339,13 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
 
         m_checkFailureVerbosity.setSelected(Parameter.getFailureVerbosity());
 
-        m_combAlgorithmSelection.setSelectedIndex(Project.getInstance().getAlgorithm());
-        Parameter.setAlgorithmName(m_panelAlgorithm[Project.getInstance().getAlgorithm()].getAlgorithmName());
+        m_combAlgorithmSelection.setSelectedIndex(m_gui.getProject().getAlgorithm());
+        Parameter.setAlgorithmName(m_panelAlgorithm[m_gui.getProject().getAlgorithm()].getAlgorithmName());
 
         // We need to take the inverse to get back to a slider value.
         m_sliderAverageTestLength.setValue((int) (1.0 / Parameter.getResetProbability()));
 
-        m_txtLength.setText("" + TestExeModel.getWalkLength());
+        m_txtLength.setText("" + m_gui.getProject().getWalkLength());
     }
 
     public void setModelRelatedButton(JButton button) {
@@ -361,12 +361,12 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
      * After user successfully load a new model this method will be called to initialize model and tester to run test
      * and set the new model loaded flag to false.
      * */
-    public void initializeTester(int idx) {
+    public void initializeTester(Project project, int idx) {
         // Generate the Tester object
-        m_panelAlgorithm[m_nCurAlgo].initialize(idx);
+        m_panelAlgorithm[m_nCurAlgo].initialize(project, idx);
         // Set current algorithm for prepare execution
         TestExeModel.setTester(m_panelAlgorithm[m_nCurAlgo].getTester(idx), idx);
-        TestExeModel.setAlgorithm(m_panelAlgorithm[m_nCurAlgo]);
+        project.setAlgorithm(m_panelAlgorithm[m_nCurAlgo]);
     }
 
     /**
@@ -396,7 +396,7 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
             m_algorithmRight.setToolTipText(m_panelAlgorithm[m_nCurAlgo].getExplanation());
             // Update the setting
             Parameter.setAlgorithmName(m_panelAlgorithm[m_nCurAlgo].getAlgorithmName());
-            Project.getInstance().setAlgorithm(m_nCurAlgo);
+            m_gui.getProject().setAlgorithm(m_nCurAlgo);
         }
         // -------------- Check the coverage matrix options --------------
 
@@ -424,11 +424,11 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
         }
 
         // -------- Set the total test length ---------
-        TestExeModel.setWalkLength(Integer.valueOf(m_txtLength.getText()));
+        m_gui.getProject().setWalkLength(Integer.valueOf(m_txtLength.getText()));
 
         // -------- Regenerate Code in View ---------
         try {
-            mCodeView.setText(generateCode());
+            mCodeView.setText(generateCode(m_gui.getProject()));
         } catch (Exception x) {
             mCodeView.setText("There was a problem generating code at this time:\n" + x.getMessage());
         }
@@ -534,11 +534,11 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
      }*/
 
     public void newModel() {
-        String cName = Parameter.getClassName();
+        String cName = m_gui.getProject().getClassName();
         // TODO: get the number of actions from the Model.
-        int actionNumber = TestExeModel.getMethodList().size();
+        int actionNumber = m_gui.getProject().getMethodCount();
         m_modelInfo1.setText("Model:   " + cName);
-        m_modelInfo2.setText("Path:     " + Parameter.getPackageLocation());
+        m_modelInfo2.setText("Path:     " + m_gui.getProject().getPackageLocation());
         m_modelInfo3.setText("Actions: " + actionNumber + " actions were loaded.");
 
         updatePanelSettings();
@@ -549,10 +549,10 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
      * 
      * @return
      */
-    public String generateCode() {
+    public String generateCode(Project project) {
         // Random walking length
         int length = Integer.valueOf(m_txtLength.getText());
-        if (Parameter.getClassName() == null || Parameter.getClassName().length() <= 0)
+        if (project.getClassName() == null || project.getClassName().length() <= 0)
             return "";
         StringBuffer buf = new StringBuffer();
 
@@ -582,12 +582,12 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
         }
         // Generate class content
         buf.append(Indentation.SEP);
-        buf.append(Indentation.indent("public class " + Parameter.getClassName() + "Tester" + Indentation.SEP + "{"));
+        buf.append(Indentation.indent("public class " + project.getClassName() + "Tester" + Indentation.SEP + "{"));
         buf.append(Indentation.indent("public static void main(String args[])"));
         buf.append(Indentation.indent("{"));
 
         // Generate code according to particular algorithm.
-        buf.append(m_panelAlgorithm[m_nCurAlgo].generateCode());
+        buf.append(m_panelAlgorithm[m_nCurAlgo].generateCode(project));
 
         // If user want to check coverage or draw dot graph,
         // build graph before add coverage listener.
@@ -652,7 +652,7 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
         }
 
         if (m_checkCoverage[CHECKBOX_PAINTGRAPH].isSelected()) {
-            buf.append(Indentation.indent("graph.printGraphDot(\"" + Parameter.getClassName() + ".dot\");"));
+            buf.append(Indentation.indent("graph.printGraphDot(\"" + project.getClassName() + ".dot\");"));
         }
         // Ending
         buf.append(Indentation.indent("}"));
@@ -713,7 +713,7 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
         }
 
         try {
-            mCodeView.setText(generateCode());
+            mCodeView.setText(generateCode(m_gui.getProject()));
         } catch (Exception x) {
             mCodeView.setText("There was a problem generating code at this time:\n" + x.getMessage());
         }
@@ -728,11 +728,11 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
     @Override
     public void focusLost(FocusEvent e) {
         if (e.getSource() == m_txtLength) {
-            TestExeModel.setWalkLength(Integer.valueOf(m_txtLength.getText()));
+            m_gui.getProject().setWalkLength(Integer.valueOf(m_txtLength.getText()));
 
             // -------- Regenerate Code in View ---------
             try {
-                mCodeView.setText(generateCode());
+                mCodeView.setText(generateCode(m_gui.getProject()));
             } catch (Exception x) {
                 mCodeView.setText("There was a problem generating code at this time:\n" + x.getMessage());
             }

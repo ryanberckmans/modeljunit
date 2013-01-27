@@ -26,11 +26,11 @@ public class OptionPanelRandomWalk extends OptionPanelAdapter implements IAlgori
     }
 
     @Override
-    public String generateCode() {
+    public String generateCode(Project project) {
         m_bufRandomTest = new StringBuffer();
 
         // Initialize test model
-        m_bufRandomTest.append(Indentation.indent(Parameter.getClassName() + " model = new " + Parameter.getClassName()
+        m_bufRandomTest.append(Indentation.indent(project.getClassName() + " model = new " + project.getClassName()
                         + "();"));
         m_bufRandomTest.append(Indentation.indent("Tester tester = new RandomTester(model);"));
         // To use random seed or not
@@ -44,14 +44,14 @@ public class OptionPanelRandomWalk extends OptionPanelAdapter implements IAlgori
     }
 
     @Override
-    public void initialize(int idx) {
+    public void initialize(Project project, int idx) {
         try {
             // Initialize model test case by using the loaded model
             // Tester tester = new GreedyTester(new SimpleSet());
             Class<?> testerClass = Class.forName("nz.ac.waikato.modeljunit.RandomTester");
             Constructor<?> con = testerClass.getConstructor(new Class[] { Class
                             .forName("nz.ac.waikato.modeljunit.FsmModel") });
-            m_tester[idx] = (RandomTester) con.newInstance(new Object[] { TestExeModel.getModelObject() });
+            m_tester[idx] = (RandomTester) con.newInstance(new Object[] { project.getModelObject() });
         } catch (Exception exp) {
             exp.printStackTrace();
         }

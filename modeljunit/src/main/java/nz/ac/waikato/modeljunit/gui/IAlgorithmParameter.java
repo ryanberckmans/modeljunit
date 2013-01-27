@@ -10,7 +10,7 @@ public interface IAlgorithmParameter {
      * Initialize particular tester object. Different panel might hold different test object. This function provides a
      * way to initialize different tester object.
      */
-    public void initialize(int idx);
+    public void initialize(Project project, int idx);
 
     /**
      * Generate any Java import statements that are needed in addition to the standard modeljunit.* imports.
@@ -23,7 +23,7 @@ public interface IAlgorithmParameter {
      * Generates the Java code that sets up this algorithm to generate tests. The generated code will declare a variable
      * 'Tester tester'. The returned code has already been indented correctly.
      */
-    public String generateCode();
+    public String generateCode(Project project);
 
     public void runAlgorithm(int idx);
 }
