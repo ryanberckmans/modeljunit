@@ -64,7 +64,7 @@ public class Project {
     private File mModelFile;
     /** This should be part of the configuration. */
     private int mAlgorithm;
-    private int mWalkLength;
+    private int mWalkLength = 10;
 
     @XmlTransient
     private boolean mSaved;
@@ -327,6 +327,7 @@ public class Project {
     }
 
     public void setWalkLength(int len) {
+        System.out.println("DEBUG: Project" + hashCode() + ".setWalkLength to " + len);
         mWalkLength = len;
     }
 

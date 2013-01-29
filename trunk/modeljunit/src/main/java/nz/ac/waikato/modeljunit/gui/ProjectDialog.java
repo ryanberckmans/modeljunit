@@ -20,13 +20,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 package nz.ac.waikato.modeljunit.gui;
 
 import javax.swing.*;
-
 import java.awt.*;
 import java.awt.event.*;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 
 /**
  * A dialogue to create or edit a ModelJUnit project, including selection of a class file for the SUT.

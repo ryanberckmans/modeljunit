@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.ArrayList;
 
 import nz.ac.waikato.modeljunit.FsmModel;
 import nz.ac.waikato.modeljunit.Model;
@@ -14,7 +13,6 @@ import nz.ac.waikato.modeljunit.RandomTester;
 import nz.ac.waikato.modeljunit.Tester;
 import nz.ac.waikato.modeljunit.VerboseListener;
 import nz.ac.waikato.modeljunit.coverage.ActionCoverage;
-import nz.ac.waikato.modeljunit.coverage.CoverageHistory;
 import nz.ac.waikato.modeljunit.coverage.CoverageMetric;
 import nz.ac.waikato.modeljunit.coverage.StateCoverage;
 import nz.ac.waikato.modeljunit.coverage.TransitionCoverage;

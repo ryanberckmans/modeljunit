@@ -2,8 +2,11 @@ package nz.ac.waikato.modeljunit.gui;
 
 import java.awt.Component;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.uispec4j.Trigger;
+import org.uispec4j.UISpec4J;
 import org.uispec4j.UISpecTestCase;
 import org.uispec4j.Window;
 import org.uispec4j.finder.ComponentMatcher;
@@ -15,24 +18,38 @@ import org.uispec4j.utils.ComponentUtils;
 import edu.uci.ics.jung.graph.Graph;
 
 /**
- * ModelJUnitGUITest 
+ * ModelJUnitGUITest for testing a few of the GUI use cases.
+ * 
+ * Note that this uses the UISpec4J library, which currently requires Java 1.6.
+ * So these tests may fail if run with Java 1.7.
  *
  * @author Celia Lai <wl31@waikato.ac.nz>
  */
 public class ModelJUnitGUITest extends UISpecTestCase {
-	private ModelJUnitGUI modelJUnitGUI;
-	private Window window;
+    private ModelJUnitGUI modelJUnitGUI;
+    private Window window;
 	
-	protected void setUp() throws Exception {
-		window = WindowInterceptor.run(new Trigger() { 
-			public void run() { 
-				modelJUnitGUI = new ModelJUnitGUI(false);
-			}
-		});
+    static {
+        // Should be done first to ensure that dialogs are handled by UISpec4J.
+        UISpec4J.init();
+    }
 
-		assertTrue(window.titleEquals("ModelJUnit - Untitled*"));
-	}
+    @Before
+    public void setUp() {
+        window = WindowInterceptor.run(new Trigger() {
+            public void run() {
+                modelJUnitGUI = new ModelJUnitGUI(false);
+            }
+        });
+        assertTrue(window.titleEquals("ModelJUnit - Untitled*"));
+    }
 
+    @After
+    public void tearDown() {
+        window = null;
+        modelJUnitGUI = null;
+    }
+    
 	@Test
 	public void testInitialControlPanel() {
 		String[] labelPositions = new String[]{"AUTO","CNTR","N","NE","E","SE","S","SW","W","NW"};
@@ -166,48 +183,49 @@ public class ModelJUnitGUITest extends UISpecTestCase {
       .run();
   }
 	 
-	@Test
-	public void testTestConfigurationWithGreedyTester() {
-		WindowInterceptor.init(window.getMenuBar().getMenu("Run").getSubMenu("Test Configuration...").triggerClick())
-  		.process(new WindowHandler() {
-    			public Trigger process(Window configurationDialog) {
-    				assertTrue(configurationDialog.titleEquals("Edit Configuration"));
-    				/* Set the test length to 20 */
-    				configurationDialog.getTextBox("totalTestLength").setText("20");
-    				/* Choose Greedy Walk algorithm*/
-    				configurationDialog.getComboBox().select("Greedy Walk");
-    				return configurationDialog.getButton("OK").triggerClick();
-    			}
-    		})
-  		.run();
-		
-		/* Choose the Generate Tests menu item to run the Greedy Test */
-		window.getMenuBar().getMenu("Run").getSubMenu("Generate Tests").click();
-		assertTrue(window.getTree().contentEquals(
-				"All test sequences\n" + 
-				"  Test sequence 1\n" +
-				"    (FF, addS2, FT)\n" +
-				"    (FT, addS1, TT)\n" +
-				"    (TT, removeS1, FT)\n" +
-				"    (FT, removeS2, FF)\n" +
-				"    (FF, removeS2, FF)\n" +
-				"    (FF, addS1, TF)\n" +
-				"    (TF, addS2, TT)\n" +
-				"    (TT, addS2, TT)\n" +
-				"    (TT, addS1, TT)\n" +
-				"    (TT, removeS2, TF)\n" +
-				"    (TF, removeS1, FF)\n" +
-				"    (FF, removeS1, FF)\n" +
-				"    (FF, removeS1, FF)\n" +
-				"    (FF, addS1, TF)\n" +
-				"    (TF, removeS2, TF)\n" +
-				"    (TF, addS1, TF)\n" +
-				"    (TF, removeS1, FF)\n" +
-				"  Test sequence 2 (Random reset)\n" +
-				"    (FF, addS2, FT)\n" +
-				"    (FT, addS2, FT)"
-		));
-	}
+    @Test
+    public void testTestConfigurationWithGreedyTester() {
+        window.getMenuBar().getMenu("Run").getSubMenu("SimpleSet").click();
+        WindowInterceptor.init(window.getMenuBar().getMenu("Run").getSubMenu("Test Configuration...").triggerClick())
+        .process(new WindowHandler() {
+            public Trigger process(Window configurationDialog) {
+                assertTrue(configurationDialog.titleEquals("Edit Configuration"));
+                /* Set the test length to 20 */
+                configurationDialog.getTextBox("totalTestLength").setText("20");
+                /* Choose Greedy Walk algorithm*/
+                configurationDialog.getComboBox().select("Greedy Walk");
+                return configurationDialog.getButton("OK").triggerClick();
+            }
+        })
+        .run();
+
+        /* Choose the Generate Tests menu item to run the Greedy Test */
+        window.getMenuBar().getMenu("Run").getSubMenu("Generate Tests").click();
+        assertTrue(window.getTree().contentEquals(
+                        "All test sequences\n" + 
+                                        "  Test sequence 1\n" +
+                                        "    (FF, addS2, FT)\n" +
+                                        "    (FT, addS1, TT)\n" +
+                                        "    (TT, removeS1, FT)\n" +
+                                        "    (FT, removeS2, FF)\n" +
+                                        "    (FF, removeS2, FF)\n" +
+                                        "    (FF, addS1, TF)\n" +
+                                        "    (TF, addS2, TT)\n" +
+                                        "    (TT, addS2, TT)\n" +
+                                        "    (TT, addS1, TT)\n" +
+                                        "    (TT, removeS2, TF)\n" +
+                                        "    (TF, removeS1, FF)\n" +
+                                        "    (FF, removeS1, FF)\n" +
+                                        "    (FF, removeS1, FF)\n" +
+                                        "    (FF, addS1, TF)\n" +
+                                        "    (TF, removeS2, TF)\n" +
+                                        "    (TF, addS1, TF)\n" +
+                                        "    (TF, removeS1, FF)\n" +
+                                        "  Test sequence 2 (Random reset)\n" +
+                                        "    (FF, addS2, FT)\n" +
+                                        "    (FT, addS2, FT)"
+                        ));
+    }
 	
 	@Test
   public void testRunEfficiencyGraphs() {

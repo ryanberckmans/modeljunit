@@ -8,10 +8,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.regex.Matcher;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -20,7 +16,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JFileChooser;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
@@ -34,9 +29,6 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import nz.ac.waikato.modeljunit.Action;
-
-import org.objectweb.asm.ClassReader;
 
 /*
  * PanelTestDesign.java
@@ -53,9 +45,6 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
 
     // There are 5 check boxes about coverage and paint graph
     private static final int NUM_GRAPH_CHECKBOX = 5;
-
-    /** The default for the total walk length of the tests */
-    private static final int DEFAULT_WALK_LENGTH = 10;
 
     // 0 Random, 1 Greedy,
     private static final int ALGORITHM_NUM = OptionPanelCreator.NUM_PANE;
@@ -79,9 +68,6 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
 
     /** The button for loading the model class. */
     private JButton m_butOpenModel;
-
-    /** The button that runs the test generation. */
-    private JButton m_butExternalExecute;
 
     // Algorithm panel
     private final static int H_SPACE = 6;
@@ -121,18 +107,8 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
 
     private JCheckBox[] m_checkCoverage;
 
-    /** Main panel for the test design tab. */
-    private static PanelTestDesign m_panel = null;
-
-    /** Singleton factory method for creating the test design panel. */
-    public static PanelTestDesign getTestDesignPanelInstance(ModelJUnitGUI gui) {
-        if (m_panel == null)
-            m_panel = new PanelTestDesign(gui);
-        return m_panel;
-    }
-
     /** Use PanelTestDesign(gui) to get a test design panel. */
-    private PanelTestDesign(ModelJUnitGUI gui) {
+    public PanelTestDesign(ModelJUnitGUI gui) {
         m_gui = gui;
         // Panel background colours
         Color[] bg = new Color[3];
@@ -219,11 +195,10 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
         m_txtLength = new JTextField();
         m_txtLength.setName("totalTestLength");
         m_txtLength.setColumns(7);
-        m_txtLength.setText(String.valueOf(DEFAULT_WALK_LENGTH));
+        m_txtLength.setText(String.valueOf(m_gui.getProject().getWalkLength()));
         m_txtLength.addFocusListener(this);
         m_txtLength.setMaximumSize(maxControlSize);
         // Set walk length to default value
-        m_gui.getProject().setWalkLength(DEFAULT_WALK_LENGTH);
 
         // Now do the layout of the above labels and controls.
         GroupLayout layout = new GroupLayout(m_algorithmLeft);
@@ -320,6 +295,7 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
         closeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 getTopLevelAncestor().setVisible(false);
+                m_gui.getProject().setWalkLength(Integer.valueOf(m_txtLength.getText()));
             }
         });
 
@@ -350,7 +326,6 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
 
     public void setModelRelatedButton(JButton button) {
         button.setEnabled(false); // disabled until user loads a model
-        m_butExternalExecute = button;
     }
 
     public PanelTestDesign clone() {

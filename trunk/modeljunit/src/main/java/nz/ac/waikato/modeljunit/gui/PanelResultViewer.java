@@ -3,7 +3,6 @@ package nz.ac.waikato.modeljunit.gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 

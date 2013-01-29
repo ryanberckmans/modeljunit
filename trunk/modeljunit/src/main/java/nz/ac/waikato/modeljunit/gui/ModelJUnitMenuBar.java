@@ -30,6 +30,7 @@ import java.awt.event.*;
  * 
  * @author Gian Perrone <gian@waikato.ac.nz>
  **/
+@SuppressWarnings("serial")
 public class ModelJUnitMenuBar extends JMenuBar {
     private ModelJUnitGUI mParent;
 
