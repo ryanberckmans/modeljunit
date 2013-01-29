@@ -30,13 +30,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.regex.Matcher;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -52,7 +45,8 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
-import nz.ac.waikato.modeljunit.Action;
+import cern.colt.Arrays;
+
 import nz.ac.waikato.modeljunit.GraphListener;
 import nz.ac.waikato.modeljunit.Model;
 import nz.ac.waikato.modeljunit.Tester;
@@ -62,8 +56,6 @@ import nz.ac.waikato.modeljunit.coverage.StateCoverage;
 import nz.ac.waikato.modeljunit.coverage.TransitionCoverage;
 import nz.ac.waikato.modeljunit.coverage.TransitionPairCoverage;
 import nz.ac.waikato.modeljunit.gui.visualisaton.PanelJUNGVisualisation;
-
-import org.objectweb.asm.ClassReader;
 
 /**
  * The main ModelJUnit GUI class.
@@ -122,7 +114,7 @@ public class ModelJUnitGUI implements Runnable {
         mVisualisation = PanelJUNGVisualisation.getGraphVisualisationInstance();
         mCoverage = PanelCoverage.getInstance(this);
         mResultViewer = PanelResultViewer.getResultViewerInstance();
-        mTestDesign = PanelTestDesign.getTestDesignPanelInstance(this);
+        mTestDesign = new PanelTestDesign(this);
         mEfficiencyGraphs = PanelEfficiencyGraph.getInstance();
     }
 
@@ -594,11 +586,11 @@ public class ModelJUnitGUI implements Runnable {
                 mCoverage.addTransitionPairCoverage((int) coverage[2].getPercentage());
                 mCoverage.addActionCoverage((int) coverage[3].getPercentage());
                 mCoverage.redrawGraph();
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    Thread.sleep(100);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
             }
         }
         // To reset tester, it solve the problem that coverage matrix incorrect.
@@ -623,16 +615,17 @@ public class ModelJUnitGUI implements Runnable {
         if (mModel == null)
             return;
 
-        SwingWorker<String, String> worker = new SwingWorker<String, String>() {
-            public String doInBackground() {
-                runClass();
-                return "";
-            }
-        };
+// NOTE: runClass cannot be run in the background, because it directly updates GUI objects.
+//        SwingWorker<String, String> worker = new SwingWorker<String, String>() {
+//            public String doInBackground() {
+//                runClass();
+//                return "";
+//            }
+//        };
+//        
+//        worker.execute();
         
-        worker.execute();
-        
-        //runClass();
+        runClass();
 
         /*CoverageHistory hist = new CoverageHistory(new TransitionCoverage(), 1);
         tester.addCoverageMetric(hist);

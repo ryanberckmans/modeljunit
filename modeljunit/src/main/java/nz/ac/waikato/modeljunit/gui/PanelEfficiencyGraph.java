@@ -9,13 +9,11 @@ import java.awt.geom.Line2D;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JProgressBar;
 
-import nz.ac.waikato.modeljunit.Action;
 import nz.ac.waikato.modeljunit.GreedyTester;
 import nz.ac.waikato.modeljunit.LookaheadTester;
 import nz.ac.waikato.modeljunit.Model;

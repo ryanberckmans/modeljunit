@@ -8,7 +8,6 @@ import java.awt.RenderingHints;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 
-import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
 public class PanelCoverage extends PanelAbstract {

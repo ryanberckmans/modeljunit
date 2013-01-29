@@ -3,7 +3,6 @@ package nz.ac.waikato.modeljunit.gui;
 import java.awt.Color;
 
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
@@ -18,8 +17,6 @@ public class OptionPanelAdapter extends JPanel implements IAlgorithmParameter {
     private String m_strNameOfAlgorithm;
 
     private String m_strExplanation;
-
-    private ImageIcon m_imgIcon;
 
     /**
      * The array of tester object Using array because we need to separate several tester for different panel. 0. For

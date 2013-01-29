@@ -41,9 +41,6 @@ import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
  */
 public class JUNGHelper {
 
-    //Class wide variables
-    private static final long serialVersionUID = -14335330588100620L;
-
     private static JUNGHelper jView_;
 
     public enum LayoutType {
@@ -65,7 +62,7 @@ public class JUNGHelper {
     /**
      * Main Constructor to initialise class wide variables.
      */
-    public JUNGHelper() {
+    private JUNGHelper() {
         g = new DirectedSparseMultigraph<Object, Object>();
         top_ = new ColorTreeNode("All test sequences");
         vertices = new HashMap<Object, Object>();
