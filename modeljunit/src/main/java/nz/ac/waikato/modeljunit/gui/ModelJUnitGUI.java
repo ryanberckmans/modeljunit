@@ -43,9 +43,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
-
-import cern.colt.Arrays;
+import javax.xml.bind.JAXBException;
 
 import nz.ac.waikato.modeljunit.GraphListener;
 import nz.ac.waikato.modeljunit.Model;
@@ -78,9 +76,15 @@ public class ModelJUnitGUI implements Runnable {
     private PanelResultViewer mResultViewer;
     private PanelTestDesign mTestDesign;
     private PanelEfficiencyGraph mEfficiencyGraphs;
+    private PanelAnimator mAnimator;
     private JDialog mSplash;
 
     private boolean mGraphCurrent;
+
+
+    public PanelResultViewer getResultViewer() {
+        return mResultViewer;
+    }
 
     /**
      * This creates the persistent panels for ModelJUnit (except the animation panel, which is transient). All panels
@@ -108,16 +112,18 @@ public class ModelJUnitGUI implements Runnable {
     }
 
     private void initialize() {
+        //TODO: Make these panels non-static
         mProject = new Project(BUILTIN, "nz.ac.waikato.modeljunit.examples.FSM");
         mGraphCurrent = false;
 
-        mVisualisation = PanelJUNGVisualisation.getGraphVisualisationInstance();
-        mCoverage = PanelCoverage.getInstance(this);
-        mResultViewer = PanelResultViewer.getResultViewerInstance();
+        mAnimator = new PanelAnimator(this); 
+        mVisualisation = new PanelJUNGVisualisation();
+        mCoverage = new PanelCoverage(this);
+        mResultViewer = new PanelResultViewer();
         mTestDesign = new PanelTestDesign(this);
-        mEfficiencyGraphs = PanelEfficiencyGraph.getInstance();
+        mEfficiencyGraphs = new PanelEfficiencyGraph();
     }
-
+    
     /** Construct an application window. **/
     public void buildGUI() {
         mAppWindow = new JFrame(mAppWindowTitle);
@@ -268,8 +274,8 @@ public class ModelJUnitGUI implements Runnable {
                     mSplash.setVisible(false);
                     loadModel(BUILTIN, example);
                     boolean[] coverage = { true, true, false, false, false };
-                    Parameter.setCoverageOption(coverage);
-                    mTestDesign.updatePanelSettings();
+                    mProject.setCoverageOption(coverage);
+                    mTestDesign.newModel();
                 }
             }
         };
@@ -296,17 +302,15 @@ public class ModelJUnitGUI implements Runnable {
         return mAppWindow;
     }
 
+    //Find out when this is being called
     public void run() {
         mAppWindow.setVisible(true);
         mAppWindow.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-        System.out.println("@@@@@@@@@@@@@@@@@ RUN @@@@@@@@@@@@@@@@@@@");
         Project pr = new Project(BUILTIN, "nz.ac.waikato.modeljunit.examples.FSM");
         pr.setName("Test Project");
         pr.setFileName(new File("test.mju"));
-        //pr.setProperty("foobar",new Integer(123));
-        //pr.setProperty("test","hello, world");
-        pr.save();
+        //pr.save();
     }
 
     /**
@@ -328,10 +332,6 @@ public class ModelJUnitGUI implements Runnable {
             File f = chooser.getSelectedFile();
 
             Parameter.setModelChooserDirectory(f.getParent());
-            // Reset the existing model
-//            mProject.reset(); //TODO: Do this later when the load button is pressed
-//
-//            mProject.setModelFile(f);
             return f.getAbsolutePath();
         } else {
             return null;
@@ -348,29 +348,26 @@ public class ModelJUnitGUI implements Runnable {
      *            the short name (without "nz.ac.waikato.modeljunit.examples") of the model to load.
      */
     public void loadModel(String jarURL, String className) {
-        try {
-            mProject = new Project(jarURL, className);
-        } catch (Exception e) {
-            ErrorMessage.DisplayErrorMessage("Error loading model", e.getLocalizedMessage());
+        mProject = new Project(jarURL, className);
+        if (className != null) {
+            displayNewModel(className);
         }
-        System.out.println("SUCCESS: loaded model " + className);
-        String cName = mProject.getClassName();
-        displayNewModel(cName);
     }
 
     public void displayNewModel(String cName) {
-        setTitle("ModelJUnit: " + cName);
-
-        mProject.setName(cName);
+        //Change the title to the filename if model is not an example
+        if (mProject.getPackageLocation().equals(BUILTIN)) {
+            mProject.setName(cName);
+        }
+        setTitle("ModelJUnit: " + mProject.getName());
 
         //Tester tester = new Tester(TestExeModel.getModelObject());
-        Model mod = new Model(mProject.getModelObject());
-
-        ModelJUnitGUI.setModel(mod);
+        mModel = new Model(mProject.getModelObject());
 
         mGraphCurrent = false;
-        // buildGraphGUI();
         newModel(); // tell the other panels about the new model
+        //Automatically generate tests for the selected model
+        runModel();
     }
 
     public void displayProjectFileChooser(boolean opening) {
@@ -398,14 +395,18 @@ public class ModelJUnitGUI implements Runnable {
             Parameter.setModelChooserDirectory(f.getParent());
 
             if (opening) {
-                mProject = Project.load(f);
-
-                Parameter.setModelChooserDirectory(mProject.getModelFile().getParent());
-                // Reset the existing model
-//                mProject.reset(); //TODO: Do this later when the load button is pressed
-
-                mTestDesign.updatePanelSettings();
-                //TODO: Fix this so it loads the model properly
+                try {
+                    mProject = Project.load(f);
+                    if (mProject.getModelFile() != null) {
+                        Parameter.setModelChooserDirectory(mProject.getModelFile().getParent());
+                    }
+                    mProject.setName(f.getAbsolutePath());
+                    displayNewModel(mProject.getClassName());
+                } catch (JAXBException ex) {
+                    String msg = ex.getLocalizedMessage();
+                    ErrorMessage.DisplayErrorMessage("Load Error", "Error loading MJU file: \n"
+                                    + (msg != null ? msg : "File is corrupt."));   
+                }
             } else {
                 // Saving the project
                 if (!wholePath.endsWith("." + fileExt)) {
@@ -413,6 +414,9 @@ public class ModelJUnitGUI implements Runnable {
                     f = new File(wholePath);
                 }
                 mProject.setFileName(f);
+                String fName = f.getAbsolutePath();
+                mProject.setName(fName);
+                setTitle("ModelJUnit: " + fName);
             }
         }
     }
@@ -442,31 +446,29 @@ public class ModelJUnitGUI implements Runnable {
     /** Display the window that permits animation of models. **/
     public void displayAnimateWindow() {
         // if there is no model loaded, throw an error:
-        if (getModel() == null) {
-            System.err.println("Error: no model loaded");
-            //XXX: throw up a dialog box.
+        if (mModel == null) {
+            ErrorMessage.DisplayErrorMessage("No Model", "Error: no model loaded");
             return;
         }
 
         JFrame animate = new JFrame("Animator - ModelJUnit");
         animate.setPreferredSize(new Dimension(760, 500));
-        PanelAnimator pa = PanelAnimator.getInstance();
-        pa.newModel();
+        mAnimator.newModel();
 
         // Add the action history, which the animator supplies.
-        JScrollPane scroll = new JScrollPane(pa.getActionHistoryList());
+        JScrollPane scroll = new JScrollPane(mAnimator.getActionHistoryList());
 
         JPanel labelPanel = new JPanel();
 
-        labelPanel.add(new JLabel("<html><h1>" + getModel().getModelName() + "</h1></html>"), BorderLayout.PAGE_START);
-        labelPanel.add(pa.getStateLabel(), BorderLayout.PAGE_END);
+        labelPanel.add(new JLabel("<html><h1>" + mModel.getModelName() + "</h1></html>"), BorderLayout.PAGE_START);
+        labelPanel.add(mAnimator.getStateLabel(), BorderLayout.PAGE_END);
 
         animate.add(labelPanel, BorderLayout.PAGE_START);
-        animate.add(pa, BorderLayout.CENTER);
+        animate.add(mAnimator, BorderLayout.CENTER);
 
         animate.add(scroll, BorderLayout.LINE_END);
 
-        animate.add(pa.getResetButton(), BorderLayout.PAGE_END);
+        animate.add(mAnimator.getResetButton(), BorderLayout.PAGE_END);
 
         animate.pack();
         animate.setVisible(true);
@@ -499,18 +501,18 @@ public class ModelJUnitGUI implements Runnable {
         mEfficiencyGraphs.runClass(mProject);
     }
 
-    public static void setModel(Model model) {
-        mModel = model;
-    }
-
-    public static Model getModel() {
-        return mModel;
-    }
-
     public Project getProject() {
         return mProject;
     }
 
+    /**
+     * Replaces the main instance of Project. Only to be used by PanelTestDesign's OK button listener!
+     * @param project
+     */
+    public void setProject(Project project) {
+        mProject = project.clone();
+    }
+    
     public void newModel() {
         mVisualisation.newModel();
         mCoverage.newModel();
@@ -521,14 +523,13 @@ public class ModelJUnitGUI implements Runnable {
 
     public void displayAlgorithmPane() {
         JFrame dialog = new JFrame("Edit Configuration");
-
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, mTestDesign, mTestDesign.getCodeView());
-        splitPane.setOneTouchExpandable(true);
         splitPane.setDividerLocation(400);
 
         dialog.add(splitPane);
         dialog.pack();
         dialog.setVisible(true);
+        mTestDesign.newModel();
     }
 
     public void buildGraphGUI() {
@@ -559,10 +560,11 @@ public class ModelJUnitGUI implements Runnable {
             mCoverage.clearCoverages();
             int[] stages = mCoverage.computeStages(mProject.getWalkLength());
 
-            mTestDesign.initializeTester(mProject, 0);
+            mTestDesign.initializeTester(0);
             Tester tester = TestExeModel.getTester(0);
             /* tester.buildGraph();*/
-            displayCoverageWindow();
+            // Leave the coverage window hidden until manually opened from the View menu
+            // displayCoverageWindow();
             buildGraphGUI();
 
             CoverageHistory[] coverage = new CoverageHistory[TestExeModel.COVERAGE_NUM];
@@ -578,7 +580,7 @@ public class ModelJUnitGUI implements Runnable {
             // Run test several times to draw line chart
             for (int i = 0; i < stages.length; i++) {
                 tester.generate(stages[0]);
-                System.out.println("Progress: " + stages[i] + "/" + mProject.getWalkLength());
+                //System.out.println("DEBUG: Progress: " + stages[i] + "/" + mProject.getWalkLength());
                 mCoverage.setProgress(stages[i], mProject.getWalkLength());
                 // Update the line chart and repaint
                 mCoverage.addStateCoverage((int) coverage[0].getPercentage());
@@ -586,15 +588,10 @@ public class ModelJUnitGUI implements Runnable {
                 mCoverage.addTransitionPairCoverage((int) coverage[2].getPercentage());
                 mCoverage.addActionCoverage((int) coverage[3].getPercentage());
                 mCoverage.redrawGraph();
-//                try {
-//                    Thread.sleep(100);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
             }
         }
         // To reset tester, it solve the problem that coverage matrix incorrect.
-        mTestDesign.initializeTester(mProject, 0);
+        mTestDesign.initializeTester(0);
         //reset the visualisation panel
         mVisualisation.resetRunTimeInformation();
         //Try to fully explore the complete graph before running the test explorations
@@ -606,7 +603,7 @@ public class ModelJUnitGUI implements Runnable {
         mResultViewer.resetRunTimeInformation();
 
         // Run test and display test output
-        TestExeModel.runTestAuto(mProject);
+        TestExeModel.runTestAuto(this);
         // Finish the visualisation panel. This effectively starts the animation.    
         mVisualisation.updateGUI(true);
     }

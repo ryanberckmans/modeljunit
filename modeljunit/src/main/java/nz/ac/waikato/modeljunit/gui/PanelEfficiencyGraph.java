@@ -80,18 +80,9 @@ public class PanelEfficiencyGraph extends PanelAbstract {
     // The maximum coverage
     private int mMaximum;
 
-    // Panel object
-    private static PanelEfficiencyGraph m_panel;
-
     private JProgressBar mProgress;
 
-    public static PanelEfficiencyGraph getInstance() {
-        if (m_panel == null)
-            m_panel = new PanelEfficiencyGraph();
-        return m_panel;
-    }
-
-    private PanelEfficiencyGraph() {
+    public PanelEfficiencyGraph() {
         this.setBackground(Color.WHITE);
         this.setDoubleBuffered(true);
         mProgress = new JProgressBar(0, 100);
@@ -272,7 +263,7 @@ public class PanelEfficiencyGraph extends PanelAbstract {
             lookaheadTester.generate(stages[i]);
             quickTester.generate(stages[i]);
 
-            System.out.println("Progress: " + stages[i] + "/" + WALK_LENGTH);
+            //System.out.println("DEBUG: Progress: " + stages[i] + "/" + WALK_LENGTH);
             setProgress(stages[i], WALK_LENGTH);
             // Update the line chart and repaint
             mRandomTesterCoverage.add((int) coverage[0].getCoverage());
@@ -355,7 +346,7 @@ public class PanelEfficiencyGraph extends PanelAbstract {
 
             w.close();
         } catch (Exception ex) {
-            System.err.println("IO error occurance");
+            System.err.println("IO error occurrence");
             ex.printStackTrace();
         }
     }

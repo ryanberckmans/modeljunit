@@ -9,8 +9,6 @@ import javax.swing.JTextArea;
 public class PanelResultViewer extends PanelAbstract {
     private static final long serialVersionUID = -6522938608020451281L;
 
-    private static PanelResultViewer m_panelRV;
-
     // Minimum height of the compile result table and text area
     private final int MIN_HEIGHT = 60;
 
@@ -22,13 +20,7 @@ public class PanelResultViewer extends PanelAbstract {
     //Scroll pane for test runtime info
     private JScrollPane m_scrollTextArea;
 
-    public static PanelResultViewer getResultViewerInstance() {
-        if (m_panelRV == null)
-            m_panelRV = new PanelResultViewer();
-        return m_panelRV;
-    }
-
-    private PanelResultViewer() {
+    public PanelResultViewer() {
         this.setLayout(new BorderLayout());
 
         // -------------------- Set up the split pane ------------------

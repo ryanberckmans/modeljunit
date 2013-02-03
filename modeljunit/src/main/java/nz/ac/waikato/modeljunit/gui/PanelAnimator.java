@@ -19,24 +19,17 @@ import java.util.TreeMap;
  **/
 @SuppressWarnings("serial")
 public class PanelAnimator extends PanelAbstract implements ActionListener {
-    private static PanelAnimator mInstance;
     private Model mModel;
     private JList mActionHistoryList;
     private DefaultListModel mActionHistory;
     private JButton mResetButton;
     private Map<JButton, Integer> mButtons;
     private JLabel mStateLabel;
+    private ModelJUnitGUI mGui;
 
-    public static PanelAnimator getInstance() {
-        if (mInstance == null) {
-            mInstance = new PanelAnimator();
-        }
-
-        return mInstance;
-    }
-
-    public PanelAnimator() {
-        mModel = ModelJUnitGUI.getModel();
+    public PanelAnimator(ModelJUnitGUI gui) {
+        mGui = gui;
+        mModel = new Model(gui.getProject().getModelObject());
 
         Comparator<JButton> sort = new Comparator<JButton>() {
             @Override
@@ -61,7 +54,7 @@ public class PanelAnimator extends PanelAbstract implements ActionListener {
     }
 
     public void newModel() {
-        mModel = ModelJUnitGUI.getModel();
+        mModel = new Model(mGui.getProject().getModelObject());
         removeAll();
         mButtons.clear();
         buildGUI();
