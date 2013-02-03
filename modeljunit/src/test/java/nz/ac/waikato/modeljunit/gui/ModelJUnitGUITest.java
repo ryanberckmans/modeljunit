@@ -28,7 +28,7 @@ import edu.uci.ics.jung.graph.Graph;
 public class ModelJUnitGUITest extends UISpecTestCase {
     private ModelJUnitGUI modelJUnitGUI;
     private Window window;
-	
+
     static {
         // Should be done first to ensure that dialogs are handled by UISpec4J.
         UISpec4J.init();
@@ -49,140 +49,144 @@ public class ModelJUnitGUITest extends UISpecTestCase {
         window = null;
         modelJUnitGUI = null;
     }
-    
-	@Test
-	public void testInitialControlPanel() {
-		String[] labelPositions = new String[]{"AUTO","CNTR","N","NE","E","SE","S","SW","W","NW"};
-		String[] layoutTypes = new String[]{"FR","CIRCLE","ISOM","KK","SPRING"};
 
-		/* Show or hide labels */
-		assertTrue(window.getCheckBox(displayedNameIdentity("Show vertex labels")).isSelected());
-		window.getComboBox("vertLabelPosComboBox").contentEquals(labelPositions);
-		assertFalse(window.getCheckBox(displayedNameIdentity("Show edge labels")).isSelected());
-		assertTrue(window.getCheckBox(displayedNameIdentity("Show unexplored states/actions")).isSelected());
+    @Test
+    public void testInitialControlPanel() {
+        String[] labelPositions = new String[]{"AUTO","CNTR","N","NE","E","SE","S","SW","W","NW"};
+        String[] layoutTypes = new String[]{"FR","CIRCLE","ISOM","KK","SPRING"};
 
-		/* Layout type selection */
-		window.getComboBox("layoutTypeComboBox").contentEquals(layoutTypes);
+        /* Show or hide labels */
+        assertTrue(window.getCheckBox(displayedNameIdentity("Show vertex labels")).isSelected());
+        window.getComboBox("vertLabelPosComboBox").contentEquals(labelPositions);
+        assertFalse(window.getCheckBox(displayedNameIdentity("Show edge labels")).isSelected());
+        assertTrue(window.getCheckBox(displayedNameIdentity("Show unexplored states/actions")).isSelected());
 
-		/* Merge buttons */
-		assertNotNull(window.getButton(displayedNameIdentity("Merge states")));
-		assertNotNull(window.getButton(displayedNameIdentity("Expand states")));
-		assertNotNull(window.getButton(displayedNameIdentity("Reset")));
-		assertNotNull(window.getButton(displayedNameIdentity("Save as image")));
+        /* Layout type selection */
+        window.getComboBox("layoutTypeComboBox").contentEquals(layoutTypes);
 
-		/* Animation controls */
-		assertTrue(window.getCheckBox(displayedNameIdentity("Show animation")).isSelected());
-		assertNotNull(window.getToggleButton(displayedNameIdentity("Pause")));
-		assertNotNull(window.getButton(displayedNameIdentity("Stop")));
-		window.getSlider().positionEquals("1000");
-		window.getSlider().relativePositionEquals(100);
-	}
+        /* Merge buttons */
+        assertNotNull(window.getButton(displayedNameIdentity("Merge states")));
+        assertNotNull(window.getButton(displayedNameIdentity("Expand states")));
+        assertNotNull(window.getButton(displayedNameIdentity("Reset")));
+        assertNotNull(window.getButton(displayedNameIdentity("Save as image")));
 
-	@Test
-	public void testSimpleSetRandomTester() {
-		/* Choose the SimpleSet model from menu */
-		window.getMenuBar().getMenu("Run").getSubMenu("SimpleSet").click();
-		assertTrue(window.titleEquals("ModelJUnit: nz.ac.waikato.modeljunit.examples.SimpleSet"));
+        /* Animation controls */
+        assertTrue(window.getCheckBox(displayedNameIdentity("Show animation")).isSelected());
+        assertNotNull(window.getToggleButton(displayedNameIdentity("Pause")));
+        assertNotNull(window.getButton(displayedNameIdentity("Stop")));
+        window.getSlider().positionEquals("1000");
+        window.getSlider().relativePositionEquals(100);
+    }
 
-		/* Choose the Generate Tests menu item to run the Random Test */
-		window.getMenuBar().getMenu("Run").getSubMenu("Generate Tests").click();
-		assertTrue(window.getTree().contentEquals(
-				"All test sequences\n" + 
-				"  Test sequence 1\n" +
-				"    (FF, addS2, FT)\n" +
-				"    (FT, addS1, TT)\n" +
-				"    (TT, removeS1, FT)\n" +
-				"    (FT, addS2, FT)\n" +
-				"    (FT, addS2, FT)\n" +
-				"    (FT, addS1, TT)\n" +
-				"    (TT, addS2, TT)\n" +
-				"    (TT, addS2, TT)\n" +
-				"    (TT, addS2, TT)\n" +
-				"    (TT, addS2, TT)"
-		));
+    @Test
+    public void testSimpleSetRandomTester() {
+        /* Choose the SimpleSet model from menu */
+        window.getMenuBar().getMenu("Run").getSubMenu("SimpleSet").click();
+        assertTrue(window.titleEquals("ModelJUnit: nz.ac.waikato.modeljunit.examples.SimpleSet"));
 
-		/* Verify the number of vertices and edges  */
-		Graph<Object, Object> graph = modelJUnitGUI.getVisualisation().getJUNGHelper().getGraph();
-		assertEquals(4, graph.getVertexCount());
-		assertEquals(16, graph.getEdgeCount());
-	}
+        /* Choose the Generate Tests menu item to run the Random Test */
+        window.getMenuBar().getMenu("Run").getSubMenu("Generate Tests").click();
+        assertTrue(window.getTree().contentEquals(
+                        "All test sequences\n" + 
+                                        "  Test sequence 1\n" +
+                                        "    (FF, addS2, FT)\n" +
+                                        "    (FT, addS1, TT)\n" +
+                                        "    (TT, removeS1, FT)\n" +
+                                        "    (FT, addS2, FT)\n" +
+                                        "    (FT, addS2, FT)\n" +
+                                        "    (FT, addS1, TT)\n" +
+                                        "    (TT, addS2, TT)\n" +
+                                        "    (TT, addS2, TT)\n" +
+                                        "    (TT, addS2, TT)\n" +
+                                        "    (TT, addS2, TT)"
+                        ));
 
-	 @Test
-	  public void testViewTests() {
-	    WindowInterceptor.init(window.getMenuBar().getMenu("View").getSubMenu("View Tests Window").triggerClick())
-	      .process(new WindowHandler() {
-	        public Trigger process(Window configurationDialog) {
-	          assertTrue(configurationDialog.titleEquals("Results - ModelJUnit"));
-	          assertTrue(configurationDialog.getTextBox("resultsOutput").textEquals(
-	              "done (FF, addS2, FT)\n" + 
-	              "done (FT, addS1, TT)\n" +
-	              "done (TT, removeS1, FT)\n" +
-	              "done (FT, addS2, FT)\n" +
-	              "done (FT, addS2, FT)\n" +
-	              "done (FT, addS1, TT)\n" +
-	              "done (TT, addS2, TT)\n" +
-	              "done (TT, addS2, TT)\n" +
-	              "done (TT, addS2, TT)\n" +
-	              "done (TT, addS2, TT)\n"
-	          ));
-	          
-	          // no action can be performed after the results window is shown,
-	          // so return a new trigger with empty run() implementation.
-	          return new Trigger() {
-	            @Override
-	            public void run() throws Exception {}
-	          };
-	        }
-	      })
-	      .run();
-	}
-	 
-  @Test
-  public void testAnimateModel() {
-    WindowInterceptor.init(window.getMenuBar().getMenu("View").getSubMenu("Animate Window").triggerClick())
-      .process(new WindowHandler() {
-          public Trigger process(Window configurationDialog) {
-            assertTrue(configurationDialog.titleEquals("Animator - ModelJUnit"));
-            
-            assertTrue(configurationDialog.getButton(displayedNameIdentity("addS1")).isEnabled());
-            assertTrue(configurationDialog.getButton(displayedNameIdentity("addS2")).isEnabled());
-            assertTrue(configurationDialog.getButton(displayedNameIdentity("removeS1")).isEnabled());
-            assertTrue(configurationDialog.getButton(displayedNameIdentity("removeS2")).isEnabled());
-            
-            configurationDialog.getListBox().contentEquals("*** RESET *** (FF)");
-            configurationDialog.getButton(displayedNameIdentity("addS1")).click();
-            configurationDialog.getListBox().contentEquals(
-                "*** RESET *** (FF)\n" +
-            		"addS1(TF)"
-            );
-            configurationDialog.getButton(displayedNameIdentity("addS2")).click();
-            configurationDialog.getListBox().contentEquals(
-                "*** RESET *** (FF)\n" +
-                "addS1(TF)\n" +
-                "addS2(TT)"
-            );
-            configurationDialog.getButton(displayedNameIdentity("removeS1")).click();
-            configurationDialog.getListBox().contentEquals(
-                "*** RESET *** (FF)" +
-                "addS1(TF)\n" +
-                "addS2(TT)\n" +
-                "removeS1(FT)"
-            );
-            configurationDialog.getButton(displayedNameIdentity("removeS2")).click();
-            configurationDialog.getListBox().contentEquals(
-                "*** RESET *** (FF)" +
-                "addS1(TF)\n" +
-                "addS2(TT)\n" +
-                "removeS1(FT)\n" +
-                "removeS2(FF)"
-            );
-            
-            return configurationDialog.getButton(displayedNameIdentity("reset")).triggerClick();
-          }
-      })
-      .run();
-  }
-	 
+        /* Verify the number of vertices and edges  */
+        Graph<Object, Object> graph = modelJUnitGUI.getVisualisation().getJUNGHelper().getGraph();
+        assertEquals(4, graph.getVertexCount());
+        assertEquals(16, graph.getEdgeCount());
+    }
+
+    @Test
+    public void testViewTests() {
+        window.getMenuBar().getMenu("Run").getSubMenu("SimpleSet").click();
+        WindowInterceptor.init(window.getMenuBar().getMenu("View").getSubMenu("View Tests Window").triggerClick())
+        .process(new WindowHandler() {
+            public Trigger process(Window configurationDialog) {
+                assertTrue(configurationDialog.titleEquals("Results - ModelJUnit"));
+                assertTrue(configurationDialog.getTextBox("resultsOutput").textEquals(
+                                "done (FF, addS2, FT)\n" + 
+                                                "done (FT, addS1, TT)\n" +
+                                                "done (TT, removeS1, FT)\n" +
+                                                "done (FT, addS2, FT)\n" +
+                                                "done (FT, addS2, FT)\n" +
+                                                "done (FT, addS1, TT)\n" +
+                                                "done (TT, addS2, TT)\n" +
+                                                "done (TT, addS2, TT)\n" +
+                                                "done (TT, addS2, TT)\n" +
+                                                "done (TT, addS2, TT)\n" + 
+                                                "State coverage = 2/4\n" + 
+                                                "Transition coverage = 5/16\n"
+                                ));
+
+                // no action can be performed after the results window is shown,
+                // so return a new trigger with empty run() implementation.
+                return new Trigger() {
+                    @Override
+                    public void run() throws Exception {}
+                };
+            }
+        })
+        .run();
+    }
+
+    @Test
+    public void testAnimateModel() {
+        window.getMenuBar().getMenu("Run").getSubMenu("SimpleSet").click();
+        WindowInterceptor.init(window.getMenuBar().getMenu("View").getSubMenu("Animate Window").triggerClick())
+        .process(new WindowHandler() {
+            public Trigger process(Window configurationDialog) {
+                assertTrue(configurationDialog.titleEquals("Animator - ModelJUnit"));
+
+                assertTrue(configurationDialog.getButton(displayedNameIdentity("addS1")).isEnabled());
+                assertTrue(configurationDialog.getButton(displayedNameIdentity("addS2")).isEnabled());
+                assertTrue(configurationDialog.getButton(displayedNameIdentity("removeS1")).isEnabled());
+                assertTrue(configurationDialog.getButton(displayedNameIdentity("removeS2")).isEnabled());
+
+                configurationDialog.getListBox().contentEquals("*** RESET *** (FF)");
+                configurationDialog.getButton(displayedNameIdentity("addS1")).click();
+                configurationDialog.getListBox().contentEquals(
+                                "*** RESET *** (FF)\n" +
+                                                "addS1(TF)"
+                                );
+                configurationDialog.getButton(displayedNameIdentity("addS2")).click();
+                configurationDialog.getListBox().contentEquals(
+                                "*** RESET *** (FF)\n" +
+                                                "addS1(TF)\n" +
+                                                "addS2(TT)"
+                                );
+                configurationDialog.getButton(displayedNameIdentity("removeS1")).click();
+                configurationDialog.getListBox().contentEquals(
+                                "*** RESET *** (FF)" +
+                                                "addS1(TF)\n" +
+                                                "addS2(TT)\n" +
+                                                "removeS1(FT)"
+                                );
+                configurationDialog.getButton(displayedNameIdentity("removeS2")).click();
+                configurationDialog.getListBox().contentEquals(
+                                "*** RESET *** (FF)" +
+                                                "addS1(TF)\n" +
+                                                "addS2(TT)\n" +
+                                                "removeS1(FT)\n" +
+                                                "removeS2(FF)"
+                                );
+
+                return configurationDialog.getButton(displayedNameIdentity("reset")).triggerClick();
+            }
+        })
+        .run();
+    }
+
     @Test
     public void testTestConfigurationWithGreedyTester() {
         window.getMenuBar().getMenu("Run").getSubMenu("SimpleSet").click();
@@ -226,49 +230,50 @@ public class ModelJUnitGUITest extends UISpecTestCase {
                                         "    (FT, addS2, FT)"
                         ));
     }
-	
-	@Test
-  public void testRunEfficiencyGraphs() {
-	  WindowInterceptor.init(window.getMenuBar().getMenu("Run").getSubMenu("Efficiency Graphs").triggerClick())
-      .process(new WindowHandler() {
-          public Trigger process(Window configurationDialog) {
-            assertTrue(configurationDialog.titleEquals("Efficiency Graphs - ModelJUnit"));
-                        
-            // no action can be performed after the efficiency graphs window is shown,
-            // so return a new trigger with empty run() implementation.
-            return new Trigger() {
-              @Override
-              public void run() throws Exception {}
-            };
-          }
-      })
-      .run();
-  }
-	
-	/**
-	 * Matches components whose displayed name is exactly the same as the reference.
-	 */
-	public static ComponentMatcher displayedNameIdentity(String reference) {
-		return new DisplayedNameComponentMatcher(StringMatcher.identity(reference));
-	}
 
-	/**
-	 * This class implements the {@link ComponentMatcher} that returns True if the display name
-	 * of the component matches the string matcher.
-	 */
-	private static class DisplayedNameComponentMatcher implements ComponentMatcher {
-		private final StringMatcher stringMatcher;
+    @Test
+    public void testViewCoverageWindow() {
+        window.getMenuBar().getMenu("Run").getSubMenu("SimpleSet").click();
+        WindowInterceptor.init(window.getMenuBar().getMenu("View").getSubMenu("Coverage Window").triggerClick())
+        .process(new WindowHandler() {
+            public Trigger process(Window configurationDialog) {
+                assertTrue(configurationDialog.titleEquals("Coverage - ModelJUnit"));
 
-		public DisplayedNameComponentMatcher(StringMatcher stringMatcher) {
-			this.stringMatcher = stringMatcher;
-		}
+                // no action can be performed after the coverage graphs window is shown,
+                // so return a new trigger with empty run() implementation.
+                return new Trigger() {
+                    @Override
+                    public void run() throws Exception {}
+                };
+            }
+        })
+        .run();
+    }
 
-		public boolean matches(Component component) {
-			if (!ComponentUtils.hasDisplayedName(component.getClass())) {
-				return false;
-			}
-			String displayedName = ComponentUtils.getDisplayedName(component);
-			return stringMatcher.matches(displayedName);
-		}
-	}
+    /**
+     * Matches components whose displayed name is exactly the same as the reference.
+     */
+    public static ComponentMatcher displayedNameIdentity(String reference) {
+        return new DisplayedNameComponentMatcher(StringMatcher.identity(reference));
+    }
+
+    /**
+     * This class implements the {@link ComponentMatcher} that returns True if the display name
+     * of the component matches the string matcher.
+     */
+    private static class DisplayedNameComponentMatcher implements ComponentMatcher {
+        private final StringMatcher stringMatcher;
+
+        public DisplayedNameComponentMatcher(StringMatcher stringMatcher) {
+            this.stringMatcher = stringMatcher;
+        }
+
+        public boolean matches(Component component) {
+            if (!ComponentUtils.hasDisplayedName(component.getClass())) {
+                return false;
+            }
+            String displayedName = ComponentUtils.getDisplayedName(component);
+            return stringMatcher.matches(displayedName);
+        }
+    }
 }
