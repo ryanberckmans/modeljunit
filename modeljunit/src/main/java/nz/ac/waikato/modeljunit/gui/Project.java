@@ -27,7 +27,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.Date;
 
 import javax.xml.bind.JAXBContext;
@@ -36,14 +36,9 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
-
-import cern.colt.Arrays;
 
 import nz.ac.waikato.modeljunit.Action;
 import nz.ac.waikato.modeljunit.FsmModel;
@@ -486,7 +481,7 @@ public class Project implements Cloneable {
                         "*** COVERAGE OPTIONS: " + Arrays.toString(getCoverageOption()) + "\n" + 
                         "*** METHODS: " + mArrayMethod.size() + "\n"; 
     }
-    
+
     @Override
     public Project clone() {
         try {
