@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.io.File;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -16,6 +15,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JScrollBar;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
@@ -52,6 +52,9 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
     /** A link to the top-level GUI, for callbacks. */
     private ModelJUnitGUI m_gui = null;
 
+    /** The Project instance that settings are saved to, replacing the old project if OK is clicked. */
+    private Project mWorkingProject;
+
     /**
      * The topmost (model) panel. This is for finding and loading the model class.
      */
@@ -65,9 +68,6 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
     private JLabel m_modelInfo1, m_modelInfo2, m_modelInfo3;
 
     private static final String MSG_NO_MODEL = "(No model loaded yet)";
-
-    /** The button for loading the model class. */
-    private JButton m_butOpenModel;
 
     // Algorithm panel
     private final static int H_SPACE = 6;
@@ -110,6 +110,7 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
     /** Use PanelTestDesign(gui) to get a test design panel. */
     public PanelTestDesign(ModelJUnitGUI gui) {
         m_gui = gui;
+        mWorkingProject = m_gui.getProject().clone();
         // Panel background colours
         Color[] bg = new Color[3];
         bg[0] = new Color(156, 186, 216);
@@ -120,10 +121,10 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         mCodeView = new JTextArea("");
-        mCodeView.setPreferredSize(new Dimension(250, 500));
         mCodeView.setEditable(false);
 
         mScrollPane = new JScrollPane(mCodeView);
+        mScrollPane.setVerticalScrollBar(new JScrollBar());
 
         ///////////////////////////////////////////////////////////
         //        Setup model panel
@@ -132,17 +133,6 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
         m_panelModel.setLayout(new BoxLayout(m_panelModel, BoxLayout.X_AXIS));
         m_panelModel.setPreferredSize(new Dimension(400, 120));
 
-        // The "Choose Model" button is on the left
-        // m_panelModel.add(Box.createHorizontalStrut(10));
-        m_butOpenModel = new JButton("Load Model...");
-        m_butOpenModel.setMinimumSize(new Dimension(100, 30));
-        m_butOpenModel.setPreferredSize(new Dimension(120, 40));
-        m_butOpenModel.setMaximumSize(new Dimension(120, 40));
-        m_butOpenModel.addActionListener(this);
-        m_butOpenModel.setToolTipText("Load a .class file that contains your test model");
-        // m_panelModel.add(m_butOpenModel);
-        // m_panelModel.add(Box.createHorizontalStrut(10));
-
         // An information area is to the right of the button.
         JPanel infoPane = new JPanel();
         infoPane.setLayout(new BoxLayout(infoPane, BoxLayout.Y_AXIS));
@@ -150,7 +140,6 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
         m_modelInfo1 = new JLabel(" ");
         m_modelInfo2 = new JLabel(MSG_NO_MODEL);
         m_modelInfo3 = new JLabel(" ");
-        //m_modelInfo.setPreferredSize(new Dimension(300, 80));
         infoPane.add(m_modelInfo1);
         infoPane.add(m_modelInfo2);
         infoPane.add(m_modelInfo3);
@@ -177,14 +166,14 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
         for (int i = 0; i < OptionPanelCreator.NUM_PANE; i++)
             m_combAlgorithmSelection.addItem(m_panelAlgorithm[i].getAlgorithmName());
         // Set default algorithm name
-        Parameter.setAlgorithmName(OptionPanelCreator.ALGORITHM_NAME[0]);
+        mWorkingProject.setAlgorithmName(OptionPanelCreator.ALGORITHM_NAME[0]);
         m_combAlgorithmSelection.addActionListener(this);
         m_combAlgorithmSelection.setMaximumSize(maxControlSize);
 
         // Setup slider
-        m_sliderAverageTestLength.setValue((int) (1 / Parameter.getResetProbability()));
+        m_sliderAverageTestLength.setValue((int) (1 / mWorkingProject.getResetProbability()));
         m_sliderAverageTestLength.addChangeListener(this);
-        m_sliderAverageTestLength.setToolTipText("Average walk length = " + (1 / Parameter.getResetProbability()));
+        m_sliderAverageTestLength.setToolTipText("Average walk length = " + (1 / mWorkingProject.getResetProbability()));
         m_sliderAverageTestLength.setMajorTickSpacing(10);
         m_sliderAverageTestLength.setPaintTicks(true);
 
@@ -195,7 +184,7 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
         m_txtLength = new JTextField();
         m_txtLength.setName("totalTestLength");
         m_txtLength.setColumns(7);
-        m_txtLength.setText(String.valueOf(m_gui.getProject().getWalkLength()));
+        m_txtLength.setText(String.valueOf(mWorkingProject.getWalkLength()));
         m_txtLength.addFocusListener(this);
         m_txtLength.setMaximumSize(maxControlSize);
         // Set walk length to default value
@@ -273,10 +262,10 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
         m_panelReport.add(m_checkFailureVerbosity);
         // Coverage matrix
         m_checkCoverage = new JCheckBox[NUM_GRAPH_CHECKBOX + 1];
-        m_checkCoverage[0] = new JCheckBox("State coverage");
-        m_checkCoverage[1] = new JCheckBox("Transition coverage");
-        m_checkCoverage[2] = new JCheckBox("Transition pair coverage");
-        m_checkCoverage[3] = new JCheckBox("Action coverage");
+        m_checkCoverage[0] = new JCheckBox("State coverage (black)");
+        m_checkCoverage[1] = new JCheckBox("<html>Transition coverage <font style=\"color:#FFA500\">(orange)</font></html>");
+        m_checkCoverage[2] = new JCheckBox("<html>Transition pair coverage <font style=\"color:#00FFFF\">(cyan)</font></html>");
+        m_checkCoverage[3] = new JCheckBox("<html>Action coverage <font style=\"color:#FF00FF\">(magenta)</font></html>");
         m_checkCoverage[CHECKBOX_PAINTGRAPH] = new JCheckBox("Print graph to a file");
 
         for (int i = 0; i < NUM_GRAPH_CHECKBOX; i++) {
@@ -289,39 +278,32 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
         // m_panelReport.setBackground(bg[2]);
         m_panelReport.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Reporting"));
         this.add(m_panelReport);
+        
+        JButton okButton = new JButton("OK");
 
-        JButton closeButton = new JButton("OK");
-
-        closeButton.addActionListener(new ActionListener() {
+        okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 getTopLevelAncestor().setVisible(false);
-                m_gui.getProject().setWalkLength(Integer.valueOf(m_txtLength.getText()));
+                m_gui.setProject(mWorkingProject);
             }
         });
-
-        this.add(closeButton);
-    }
-
-    /**
-     * Load panel settings from the current Parameter class. This is typically called when a new model is loaded, or (in
-     * the future) when a new configuration is created.
-     **/
-    public void updatePanelSettings() {
-        for (int i = 0; i < NUM_GRAPH_CHECKBOX; i++) {
-            m_checkCoverage[i].setSelected(Parameter.getCoverageOption()[i]);
-        }
-
-        m_checkCoverage[CHECKBOX_PAINTGRAPH].setSelected(Parameter.getGenerateGraph());
-
-        m_checkFailureVerbosity.setSelected(Parameter.getFailureVerbosity());
-
-        m_combAlgorithmSelection.setSelectedIndex(m_gui.getProject().getAlgorithm());
-        Parameter.setAlgorithmName(m_panelAlgorithm[m_gui.getProject().getAlgorithm()].getAlgorithmName());
-
-        // We need to take the inverse to get back to a slider value.
-        m_sliderAverageTestLength.setValue((int) (1.0 / Parameter.getResetProbability()));
-
-        m_txtLength.setText("" + m_gui.getProject().getWalkLength());
+        
+        JButton cancelButton = new JButton("Cancel");
+        
+        cancelButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                getTopLevelAncestor().setVisible(false);
+            }
+        });
+        
+        JPanel buttons = new JPanel();
+        
+        buttons.add(okButton);
+        buttons.add(cancelButton);
+        
+        this.add(buttons);
+        
+        m_gui.setProject(mWorkingProject);
     }
 
     public void setModelRelatedButton(JButton button) {
@@ -336,17 +318,17 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
      * After user successfully load a new model this method will be called to initialize model and tester to run test
      * and set the new model loaded flag to false.
      * */
-    public void initializeTester(Project project, int idx) {
+    public void initializeTester(int idx) {
         // Generate the Tester object
-        m_panelAlgorithm[m_nCurAlgo].initialize(project, idx);
+        m_panelAlgorithm[m_nCurAlgo].initialize(m_gui.getProject(), idx);
         // Set current algorithm for prepare execution
         TestExeModel.setTester(m_panelAlgorithm[m_nCurAlgo].getTester(idx), idx);
-        project.setAlgorithm(m_panelAlgorithm[m_nCurAlgo]);
+        m_gui.getProject().setAlgorithm(m_panelAlgorithm[m_nCurAlgo]);
     }
 
     /**
      * If user checked any coverage check button or want to generate .dot graph file. Tester will build graph, this
-     * function will return ture. Otherwise false.
+     * function will return true. Otherwise false.
      * */
     public boolean isLineChartDrawable() {
         return (m_checkCoverage[0].isSelected() || m_checkCoverage[1].isSelected() || m_checkCoverage[2].isSelected() || m_checkCoverage[3]
@@ -370,40 +352,36 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
 
             m_algorithmRight.setToolTipText(m_panelAlgorithm[m_nCurAlgo].getExplanation());
             // Update the setting
-            Parameter.setAlgorithmName(m_panelAlgorithm[m_nCurAlgo].getAlgorithmName());
-            m_gui.getProject().setAlgorithm(m_nCurAlgo);
+            mWorkingProject.setAlgorithmName(m_panelAlgorithm[m_nCurAlgo].getAlgorithmName());
+            mWorkingProject.setAlgorithm(m_nCurAlgo);
         }
         // -------------- Check the coverage matrix options --------------
 
-        boolean bchecked[] = Parameter.getCoverageOption();
+        boolean bchecked[] = mWorkingProject.getCoverageOption();
 
         for (int i = 0; i < NUM_GRAPH_CHECKBOX; i++) {
             if (e.getSource() == m_checkCoverage[i]) {
                 bchecked[i] = !bchecked[i];
-                Parameter.setCoverageOption(bchecked);
-                System.out.println("Checkbox: " + i + " " + bchecked[i]);
+                mWorkingProject.setCoverageOption(bchecked);
+                //System.out.println("DEBUG: Checkbox: " + i + " " + bchecked[i]);
                 if (i == CHECKBOX_PAINTGRAPH)
-                    Parameter.setGenerateGraph(m_checkCoverage[CHECKBOX_PAINTGRAPH].isSelected());
+                    mWorkingProject.setGenerateGraph(m_checkCoverage[CHECKBOX_PAINTGRAPH].isSelected());
             }
-        }
-        // ------- Model loading --------
-        if (e.getSource() == m_butOpenModel) {
-            //openModelFromFile();
         }
         // ------- Verbosity comboboxes --------
         if (e.getSource() == m_checkVerbosity) {
-            Parameter.setVerbosity(m_checkVerbosity.isSelected());
+            mWorkingProject.setVerbosity(m_checkVerbosity.isSelected());
         }
         if (e.getSource() == m_checkFailureVerbosity) {
-            Parameter.setFailureVerbosity(m_checkFailureVerbosity.isSelected());
+            mWorkingProject.setFailureVerbosity(m_checkFailureVerbosity.isSelected());
         }
 
         // -------- Set the total test length ---------
-        m_gui.getProject().setWalkLength(Integer.valueOf(m_txtLength.getText()));
+        mWorkingProject.setWalkLength(Integer.valueOf(m_txtLength.getText()));
 
         // -------- Regenerate Code in View ---------
         try {
-            mCodeView.setText(generateCode(m_gui.getProject()));
+            mCodeView.setText(generateCode());
         } catch (Exception x) {
             mCodeView.setText("There was a problem generating code at this time:\n" + x.getMessage());
         }
@@ -411,112 +389,25 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
         mCodeView.setPreferredSize(mScrollPane.getViewport().getExtentSize());
     }
 
-    /* private void openModelFromFile()
-     {
-       // ------------ Open model from class file --------------
-       String[] extensions = {"class"};
-       FileChooserFilter javaFileFilter = new FileChooserFilter(extensions,
-           "Java class Files");
-       JFileChooser chooser = new JFileChooser();
-       chooser.setCurrentDirectory(new File(Parameter.getModelChooserDirectory()));
-       chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-       chooser.setDialogTitle("Open model file");
-       chooser.addChoosableFileFilter(javaFileFilter);
-       int option = chooser.showOpenDialog(this.m_panelModel);
-
-       if (option == JFileChooser.APPROVE_OPTION) {
-         String errmsg = null;  // null means no errors yet
-         File f = chooser.getSelectedFile();
-         String wholePath = f.getAbsolutePath();
-         Parameter.setModelChooserDirectory(f.getParent());
-
-         // Use ASM to read the package and class name from the .class file
-         try {
-           ClassReader reader = new ClassReader(new FileInputStream(f));
-           String internalName = reader.getClassName();
-           int slash = internalName.lastIndexOf('/');
-           String className = internalName.substring(slash+1);
-           String packageName = "";
-           String classPath = "";
-           if (slash >= 0) {
-             packageName = internalName.substring(0, slash).replaceAll("/", ".");
-           }
-           //System.out.println("f.absolutePath="+f.getAbsolutePath());
-           //System.out.println("internalName="+internalName);
-           //System.out.println("className="+className);
-           //System.out.println("packageName="+packageName);
-
-           // now calculate the classpath for this .class file.
-           String sep = Matcher.quoteReplacement(File.separator);
-           String ignore = ("/"+internalName+".class").replaceAll("/", sep);
-           //System.out.println("ignore="+ignore);
-           if (wholePath.endsWith(ignore)) {
-             classPath = wholePath.substring(0, wholePath.lastIndexOf(ignore));
-             //System.out.println("MU: classPath="+classPath);
-           }
-           else {
-             errmsg = "Error calculating top of package from: "+wholePath;
-           }
-
-           // Load model from file and initialize the model object
-           int actionNumber = 0;
-           if (errmsg == null) {
-             Parameter.setModelPath(wholePath);
-             Parameter.setClassName(className);
-             Parameter.setPackageName(packageName);
-             Parameter.setPackageLocation(classPath);
-             if (TestExeModel.loadModelClassFromFile()) {
-               Class<?> testcase = TestExeModel.getModelClass();
-               for (Method method : testcase.getMethods()) {
-                 if (method.isAnnotationPresent(Action.class)) {
-                   actionNumber++;
-                   TestExeModel.addMethod(method);
-                 }
-               }
-             }
-             else {
-               errmsg = "Invalid model class: no @Action methods.";
-             }
-           }
-           if (errmsg == null) {
-             // We have successfully loaded a new model
-             initializeTester(0);
-             initializeTester(1);
-             m_butExternalExecute.setEnabled(true);
-             String cName = Parameter.getPackageName()+"."+Parameter.getClassName();
-             m_modelInfo1.setText("Model:   "+cName);
-             m_modelInfo2.setText("Path:     "+Parameter.getPackageLocation());
-             m_modelInfo3.setText("Actions: "+actionNumber + " actions were loaded.");
-             m_gui.newModel(); // tell the other panels about the new model
-           }
-         }
-         catch (IOException ex) {
-           errmsg = "Error reading .class file: "+ex.getLocalizedMessage();
-         }
-         if (errmsg != null) {
-           ErrorMessage.DisplayErrorMessage("Error loading model", errmsg);
-           TestExeModel.resetModelToNull();
-           Parameter.setModelPath("");
-           Parameter.setClassName("");
-           Parameter.setPackageName("");
-           Parameter.setPackageLocation("");
-           m_modelInfo1.setText(" ");
-           m_modelInfo2.setText(MSG_NO_MODEL);
-           m_modelInfo3.setText(" ");
-           // TODO: could call m_gui.newModel() here too? (To reset all panels)
-         }
-       }
-     }*/
-
     public void newModel() {
-        String cName = m_gui.getProject().getClassName();
-        // TODO: get the number of actions from the Model.
-        int actionNumber = m_gui.getProject().getMethodCount();
+        mWorkingProject = m_gui.getProject().clone();
+        String cName = mWorkingProject.getClassName();
+        int actionNumber = mWorkingProject.getMethodCount();
         m_modelInfo1.setText("Model:   " + cName);
-        m_modelInfo2.setText("Path:     " + m_gui.getProject().getPackageLocation());
+        m_modelInfo2.setText("Path:     " + mWorkingProject.getPackageLocation());
         m_modelInfo3.setText("Actions: " + actionNumber + " actions were loaded.");
-
-        updatePanelSettings();
+        
+        for (int i = 0; i < NUM_GRAPH_CHECKBOX; i++) {
+            m_checkCoverage[i].setSelected(mWorkingProject.getCoverageOption()[i]);
+        }
+        m_checkCoverage[CHECKBOX_PAINTGRAPH].setSelected(mWorkingProject.getGenerateGraph());
+        m_checkVerbosity.setSelected(mWorkingProject.getVerbosity());
+        m_checkFailureVerbosity.setSelected(mWorkingProject.getFailureVerbosity());
+        m_txtLength.setText("" + mWorkingProject.getWalkLength());
+        m_combAlgorithmSelection.setSelectedIndex(mWorkingProject.getAlgorithm());
+        mWorkingProject.setAlgorithmName(m_panelAlgorithm[mWorkingProject.getAlgorithm()].getAlgorithmName());
+        // We need to take the inverse to get back to a slider value.
+        m_sliderAverageTestLength.setValue((int) (1.0 / mWorkingProject.getResetProbability()));
     }
 
     /**
@@ -524,10 +415,10 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
      * 
      * @return
      */
-    public String generateCode(Project project) {
+    public String generateCode() {
         // Random walking length
         int length = Integer.valueOf(m_txtLength.getText());
-        if (project.getClassName() == null || project.getClassName().length() <= 0)
+        if (mWorkingProject.getClassName() == null || mWorkingProject.getClassName().length() <= 0)
             return "";
         StringBuffer buf = new StringBuffer();
 
@@ -557,12 +448,18 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
         }
         // Generate class content
         buf.append(Indentation.SEP);
-        buf.append(Indentation.indent("public class " + project.getClassName() + "Tester" + Indentation.SEP + "{"));
-        buf.append(Indentation.indent("public static void main(String args[])"));
+        String[] words = mWorkingProject.getClassName().split("\\.");
+        String className = words[words.length-1];
+        buf.append(Indentation.indent("public class " + className + "Tester" + Indentation.SEP + "{"));
+        String throwString = "";
+        if (m_checkCoverage[CHECKBOX_PAINTGRAPH].isSelected()) {
+            throwString = " throws FileNotFoundException";
+        }
+        buf.append(Indentation.indent("public static void main(String args[])" + throwString));
         buf.append(Indentation.indent("{"));
 
         // Generate code according to particular algorithm.
-        buf.append(m_panelAlgorithm[m_nCurAlgo].generateCode(project));
+        buf.append(m_panelAlgorithm[m_nCurAlgo].generateCode(mWorkingProject));
 
         // If user want to check coverage or draw dot graph,
         // build graph before add coverage listener.
@@ -627,7 +524,7 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
         }
 
         if (m_checkCoverage[CHECKBOX_PAINTGRAPH].isSelected()) {
-            buf.append(Indentation.indent("graph.printGraphDot(\"" + project.getClassName() + ".dot\");"));
+            buf.append(Indentation.indent("graph.printGraphDot(\"" + mWorkingProject.getClassName() + ".dot\");"));
         }
         // Ending
         buf.append(Indentation.indent("}"));
@@ -639,38 +536,11 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
     public JComponent getCodeView() {
         return mScrollPane;
     }
-
-    private class FileChooserFilter extends javax.swing.filechooser.FileFilter {
-        private String m_description = null;
-
-        private String[] m_extension = null;
-
-        public FileChooserFilter(String[] extension, String description) {
-            m_description = description;
-            m_extension = new String[extension.length];
-            for (int i = 0; i < extension.length; i++) {
-                m_extension[i] = "." + extension[i].toLowerCase();
-            }
-        }
-
-        public String getDescription() {
-            return m_description;
-        }
-
-        @Override
-        public boolean accept(File f) {
-            if (f == null)
-                return false;
-            if (f.isDirectory())
-                return true;
-            for (int i = 0; i < m_extension.length; i++) {
-                if (f.getName().toLowerCase().endsWith(m_extension[i]))
-                    return true;
-            }
-            return false;
-        }
-    }
-
+    
+    /**
+     * Handles the slider change events.
+     */
+    @Override
     public void stateChanged(ChangeEvent e) {
         if (e.getSource() == this.m_sliderAverageTestLength) {
             JSlider source = (JSlider) e.getSource();
@@ -680,15 +550,14 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
                     avgLength = 2;
                 }
                 double prob = (double) 1.0 / (double) avgLength;
-                Parameter.setResetProbability(prob);
+                mWorkingProject.setResetProbability(prob);
                 m_sliderAverageTestLength.setToolTipText("Average walk length: "
-                                + (1 / Parameter.getResetProbability()));
-                // System.out.println("(PaneltestDesign.java)Average length :"+prob);
+                                + (1 / mWorkingProject.getResetProbability()));
             }
         }
 
         try {
-            mCodeView.setText(generateCode(m_gui.getProject()));
+            mCodeView.setText(generateCode());
         } catch (Exception x) {
             mCodeView.setText("There was a problem generating code at this time:\n" + x.getMessage());
         }
@@ -703,11 +572,11 @@ public class PanelTestDesign extends PanelAbstract implements ActionListener, Fo
     @Override
     public void focusLost(FocusEvent e) {
         if (e.getSource() == m_txtLength) {
-            m_gui.getProject().setWalkLength(Integer.valueOf(m_txtLength.getText()));
+            mWorkingProject.setWalkLength(Integer.valueOf(m_txtLength.getText()));
 
             // -------- Regenerate Code in View ---------
             try {
-                mCodeView.setText(generateCode(m_gui.getProject()));
+                mCodeView.setText(generateCode());
             } catch (Exception x) {
                 mCodeView.setText("There was a problem generating code at this time:\n" + x.getMessage());
             }

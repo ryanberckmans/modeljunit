@@ -205,6 +205,8 @@ public class PanelJUNGVisualisation extends PanelAbstract implements ActionListe
         vv = new VisualizationViewer<Object, Object>(layout);
         vv.setBackground(Color.white);
 
+        //TODO Fix the application-crashing problem when zooming out too far
+        //TODO Reset the view window to center on the model's starting node when generating new tests
         //TODO find a fix for the merging of edges
         //Setup the ability to compress multiple edges into one
         /*final PredicatedParallelEdgeIndexFunction<Object, Object> eif =
@@ -304,18 +306,6 @@ public class PanelJUNGVisualisation extends PanelAbstract implements ActionListe
 
         setLayout(new BorderLayout());
         add(treeAndViz, BorderLayout.CENTER);
-    }
-
-    /**
-     * Use singleton pattern to get instance of graph view panel
-     * 
-     * @return An instance of the PanelGraphVisualistation panel
-     */
-    public static PanelJUNGVisualisation getGraphVisualisationInstance() {
-        if (m_panelGraph == null) {
-            m_panelGraph = new PanelJUNGVisualisation();
-        }
-        return m_panelGraph;
     }
 
     /**
@@ -950,7 +940,7 @@ public class PanelJUNGVisualisation extends PanelAbstract implements ActionListe
         animationSlider.setMajorTickSpacing(500);
         animationSlider.setMaximum(3000);
         animationSlider.setMinimum(100);
-        animationSlider.setValue(1000);
+        animationSlider.setValue(300);
         animationSlider.setPaintTicks(true);
         animationSlider.setToolTipText("Use this slider to control the speed of the animation");
         animationSlider.addChangeListener(new ChangeListener() {

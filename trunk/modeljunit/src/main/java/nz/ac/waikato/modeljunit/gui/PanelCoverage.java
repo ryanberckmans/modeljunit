@@ -55,20 +55,11 @@ public class PanelCoverage extends PanelAbstract {
     // Action coverage array
     private ArrayList<Integer> m_covA;
 
-    // Panel object
-    private static PanelCoverage m_panel;
-
     private JProgressBar mProgress;
     
     private ModelJUnitGUI mGUI;
 
-    public static PanelCoverage getInstance(ModelJUnitGUI gui) {
-        if (m_panel == null)
-            m_panel = new PanelCoverage(gui);
-        return m_panel;
-    }
-
-    private PanelCoverage(ModelJUnitGUI gui) {
+    public PanelCoverage(ModelJUnitGUI gui) {
         mGUI = gui;
         this.setBackground(Color.WHITE);
         this.setDoubleBuffered(true);
@@ -155,7 +146,7 @@ public class PanelCoverage extends PanelAbstract {
             arraySScaleYPos[0] = arrayTScaleYPos[0] = arrayTPScaleYPos[0] = arrayAScaleYPos[0] = AXIS_HEIGHT;
             arrayScaleXPos[0] = LEFT_SPACE;
             // Draw line chart for state coverage
-            boolean[] bShowCoverage = Parameter.getCoverageOption();
+            boolean[] bShowCoverage = mGUI.getProject().getCoverageOption();
 
             // State coverage
             if (bShowCoverage[0]) {

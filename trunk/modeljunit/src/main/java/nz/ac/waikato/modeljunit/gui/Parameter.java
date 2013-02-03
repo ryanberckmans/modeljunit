@@ -25,82 +25,9 @@ import nz.ac.waikato.modeljunit.RandomTester;
 @XmlRootElement
 public class Parameter {
     public static final String DEFAULT_DIRECTORY = System.getProperty("user.dir");
-
+    
     // Number of coverage options
     public static final int NUM_COVERAGE = 5;
-    /**
-     * Testing parameters, dot graph
-     * */
-    private static boolean m_bGenerateGraph;
-
-    public static boolean getGenerateGraph() {
-        return m_bGenerateGraph;
-    }
-
-    public static void setGenerateGraph(boolean print) {
-        System.out.println("SetGenerateGraph to " + print);
-        m_bGenerateGraph = print;
-    }
-
-    /**
-     * Reset probability
-     * 
-     * Set the probability of doing a reset during random walks. Note that the average length of each test sequence will
-     * be roughly proportional to the inverse of this probability.
-     * 
-     * If this is set to 0.0, then resets will only be done when we reach a dead-end state (no enabled actions). This
-     * means that if the FSM contains a loop that does not have a path back to the initial state, then the random walks
-     * may get caught in that loop forever. For this reason, a non-zero probability is recommended.
-     */
-    private static double m_dResetProbability = RandomTester.DEFAULT_RESET_PROBABILITY;
-
-    public static double getResetProbability() {
-        return m_dResetProbability;
-    }
-
-    public static void setResetProbability(double probability) {
-        m_dResetProbability = probability;
-    }
-
-    /**
-     * Test generation verbosity whether user wants show verbosity or not
-     */
-    private static boolean m_bVerbosity = true;
-
-    public static boolean getVerbosity() {
-        return m_bVerbosity;
-    }
-
-    public static void setVerbosity(boolean verb) {
-        m_bVerbosity = verb;
-    }
-
-    /**
-     * Test failure verbosity
-     * 
-     */
-    private static boolean m_bFailureVerbosity;
-
-    public static boolean getFailureVerbosity() {
-        return m_bFailureVerbosity;
-    }
-
-    public static void setFailureVerbosity(boolean verb) {
-        m_bFailureVerbosity = verb;
-    }
-
-    /**
-     * Algorithm name When user select new algorithm from GUI, this value will be changed.
-     */
-    private static String m_strAlgorithmName;
-
-    public static String getAlgorithmName() {
-        return m_strAlgorithmName;
-    }
-
-    public static void setAlgorithmName(String algorithmname) {
-        m_strAlgorithmName = algorithmname;
-    }
 
     /**
      * Test case class name
@@ -114,21 +41,7 @@ public class Parameter {
     public static void setTestCaseVariableName(String name) {
         m_strTestCaseVariableName = name;
     }
-
-    /**
-     * Transition Coverage options 0. State coverage 1. Transition coverage 2. Transition pair coverage 3. Action
-     * coverage
-     */
-    private static boolean[] m_bCoverageOption = new boolean[NUM_COVERAGE];
-
-    public static boolean[] getCoverageOption() {
-        return m_bCoverageOption;
-    }
-
-    public static void setCoverageOption(boolean[] options) {
-        m_bCoverageOption = options;
-    }
-
+    
     /**
      * The path to the directory where the .class model files are read from.
      */
@@ -210,7 +123,7 @@ public class Parameter {
 
     //----------------------Override toString----------------------
     public String toString() {
-        return "Algorithm: " + m_strAlgorithmName + ", \nCoverage: "
-                        + m_bCoverageOption[0] + ", " + m_bCoverageOption[1] + ", " + m_bCoverageOption[2] + ".";
+        return "Model Chooser Directory: " + m_strModelChooserDirectory + 
+                        ", File Chooser Open Mode: " + m_nFileChooserOpenMode;
     }
 }

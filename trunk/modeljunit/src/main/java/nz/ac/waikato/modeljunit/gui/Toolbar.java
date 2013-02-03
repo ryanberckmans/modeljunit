@@ -113,8 +113,21 @@ public class Toolbar extends JPanel {
             }
         });
 
-        b = new JButton("Efficiency Graphs");
+        b = new JButton("Coverage Graphs");
+        
+        this.add(b);
 
+        b.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                mParent.displayCoverageWindow();
+            }
+        });
+
+        b = new JButton("Efficiency Graphs");
+        // TODO: Fix the efficiency graphs 
+        // They draw the first time but not subsequent times
+        b.setEnabled(false);
+        
         this.add(b);
 
         b.addActionListener(new ActionListener() {

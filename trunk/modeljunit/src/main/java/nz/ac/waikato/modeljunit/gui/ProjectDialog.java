@@ -22,6 +22,9 @@ package nz.ac.waikato.modeljunit.gui;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.jar.JarFile;
 
 /**
  * A dialogue to create or edit a ModelJUnit project, including selection of a class file for the SUT.
@@ -41,7 +44,7 @@ public class ProjectDialog extends JDialog {
         super(parent.getFrame(), "Edit ModelJUnit Project", true);
         mParent = parent;
         mModelJARName = new JLabel("(none selected)");
-        mModelInfoLabel = new JLabel(" Please enter the location of the class file (e.g: package.MyModel): ");
+        mModelInfoLabel = new JLabel(" Please enter the full class name of the model within the JAR file: ");
         mModelClassName = new JTextField();
         createButton = new JButton("Load");
         constructGUI();
@@ -66,14 +69,22 @@ public class ProjectDialog extends JDialog {
 
         browseButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                mModelClassName.setText("");
                 mJarName = mParent.displayFileChooser();
-                mModelJARName.setText("<html><em>" + mJarName + "&nbsp;</em></html>");
-                pack();
                 if (mJarName != null) {
+                    mModelJARName.setText("<html><em>" + mJarName + "&nbsp;</em></html>");
                     mModelInfoLabel.setEnabled(true);
                     mModelClassName.setEnabled(true);
                     createButton.setEnabled(true);
                 }
+                try {
+                    JarFile jarFile = new JarFile(mJarName);
+                    String mainClass = jarFile.getManifest().getMainAttributes().getValue("Main-Class");
+                    mModelClassName.setText(mainClass);
+                } catch (IOException ex) {
+                    mModelClassName.setText("< No main class found >");
+                }
+                pack();
             }
         });
 
@@ -112,8 +123,8 @@ public class ProjectDialog extends JDialog {
             }
         });
 
-        buttonPanel.add(cancelButton);
         buttonPanel.add(createButton);
+        buttonPanel.add(cancelButton);
 
         add(buttonPanel);
 

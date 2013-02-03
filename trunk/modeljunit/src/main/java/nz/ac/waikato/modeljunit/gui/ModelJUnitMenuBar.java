@@ -177,6 +177,9 @@ public class ModelJUnitMenuBar extends JMenuBar {
         });
 
         item = new JMenuItem("Efficiency Graphs");
+        // TODO: Fix the efficiency graphs
+        // They draw the first time but not subsequent times
+        item.setEnabled(false);
         item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
         mRun.add(item);
 

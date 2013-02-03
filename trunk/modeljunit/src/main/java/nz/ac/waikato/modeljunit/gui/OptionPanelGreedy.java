@@ -5,16 +5,23 @@ import java.util.Random;
 
 import javax.swing.Box;
 import javax.swing.JCheckBox;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import nz.ac.waikato.modeljunit.GreedyTester;
 import nz.ac.waikato.modeljunit.RandomTester;
 import nz.ac.waikato.modeljunit.Tester;
 
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.NONE)
 public class OptionPanelGreedy extends OptionPanelAdapter implements IAlgorithmParameter {
     private static final long serialVersionUID = -3666437825873201003L;
 
     private StringBuffer m_bufCode;
 
+    @XmlElement(name = "randomSeed")
     private JCheckBox m_checkRandomSeed;
 
     public OptionPanelGreedy(String name, String explain, String imgPath) {
@@ -40,7 +47,7 @@ public class OptionPanelGreedy extends OptionPanelAdapter implements IAlgorithmP
         if (m_checkRandomSeed.isSelected())
             m_bufCode.append(Indentation.indent("tester.setRandom(new Random());"));
 
-        double resetProb = Parameter.getResetProbability();
+        double resetProb = project.getResetProbability();
         if (resetProb != RandomTester.DEFAULT_RESET_PROBABILITY) {
             m_bufCode.append(Indentation.indent("tester.setResetProbability("
                             + String.format("%1$.3f", new Object[] { resetProb }) + ");"));

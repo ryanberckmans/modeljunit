@@ -47,7 +47,7 @@ public class TestExeModel {
     private static Tester[] m_tester = new Tester[2];
 
     public static void setTester(Tester tester, int idx) {
-        System.out.println("Changed tester[" + idx + "] from " + m_tester[idx] + " to " + tester);
+        //System.out.println("DEBUG: Changed tester[" + idx + "] from " + m_tester[idx] + " to " + tester);
 
         m_tester[idx] = tester;
     }
@@ -63,7 +63,8 @@ public class TestExeModel {
      * object.
      * @param project The current project.
      */
-    public static void runTestAuto(Project project) {
+    public static void runTestAuto(final ModelJUnitGUI gui) {
+        Project project = gui.getProject();
         String output = new String();
         // Redirect the system.out to result viewer text area component
         PrintStream ps = System.out; //Backup the System.out for later restore
@@ -73,10 +74,10 @@ public class TestExeModel {
         project.getAlgo().runAlgorithm(0);
         if (m_tester[0] instanceof RandomTester) {
             RandomTester tester = (RandomTester) m_tester[0];
-            tester.setResetProbability(Parameter.getResetProbability());
+            tester.setResetProbability(project.getResetProbability());
         }
         // Set up coverage matrix to check the test result
-        boolean[] bCoverage = Parameter.getCoverageOption();
+        boolean[] bCoverage = project.getCoverageOption();
         // Generate graph
         if (bCoverage[0] || bCoverage[1] || bCoverage[2] || bCoverage[3])
             m_tester[0].buildGraph();
@@ -103,11 +104,12 @@ public class TestExeModel {
 
         StringBuffer verbose = new StringBuffer();
         StringWriter sw = new StringWriter();
-        if (Parameter.getVerbosity()) {
+        if (project.getVerbosity()) {
             VerboseListener vl = new VerboseListener();
             m_tester[0].addListener(vl);
-            m_tester[0].addListener(new VisualisationListener());
         }
+        // We always want to see the tests drawn
+        m_tester[0].addListener(new VisualisationListener());
         // Redirect model's output to string
         Model md = m_tester[0].getModel();
         Writer defWriter = md.getOutput();
@@ -115,8 +117,6 @@ public class TestExeModel {
         // This writer updates the test results panel.
         // TODO: move this class into PanelResultViewer.
         Writer newWriter = new Writer() {
-            PanelResultViewer panel = PanelResultViewer.getResultViewerInstance();
-
             @Override
             public void close() throws IOException {
             }
@@ -131,7 +131,7 @@ public class TestExeModel {
                 for (int i = off; i < off + len; i++) {
                     str.append(cbuf[i]);
                 }
-                panel.updateRunTimeInformation(str.toString());
+                gui.getResultViewer().updateRunTimeInformation(str.toString());
             }
         };
         md.setOutput(newWriter);
@@ -147,7 +147,7 @@ public class TestExeModel {
         }
 
         // Generate tests
-        System.err.println("Generating " + project.getWalkLength() + " tests with " + m_tester[0]);
+        //System.err.println("Generating " + project.getWalkLength() + " tests with " + m_tester[0]);
         m_tester[0].generate(project.getWalkLength());
 
         // Print out generated model coverage metrics
