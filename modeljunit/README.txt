@@ -10,16 +10,25 @@
   metrics.  The principles behind ModelJUnit are described in Sections 5.2
   and 5.3 of our book: {{{http://www.cs.waikato.ac.nz/~marku/mbt} Mark Utting
   and Bruno Legeard: <Practical Model-Based Testing: A Tools Approach>,
-  Elsevier 2007}}.
+  Elsevier 2007}}.  The following tutorial chapter is the most comprehensive
+  introduction to ModelJUnit:
 
-  This is version 1.5 of ModelJUnit.  Note that it uses the annotations
-  feature of Java 5.0, so requires JDK 1.5 or higher to run.
+  Mark Utting.
+  "How to design extended finite state machine test models in Java."
+  In Justyna Zander, Ina Schieferdecker, and Pieter J. Mosterman,
+  editors, Model-Based Testing for Embedded Systems, chapter 6, pages
+  147-170. CRC Press, Taylor and Francis Group, Boca Raton, FL, 2012.  
+
+  This is version 2.0 of ModelJUnit.  Note that it uses the annotations
+  feature of Java 5.0, so requires JDK 1.5 or higher to run.  JDK 1.7 is
+  recommended (but note that the GUI tests currently require a JDK 1.6,
+  due to a bug in the Uispec4j libraries).
 
 
 Compilation
 
-  To compile modeljunit you need Maven 2.0.4 or higher from maven.apache.org.
-  Then you can run the following Maven command in this modeljunit directory
+  To compile ModelJUnit you need Maven 3.0 or higher from maven.apache.org.
+  Then you can run the following Maven command in this ModelJUnit directory
   (which should contain this README.txt file, a pom.xml file, and directories
   called jdsl and src). 
 
@@ -28,8 +37,17 @@ Compilation
 +-----------------+
 
   This will compile ModelJUnit, run its unit tests, and create a
-  modeljunit.jar file in the <<<target>>> directory.
+  modeljunit.jar file in the <<<target>>> directory.  This modeljunit.jar
+  file is all you need to include ModelJUnit in your own projects,
+  or to run the GUI interface of ModelJUnit.
 
+  However, if you want to view or edit the source code of ModelJUnit,
+  it is useful to set up an Eclipse project for it.  To do this, run
+  the following Maven command:
+
++----------------------+
+  mvn eclipse:eclipse -DdownloadSources=true
++----------------------+
 
 Documentation
 
@@ -49,9 +67,32 @@ Documentation
 
 Using ModelJUnit
 
-  See {{{http://www.cs.waikato.ac.nz/~marku/mbt/modeljunit} instructions
-  and examples}} on how to use ModelJUnit to generate tests.  
-  There are also lots of examples in the 
+  Double-click on the modeljunit.jar file to run the ModelJUnit GUI.
+  You can immediately experiment with generating tests from any of the
+  example models.  The source code for these example models is in the
   <<<src/main/java/nz/ac/modeljunit/examples>>>
   directory of this distribution.
 
+  To load your own model, you should write your model class so that
+  it implements the <<<nz.ac.waikato.modeljunit.FsmModel>>> interface.
+  It is recommended to add a simple <<<main>>> method like the following,
+  and then export your model as a Runnable Jar File.
+
++----------------------+
+  public static void main(String args[])
+  {
+    // create your model and a test generation algorithm
+    Tester tester = new RandomTester(new YourModel());
+
+    // ask to print the generated tests
+    tester.addListener("verbose");
+
+    // generate a small test suite of 20 steps
+    tester.generate(20);
+  }
++----------------------+
+
+  Then you can execute your .jar file to generate tests, or you can
+  run the ModelJUnit GUI, create a new project and load in your .jar
+  file to explore your model and experiment with different test generation
+  strategies and options.
