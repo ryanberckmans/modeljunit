@@ -92,7 +92,7 @@ public class UndoThing
      
      public void actionPerformed(ActionEvent e)
      {
-        System.out.println("undo");
+        // System.out.println("undo");
         if (canUndo()) {undo();}
      }
   }

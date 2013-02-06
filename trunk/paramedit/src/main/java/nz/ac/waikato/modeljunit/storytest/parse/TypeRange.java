@@ -54,7 +54,7 @@ public class TypeRange
       double[][] ranges = new double[tup.mRange.size()][2];
       mRanges = tup.mRange.toArray(ranges);
     }
-    System.out.println(Arrays.toString(mRanges));
+    // System.out.println("DEBUG: mRanges=" + Arrays.toString(mRanges));
   }
   
   public double calculateRow(int row)

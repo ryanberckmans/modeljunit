@@ -28,6 +28,7 @@ public class MCDCSuggestionStrategyTest
     compareValues(PATH + "StandardTable.txt", PATH + "Empty.txt", FACTORY);
   }
 
+  // TODO: figure out more thorough input data and output data for this test!
   public void testRand()
     throws IOException, FileNotFoundException
   {

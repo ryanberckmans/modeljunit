@@ -214,7 +214,7 @@ public class CalcTablePanel
              boolean isSelected, int rowIndex, int vColIndex) {
  
          mComponent.setText((String)value);
-         System.out.println(value);
+         // System.out.println("DEBUG: getTableCellEditorComponent value=" + value);
          mRow = rowIndex;
          mColumn = vColIndex;
          mPrevious = (String)value;
@@ -223,7 +223,7 @@ public class CalcTablePanel
  
      public Object getCellEditorValue() {
         if (mPrevious.equals(mComponent.getText())) {return mPrevious;}
-        System.out.println(mComponent.getText());
+        // System.out.println("DEBUG: getCellEditorValue " + mComponent.getText());
         Command command;
         if (mRow == 0) {
           command = new SetColumnNameCommand(mCalc, mColumn,
@@ -414,7 +414,7 @@ public class CalcTablePanel
       public void actionPerformed(ActionEvent e)
       {
          super.actionPerformed(e);
-         System.out.println("undo");
+         // System.out.println("undo");
          if (getUndoInterface().canUndo()) {getUndoInterface().undo();}
       }
    }

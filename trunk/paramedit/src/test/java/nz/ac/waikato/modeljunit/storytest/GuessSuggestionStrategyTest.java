@@ -28,6 +28,8 @@ public class GuessSuggestionStrategyTest
     compareValues(PATH + "StandardTable.txt", PATH + "StandardGuess.txt", FACTORY);
   }
 
+  // TODO: figure out better inputs for this test.
+  //       (Every input table seems to generate no suggestions!)
   public void testRand()
     throws IOException, FileNotFoundException
   {

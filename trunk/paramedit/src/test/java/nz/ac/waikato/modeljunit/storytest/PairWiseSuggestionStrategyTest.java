@@ -28,6 +28,8 @@ public class PairWiseSuggestionStrategyTest
     compareValues(PATH + "StandardTable.txt", PATH + "Empty.txt", FACTORY);
   }
 
+  // TODO: figure out more thorough input data and output data for this test!
+  //       Why do the RandPair lines start with '--' rather than a pipe character?
   public void testRand()
     throws IOException, FileNotFoundException
   {

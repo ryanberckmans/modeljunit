@@ -33,7 +33,7 @@ Basic constructor for SetValueCommand
    
    public void execute()
    {
-      System.out.println("execute");
+      // System.out.println("execute");
       mTable.setValue(mRow, mColumn, mValue);
    }
    

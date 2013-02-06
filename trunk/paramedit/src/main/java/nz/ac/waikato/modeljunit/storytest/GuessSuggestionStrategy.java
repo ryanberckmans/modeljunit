@@ -11,6 +11,34 @@ import java.util.TreeSet;
 import java.lang.NumberFormatException;
 import java.util.Arrays;
 
+/**
+ * The Guess Suggestion strategy.
+ * 
+ * First the Parameters of the table are ordered, such that booleans are dealt with first then integers.
+ * The algorithm takes as arguments a set of rows R and a parameter p to split upon,
+ * and a current guess g of what covers these rows. The algorithm splits R into groups
+ * of rows R' such that each group in R' has the same value for the parameter p.
+ * From here every set of rows s in R' is enumerated.  If every row in s agrees on
+ * the result then the current guess for the set s is added to the set of suggestions G.
+ * Otherwise this set of rows s is fed back into the algorithm with its guess and
+ * to be split on the next parameter.  For each set s the guess g is updated so as to
+ * guess that for every value of p less than s's value of p but greater than the
+ * previous's value of p the result will be the same.
+ * 
+ * If this algorithm gets to the end and finds two rows with identical parameters
+ * but different results then it adds a contradiction suggestion.
+ *
+ * The algorithm starts with the entire table being fed in, with splitting on
+ * the first parameter and a guess that every parameter doesn't care about anything else.
+ *
+ * Next is the pruning stage which takes the set of suggestions generated
+ * and in instances where two suggestions are identical except for one parameter,
+ * then these two parameters are attempted to be merged, if they happen to be
+ * contiguous with one another. For example one says p goes from 5...7 and the
+ * other says p goes from 7...15.
+ *
+ * @author Simon Ware
+ */
 public class GuessSuggestionStrategy
    extends AbstractSuggestionStrategy
    implements Observer, Subject, SuggestionStrategy
@@ -176,12 +204,12 @@ public class GuessSuggestionStrategy
    
    private void guess()
    {
-      System.out.println("guess");
+      // System.out.println("guess");
       mSuggestions.clear();
       int result = -1;
       CalcTable calc = getCalcTable();
       if (calc.rows() == 0) {return;}
-      System.out.println(calc.toString());
+      // System.out.println(calc.toString());
       for (int c = 0; c < calc.columns(); c++) {
          if (calc.isResult(c)) {
             result = c; break;
@@ -902,18 +930,18 @@ siftdouble(columnorder, resultcolumn, rows, isBoolean, guesses, depth, currentgu
      
      public Bound merge(Bound b)
      {
-       System.out.println("merge");
+       // System.out.println("merge");
        if (b instanceof DontCare) {return b;}
-       System.out.println("merge2");
+       // System.out.println("merge2");
        if (!(b instanceof BoundDouble)) {return null;}
        BoundDouble bd = (BoundDouble) b;
-       System.out.println(this + " vs " + bd);
+       // System.out.println(this + " vs " + bd);
        if (bd.mLower == mUpper) {
          return new BoundDouble(mLower, bd.mUpper);
        } else if (mLower == bd.mUpper) {
          return new BoundDouble(bd.mLower, mUpper);
        }
-       System.out.println(this + " vs " + bd);
+       // System.out.println(this + " vs " + bd);
        return null;
      }
      

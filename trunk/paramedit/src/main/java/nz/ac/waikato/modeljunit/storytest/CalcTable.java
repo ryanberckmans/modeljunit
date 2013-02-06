@@ -72,7 +72,7 @@ public class CalcTable
      }
      mMatrix = new ArrayList<List<String>>();
      mHighlighted = new HashSet<Integer>();
-     System.out.println("addrow");
+     // System.out.println("addrow");
      addRow();
    }
    
@@ -198,7 +198,7 @@ public class CalcTable
     */
    private List<String> createNewRow()
    {
-      System.out.println("columns(): = " + columns() + "\tmColumns.size() = " + mColumns.size());
+      // System.out.println("columns(): = " + columns() + "\tmColumns.size() = " + mColumns.size());
       List<String> list = new ArrayList<String>(columns());
       for(int i = 0; i < mColumns.size(); i++) {
          list.add("");
@@ -538,17 +538,16 @@ public class CalcTable
             return false;
          } catch (IllegalArgumentException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            //e.printStackTrace();
          } catch (InstantiationException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            //e.printStackTrace();
          } catch (IllegalAccessException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            //e.printStackTrace();
          } catch (InvocationTargetException e) {
-           System.out.println(s);
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            // e.printStackTrace();
          }
          return false;
       }
