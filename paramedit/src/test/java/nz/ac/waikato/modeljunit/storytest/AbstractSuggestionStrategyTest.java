@@ -33,10 +33,10 @@ public abstract class AbstractSuggestionStrategyTest
     Set<List<String>> tac = new HashSet<List<String>>(actualSuggestions);
     tex.removeAll(actualSuggestions);
     tac.removeAll(expectedSuggestions);
-    System.out.println("expected");
-    System.out.println(tex);
-    System.out.println("actual");
-    System.out.println(tac);
+//    System.out.println("expected");
+//    System.out.println(tex);
+//    System.out.println("actual");
+//    System.out.println(tac);
     assertEquals(expectedSuggestions, actualSuggestions);
   }
 

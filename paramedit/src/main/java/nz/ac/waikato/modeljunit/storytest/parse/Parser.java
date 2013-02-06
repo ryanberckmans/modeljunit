@@ -14,17 +14,26 @@ import nz.ac.waikato.modeljunit.storytest.CalcTable;
  */
 public class Parser
 {
+
+  static void debugPrintln(String msg) {
+      // System.out.println(msg);
+  }
+
+  static void debugPrint(String msg) {
+      // System.out.print(msg);
+  }
+
   static Tuple2 D(String string, int depth) throws ParseException
   {
-    System.out.println("D:" + depth);
+    debugPrintln("D:" + depth);
     int tint = depth;
     boolean decimal = false;
     if (string.length() <= depth || !(string.charAt(tint) >= '0' && string.charAt(tint) <= '9')) {
-      System.out.println(string);
+      debugPrintln(string);
       for (int i = 0; i < depth; i++) {
-        System.out.print(" ");
+        debugPrint(" ");
       }
-      System.out.println("^");
+      debugPrintln("^");
       throw new ParseException("Expected Digit", depth);
     }
     while (tint < string.length()) {
@@ -50,48 +59,48 @@ public class Parser
   
   static int R(String string, int depth, Tuple tup) throws ParseException
   {
-    System.out.println("R:" + depth);
+    debugPrintln("R:" + depth);
     Tuple2 tup2 = D(string, depth);
     depth = tup2.mDepth;
     double first = tup2.mDouble;
     double second = tup2.mDouble;
-    System.out.println("R:" + depth);
+    debugPrintln("R:" + depth);
     if (string.startsWith("...", depth)) {
       depth += 3;
-      System.out.println("R:" + depth);
+      debugPrintln("R:" + depth);
       tup2 = D(string, depth);
       depth = tup2.mDepth;
       second = tup2.mDouble;
     }
     tup.mRange.add(new double[]{first, second});
-    System.out.println(tup.mRange);
-    System.out.println(string);
+    debugPrintln("" + tup.mRange);
+    debugPrintln(string);
     for (int i = 0; i < depth; i++) {
-      System.out.print(" ");
+        debugPrint(" ");
     }
-    System.out.println("^");
-    System.out.println("R:" + depth);
+    debugPrintln("^");
+    debugPrintln("R:" + depth);
     return depth;
   }
   
   static int O(String string, int depth, Tuple tup) throws ParseException
   {
-    System.out.println("O:" + depth);
+    debugPrintln("O:" + depth);
     depth = R(string, depth, tup);
     if (!string.startsWith(",", depth)) {return depth;}
     depth++;
     depth = O(string, depth, tup);
-    System.out.println(string);
+    debugPrintln(string);
     for (int i = 0; i < depth; i++) {
-      System.out.print(" ");
+        debugPrint(" ");
     }
-    System.out.println("^");
+    debugPrintln("^");
     return depth;
   }
   
   static int S(String string, int depth, Tuple tup) throws ParseException
   {
-    System.out.println("S:" + depth);
+    debugPrintln("S:" + depth);
     if (string.startsWith("Boolean", depth)) {
       depth += "Boolean".length();
       tup.mType = Boolean.class;
@@ -103,11 +112,11 @@ public class Parser
         depth = O(string, depth, tup);
       }
     }
-    System.out.println(string);
+    debugPrintln(string);
     for (int i = 0; i < depth; i++) {
-      System.out.print(" ");
+        debugPrint(" ");
     }
-    System.out.println("^");
+    debugPrintln("^");
     return depth;
   }
   
@@ -127,10 +136,10 @@ public class Parser
       }
       depth++;
     }
-    System.out.println(tup.mDepth + "," + depth);
-    System.out.println(tup.mDepth + "," + (depth - tup.mDepth));
+    debugPrintln(tup.mDepth + "," + depth);
+    debugPrintln(tup.mDepth + "," + (depth - tup.mDepth));
     String name = string.substring(tup.mDepth, depth);
-    System.out.println(name);
+    debugPrintln(name);
     tup.mDepth = depth;
     return new Variable(name, calc);
   }
@@ -164,12 +173,12 @@ public class Parser
   {
     Function func1 = factor(string, calc, tup);
     int depth = tup.mDepth;
-    System.out.println("TERM");
-    System.out.println(string);
+    debugPrintln("TERM");
+    debugPrintln(string);
     for (int i = 0; i < depth; i++) {
-      System.out.print(" ");
+        debugPrint(" ");
     }
-    System.out.println("^");
+    debugPrintln("^");
     if (string.length() <= depth) {return func1;}
     if (string.charAt(depth) == '*' || string.charAt(depth) == '/') {
       char mod = string.charAt(depth);
@@ -189,15 +198,15 @@ public class Parser
   {
     Function func1 = term(string, calc, tup);
     int depth = tup.mDepth;
-    System.out.println("EXP");
-    System.out.println(string);
+    debugPrintln("EXP");
+    debugPrintln(string);
     for (int i = 0; i < depth; i++) {
-      System.out.print(" ");
+        debugPrint(" ");
     }
-    System.out.println("^");
+    debugPrintln("^");
     if (string.length() <= depth) {return func1;}
     if (string.charAt(depth) == '+' || string.charAt(depth) == '-') {
-      System.out.println("plus | minus");
+      debugPrintln("plus | minus");
       char mod = string.charAt(depth);
       depth++;
       tup.mDepth = depth;
@@ -264,11 +273,11 @@ public class Parser
     } catch(ParseException pe) {
       depth = O(string, depth, tup);
     }
-    System.out.println(string);
+    debugPrintln(string);
     for (int i = 0; i < depth; i++) {
-      System.out.print(" ");
+        debugPrint(" ");
     }
-    System.out.println("^");
+    debugPrintln("^");
     if (depth != string.length()) {
       throw new ParseException("Not all matched", depth); 
     }

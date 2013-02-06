@@ -29,7 +29,7 @@ public class Variable
   
   public double calculate(int row)
   {
-    System.out.println(mColumn + "\tnum = " + mTable.getColumnNum(mColumn));
+    // System.out.println("DEBUG: mColumn=" + mColumn + "\tnum = " + mTable.getColumnNum(mColumn));
     String val = mTable.getValue(row, mTable.getColumnNum(mColumn));
     if (val == "") {
       return 0;

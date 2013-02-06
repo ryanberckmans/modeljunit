@@ -6,6 +6,24 @@ import java.util.Set;
 import java.util.List;
 import java.lang.NumberFormatException;
 
+/**
+ * Implements the MCDC (Modified Condition Decision Coverage) strategy.
+ * 
+ * <pre>
+ * For each test t in the Table:
+ *  For each parameter p in the test:
+ *    if p is an integer the MCDC suggestion strategy generates two suggestions
+ *      s1 and s2 for possible testing strategies. Both suggestions s1 and s2
+ *      are identical to the test t except that for parameter p, instead of 
+ *      having p s1 has p – 1 and s2 has p + 1. Then as a heuristic to cut
+ *      down on the number of suggestions, s1 and s2 will only be added to the
+ *      suggestion set if neither s1 or s2 is already contained in the Table.
+ * </pre>
+ *     
+ * The rationale behind this is that if one of the suggestions is already contained
+ * in the test suite then the other suggestion is unlikely to be needed to cover that boundary.
+ * @author Simon Ware
+ */
 public class MCDCSuggestionStrategy
    extends AbstractSuggestionStrategy
    implements Observer, Subject, SuggestionStrategy
