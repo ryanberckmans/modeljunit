@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>nz.ac.waikato.modeljunit</groupId>
   <artifactId>modeljunit-projects</artifactId>
-  <version>2.2</version>
+  <version>2.3-SNAPSHOT</version>
   <packaging>pom</packaging>
   <url>http://modeljunit.sourceforge.net</url>
   <organisation>
@@ -18,9 +18,9 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:svn:http://svn.code.sf.net/p/modeljunit/code/tags/modeljunit-projects-2.2/trunk</connection>
-    <developerConnection>scm:svn:svn+ssh://svn.code.sf.net/p/modeljunit/code/tags/modeljunit-projects-2.2/trunk</developerConnection>
-    <url>http://svn.code.sf.net/p/modeljunit/code/tags/modeljunit-projects-2.2/trunk</url>
+    <connection>scm:svn:http://svn.code.sf.net/p/modeljunit/code/trunk</connection>
+    <developerConnection>scm:svn:svn+ssh://svn.code.sf.net/p/modeljunit/code/trunk</developerConnection>
+    <url>http://svn.code.sf.net/p/modeljunit/code/trunk</url>
   </scm>
   <!-- We still need the CZT repository for jung dependencies -->
   <repositories>
