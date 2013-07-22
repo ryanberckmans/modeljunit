@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
+import org.apache.commons.collections15.Transformer;
+import org.apache.commons.collections15.TransformerUtils;
+
 import nz.ac.waikato.jdsl.graph.api.Edge;
 import nz.ac.waikato.jdsl.graph.api.EdgeIterator;
 import nz.ac.waikato.modeljunit.GraphListener;
@@ -32,7 +35,6 @@ import edu.uci.ics.jung.algorithms.layout.ISOMLayout;
 import edu.uci.ics.jung.algorithms.layout.KKLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.algorithms.layout.SpringLayout;
-import edu.uci.ics.jung.algorithms.layout.SpringLayout.LengthFunction;
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
 
 /**
@@ -47,7 +49,7 @@ public class JUNGHelper {
         CIRCLE, FR, SPRING, KK, ISOM
     }
 
-    public static final LengthFunction<Object> UNITLENGTHFUNCTION = new SpringLayout.UnitLengthFunction<Object>(200);
+    public static final Transformer<Object,Integer> UNITLENGTHFUNCTION = TransformerUtils.constantTransformer(200);
 
     private DirectedSparseMultigraph<Object, Object> g;
 
