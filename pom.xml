@@ -14,7 +14,7 @@
   </issueManagement>
   <licenses>
     <license>
-      <name>GPL</name>
+      <name>GPL Version 3.0</name>
       <url>http://www.gnu.org/copyleft/gpl.txt</url>
     </license>
   </licenses>
@@ -27,20 +27,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <distributionManagement>
-    <repository>
-      <uniqueVersion>false</uniqueVersion>
-      <id>czt-sourceforge</id>
-      <name>CZT Sourceforge Repository</name>
-      <url>http://czt.sourceforge.net/maven/repository</url>
-      <layout>default</layout>
-    </repository>
-    <snapshotRepository>
-      <uniqueVersion>false</uniqueVersion>
-      <id>czt-sourceforge</id>
-      <name>CZT Sourceforge Repository</name>
-      <url>http://czt.sourceforge.net/maven/repository</url>
-      <layout>default</layout>
-    </snapshotRepository>
     <site>
       <id>modeljunit.sourceforge.net</id>
       <name>ModelJUnit Website</name>
