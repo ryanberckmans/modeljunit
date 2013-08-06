@@ -36,11 +36,13 @@
       <timezone>+10</timezone>
     </developer>
   </developers>
+<!-- This is specified in the parent pom.xml
   <scm>
     <connection>scm:svn:http://svn.code.sf.net/p/modeljunit/code/trunk</connection>
     <developerConnection>scm:svn:svn+ssh://svn.code.sf.net/p/modeljunit/code/trunk</developerConnection>
     <url>http://svn.code.sf.net/p/modeljunit/code/trunk</url>
   </scm>
+-->
   <dependencies>
     <dependency>
       <groupId>asm</groupId>

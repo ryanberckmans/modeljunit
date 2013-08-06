@@ -19,10 +19,15 @@
   editors, Model-Based Testing for Embedded Systems, chapter 6, pages
   147-170. CRC Press, Taylor and Francis Group, Boca Raton, FL, 2012.  
 
-  This is version 2.0 of ModelJUnit.  Note that it uses the annotations
+  This is version 2.3 of ModelJUnit.  Note that it uses the annotations
   feature of Java 5.0, so requires JDK 1.5 or higher to run.  JDK 1.7 is
-  recommended (but note that the GUI tests currently require a JDK 1.6,
-  due to a bug in the Uispec4j libraries).
+  recommended.
+
+  (But note that the GUI tests currently require a JDK 1.6,
+  due to a bug in the Uispec4j libraries.  So, if you want to run
+  the nz.ac.waikato.modeljunit.gui tests, you should first change your
+  default JRE (see Eclipse Preferences / Java / Installed JREs)
+  to a Java 1.6.x JRE.)
 
 
 Compilation
@@ -68,6 +73,8 @@ Documentation
 Using ModelJUnit
 
   Double-click on the modeljunit.jar file to run the ModelJUnit GUI.
+  (If you've built ModelJUnit yourself, use the '-with-dependencies'
+  .jar file in the <<<target>>> directory.)
   You can immediately experiment with generating tests from any of the
   example models.  The source code for these example models is in the
   <<<src/main/java/nz/ac/modeljunit/examples>>>
@@ -95,4 +102,7 @@ Using ModelJUnit
   Then you can execute your .jar file to generate tests, or you can
   run the ModelJUnit GUI, create a new project and load in your .jar
   file to explore your model and experiment with different test generation
-  strategies and options.
+  strategies and options.  Note that the 'Test Configuration' dialogue has
+  a right-hand panel that shows you a Java 'main' method to set up and run
+  your current configuration.
+
