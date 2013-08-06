@@ -18,6 +18,11 @@
       <url>http://www.gnu.org/copyleft/gpl.txt</url>
     </license>
   </licenses>
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
   <scm>
     <connection>scm:svn:http://svn.code.sf.net/p/modeljunit/code/trunk</connection>
     <developerConnection>scm:svn:svn+ssh://svn.code.sf.net/p/modeljunit/code/trunk</developerConnection>
@@ -26,14 +31,6 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-  <distributionManagement>
-    <site>
-      <id>modeljunit.sourceforge.net</id>
-      <name>ModelJUnit Website</name>
-      <url>scp://shell.sourceforge.net/home/project-web/modeljunit/htdocs</url>
-    </site>
-    <downloadUrl>http://czt.sourceforge.net/maven/repository</downloadUrl>
-  </distributionManagement>
   <modules>
     <module>modeljunit</module>
     <module>paramedit</module>
