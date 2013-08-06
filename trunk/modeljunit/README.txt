@@ -22,7 +22,6 @@
   This is version 2.3 of ModelJUnit.  Note that it uses the annotations
   feature of Java 5.0, so requires JDK 1.5 or higher to run.  JDK 1.7 is
   recommended.
-
   (But note that the GUI tests currently require a JDK 1.6,
   due to a bug in the Uispec4j libraries.  So, if you want to run
   the nz.ac.waikato.modeljunit.gui tests, you should first change your
