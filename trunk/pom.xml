@@ -28,6 +28,13 @@
     <developerConnection>scm:svn:svn+ssh://svn.code.sf.net/p/modeljunit/code/trunk</developerConnection>
     <url>http://svn.code.sf.net/p/modeljunit/code/trunk</url>
   </scm>
+  <developers>
+    <developer>
+      <id>marku</id>
+      <name>Mark Utting</name>
+      <email>marku@cs.waikato.ac.nz</email>
+    </developer>
+  </developers>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
