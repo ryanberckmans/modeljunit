@@ -3,11 +3,11 @@
   <parent>
     <groupId>nz.ac.waikato.modeljunit</groupId>
     <artifactId>modeljunit-projects</artifactId>
-    <version>2.5-SNAPSHOT</version>
+    <version>2.5</version>
     <relativePath>..</relativePath>
   </parent>
   <artifactId>modeljunit</artifactId>
-  <version>2.5-SNAPSHOT</version>
+  <version>2.5</version>
   <packaging>jar</packaging>
   <name>ModelJUnit</name>
   <description>
